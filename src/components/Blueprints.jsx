@@ -5,26 +5,26 @@ const projects = [
   {
     id: 'PRJ-01',
     title: 'FEAST_FLEET',
-    description: 'Serverless Food Delivery & Reservations Platform achieving 99.9% uptime. Features NLP chatbot ordering, real-time location tracking, and smart food search via image recognition.',
+    description: 'Serverless Food Delivery & Logistics Platform. Reduced order processing latency by 43% for 1,248 concurrent users by designing a serverless microservices architecture on AWS Lambda with decoupled, independently deployable services.',
     icon: Activity,
     metadata: [
-      { label: 'ARCH', value: 'Serverless, Event-Driven' },
+      { label: 'ARCH', value: 'Serverless Microservices' },
       { label: 'COMPUTE', value: 'AWS Lambda, API Gateway' },
       { label: 'DATA', value: 'DynamoDB, OpenSearch' },
-      { label: 'AI/ML', value: 'Amazon Lex, SageMaker' },
-      { label: 'ASYNC', value: 'SQS, EventBridge, SES' }
+      { label: 'AI/ML', value: 'Amazon Lex, SageMaker (74% intent res.)' },
+      { label: 'PERF', value: '312ms full-text search response' }
     ]
   },
   {
     id: 'PRJ-02',
     title: 'ROUTE_SAVVY',
-    description: 'Big Data Urban Mobility Optimizer. Processes continuous real-time streams of MTA transit, NYC traffic, and weather data to predict congestion and deliver dynamic route adjustments.',
+    description: 'MTA Transit Telemetry & Mobility Optimizer. Processes 112M+ daily signals with 99.87% system stability, cutting pathfinding latency by 17% across 14,321 simulations via distributed graph algorithms.',
     icon: Database,
     metadata: [
-      { label: 'STREAM', value: 'Apache Kafka' },
-      { label: 'PROCESS', value: 'Apache Spark (PySpark)' },
-      { label: 'LANG', value: 'Python' },
-      { label: 'MODELS', value: 'Scikit-learn Predictive' },
+      { label: 'STREAM', value: 'Apache Kafka, PySpark' },
+      { label: 'INFRA', value: 'Docker, Distributed Systems' },
+      { label: 'SCALE', value: '112M+ daily signals, <2 dropped events' },
+      { label: 'UPTIME', value: '99.87% over 8,432 hrs continuous' },
       { label: 'CLOUD', value: 'AWS / Azure Multi-Cloud' }
     ]
   },
@@ -46,7 +46,7 @@ const projects = [
 export default function Blueprints({ id }) {
   return (
     <section id={id} className="min-h-screen py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
-      
+
       {/* Section Header */}
       <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-8 gap-6">
         <div>
@@ -64,11 +64,11 @@ export default function Blueprints({ id }) {
         </div>
       </div>
 
-      {/* Grid Layout typical of schematics */}
+      {/* Grid Layout */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-yale-blue border sharp-border">
         {projects.map((project, idx) => {
           const Icon = project.icon
-          
+
           return (
             <motion.div
               key={project.id}
@@ -79,8 +79,8 @@ export default function Blueprints({ id }) {
               className="group relative bg-graphite-100 p-8 overflow-hidden hover:bg-yale-blue/10 transition-colors duration-200"
             >
               <div className="relative z-10 flex flex-col h-full">
-                
-                {/* Header line of the blueprint */}
+
+                {/* Header */}
                 <div className="flex items-start justify-between mb-8">
                   <div className="flex items-center gap-4">
                     <div className="p-3 border sharp-border text-yale-blue-light group-hover:text-stormy-teal-light group-hover:border-stormy-teal-light transition-colors duration-200">
@@ -104,29 +104,29 @@ export default function Blueprints({ id }) {
                 </p>
 
                 {/* Terminal Metadata Revealer */}
-                <div className="relative border-t sharp-border overflow-hidden transition-all duration-300 ease-out h-[50px] group-hover:h-[180px]">
-                  
+                <div className="relative border-t sharp-border overflow-hidden transition-all duration-300 ease-out h-[50px] group-hover:h-[200px]">
+
                   {/* Default State */}
                   <div className="absolute top-4 inset-x-0 font-mono text-xs text-alabaster/50 font-semibold flex items-center gap-2 group-hover:opacity-0 transition-opacity duration-200">
                     <div className="w-2 h-2 rounded-full bg-stormy-teal-light/50" />
                     HOVER TO EXTRACT METADATA
                   </div>
-                  
-                  {/* Hover State - Terminal Details */}
+
+                  {/* Hover State */}
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100 ease-out font-mono text-xs flex flex-col gap-y-3 pt-4">
                     {project.metadata.map((item, i) => (
                       <div key={i} className="flex gap-3">
-                        <span className="text-stormy-teal-light min-w-[65px] font-bold">{item.label}</span> 
+                        <span className="text-stormy-teal-light min-w-[65px] font-bold">{item.label}</span>
                         <span className="text-alabaster/90">{item.value}</span>
                       </div>
                     ))}
                   </div>
-                  
+
                 </div>
 
               </div>
 
-              {/* Decorative Schematic lines appearing on hover */}
+              {/* Decorative Schematic lines on hover */}
               <div className="absolute inset-0 pointer-events-none opacity-0 group-hover:opacity-10 transition-opacity duration-300">
                 <div className="absolute top-0 left-10 w-px h-full bg-stormy-teal-light" />
                 <div className="absolute top-10 w-full h-px bg-stormy-teal-light" />
@@ -135,7 +135,7 @@ export default function Blueprints({ id }) {
           )
         })}
       </div>
-      
+
     </section>
   )
 }
