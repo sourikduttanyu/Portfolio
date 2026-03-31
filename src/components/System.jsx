@@ -61,43 +61,59 @@ export default function System({ id }) {
         </div>
       </div>
 
-      {/* Grid of Brutalist Blocks */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      {/* Capability Manifest — full-width module rows */}
+      <div>
         {skillCategories.map((group, idx) => {
           const Icon = group.icon
-          
+
           return (
             <motion.div
               key={group.category}
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ ease: "easeOut", duration: 0.2, delay: idx * 0.05 }}
-              className="group border border-yale-blue bg-graphite-100 hover:bg-yale-blue/10 transition-colors duration-150 flex flex-col"
+              initial={{ opacity: 0, x: -24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ ease: 'easeOut', duration: 0.4, delay: idx * 0.09 }}
+              className="group relative border-b border-yale-blue last:border-b-0 overflow-hidden"
             >
-              {/* Top brutalist bar */}
-              <div className="border-b sharp-border bg-yale-blue/20 p-4 flex items-center justify-between">
-                <Icon className="text-yale-blue-light group-hover:text-stormy-teal-light transition-colors duration-150" size={20} strokeWidth={2} />
-                <span className="font-mono text-xs tracking-wider text-alabaster font-bold group-hover:text-brand-white transition-colors duration-150">
+              {/* Ghost category watermark */}
+              <div
+                className="absolute inset-y-0 right-0 flex items-center pointer-events-none select-none"
+                aria-hidden="true"
+              >
+                <span
+                  className="font-sans font-black uppercase leading-none"
+                  style={{ fontSize: '4.5rem', color: 'rgba(40,75,99,0.14)', letterSpacing: '-0.04em' }}
+                >
                   {group.category}
                 </span>
               </div>
-              
-              {/* Skills List */}
-              <div className="p-6 flex-grow flex flex-col gap-3">
+
+              {/* Module header */}
+              <div className="relative flex items-center gap-4 pt-6 pb-3">
+                <div className="flex items-center justify-center w-7 h-7 border border-yale-blue bg-yale-blue/15 group-hover:border-stormy-teal-light group-hover:bg-stormy-teal-light/10 transition-colors duration-200 flex-shrink-0">
+                  <Icon size={13} className="text-yale-blue-light group-hover:text-stormy-teal-light transition-colors duration-200" strokeWidth={2} />
+                </div>
+                <span className="font-mono text-xs tracking-widest text-alabaster font-bold group-hover:text-brand-white transition-colors duration-200 flex-shrink-0">
+                  {group.category}
+                </span>
+                <div className="flex-1 h-px bg-yale-blue/40" />
+                <span className="font-mono text-[10px] text-stormy-teal-light/55 flex-shrink-0 tracking-widest">
+                  {String(group.skills.length).padStart(2, '0')} MODULES
+                </span>
+              </div>
+
+              {/* Skills inline */}
+              <div className="relative pb-6 flex flex-wrap gap-x-8 gap-y-2.5">
                 {group.skills.map((skill, skillIdx) => (
-                  <div key={skill} className="flex items-center gap-3">
-                    <div className="w-1.5 h-1.5 bg-stormy-teal-light/30 group-hover:bg-stormy-teal-light transition-colors duration-150" style={{ transitionDelay: `${skillIdx * 30}ms` }} />
-                    <span className="font-sans text-sm text-alabaster/90 group-hover:text-brand-white transition-colors duration-150 font-medium tracking-tight">
+                  <div key={skill} className="flex items-center gap-2">
+                    <span className="font-mono text-[9px] text-stormy-teal-light/35 group-hover:text-stormy-teal-light/65 transition-colors duration-200 select-none">
+                      {String(skillIdx + 1).padStart(2, '0')}
+                    </span>
+                    <span className="font-sans text-sm text-alabaster/80 group-hover:text-brand-white transition-colors duration-200 font-medium">
                       {skill}
                     </span>
                   </div>
                 ))}
-              </div>
-
-              {/* Bottom decorative bracket */}
-              <div className="h-2 border-t border-yale-blue relative">
-                <div className="absolute top-0 right-0 w-8 h-[2px] bg-stormy-teal-light transform origin-right scale-x-0 group-hover:scale-x-100 transition-transform duration-200 ease-out" />
               </div>
             </motion.div>
           )
