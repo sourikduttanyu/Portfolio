@@ -61,3 +61,19 @@
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Aurora blob drift animations */
+@keyframes aurora-a {
+  0%, 100% { transform: translateY(0px)    scale(1.00); }
+  33%       { transform: translateY(-110px) scale(1.06); }
+  66%       { transform: translateY(65px)   scale(0.94); }
+}
+@keyframes aurora-b {
+  0%, 100% { transform: translateY(-55px)  scale(0.96); }
+  50%       { transform: translateY(90px)   scale(1.08); }
+}
+@keyframes aurora-c {
+  0%, 100% { transform: translateY(40px)   scale(1.04); }
+  40%       { transform: translateY(-95px)  scale(0.91); }
+  80%       { transform: translateY(55px)   scale(1.07); }
+}
