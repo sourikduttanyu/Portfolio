@@ -17,15 +17,15 @@ export default function ParticleField() {
     }
 
     const createParticles = () => {
-      // Density: 1 particle per ~22k px², capped at 65
-      const count = Math.min(Math.floor((canvas.width * canvas.height) / 22000), 65)
+      // Density: 1 particle per ~18k px², capped at 85
+      const count = Math.min(Math.floor((canvas.width * canvas.height) / 18000), 85)
       particles = Array.from({ length: count }, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.22,
-        vy: (Math.random() - 0.5) * 0.22,
-        r: Math.random() * 1.3 + 0.5,
-        o: Math.random() * 0.35 + 0.12,
+        vx: (Math.random() - 0.5) * 0.28,
+        vy: (Math.random() - 0.5) * 0.28,
+        r: Math.random() * 1.5 + 0.6,
+        o: Math.random() * 0.42 + 0.18,
       }))
     }
 
@@ -51,13 +51,13 @@ export default function ParticleField() {
           const dx = particles[i].x - particles[j].x
           const dy = particles[i].y - particles[j].y
           const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < 135) {
-            const alpha = (1 - dist / 135) * 0.18
+          if (dist < 150) {
+            const alpha = (1 - dist / 150) * 0.38
             ctx.beginPath()
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
             ctx.strokeStyle = `rgba(96,153,190,${alpha})`  // yale-blue-light
-            ctx.lineWidth = 0.5
+            ctx.lineWidth = 0.9
             ctx.stroke()
           }
         }

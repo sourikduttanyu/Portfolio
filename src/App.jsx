@@ -22,7 +22,7 @@ export default function App() {
 
       <StatusBar />
 
-      <main className="relative z-10 w-full max-w-7xl mx-auto px-4 lg:px-12 border-l border-r border-yale-blue min-h-screen bg-graphite-100/90">
+      <main className="relative z-10 w-full max-w-7xl mx-auto px-4 lg:px-12 border-l border-r border-yale-blue min-h-screen bg-graphite-100/80">
         <Hero id="hero" />
         <Blueprints id="blueprints" />
         <ServiceLogs id="logs" />
