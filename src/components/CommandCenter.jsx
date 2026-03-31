@@ -33,6 +33,14 @@ export default function CommandCenter({ id }) {
         <div className="absolute left-1/2 top-0 bottom-0 w-px bg-yale-blue" />
       </div>
 
+      {/* Section number marker */}
+      <div className="flex items-center gap-3 mb-12 max-w-3xl w-full mx-auto">
+        <span className="font-mono text-xs text-alabaster/25 font-bold tracking-widest">04</span>
+        <div className="flex-1 h-px bg-yale-blue/30" />
+        <span className="font-mono text-[10px] text-alabaster/20 tracking-[0.2em] uppercase">DIRECT_LINE</span>
+        <div className="w-12 h-px bg-alabaster/10" />
+      </div>
+
       <div className="max-w-3xl w-full mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 20 }}

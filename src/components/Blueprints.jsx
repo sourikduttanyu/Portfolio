@@ -305,8 +305,18 @@ export default function Blueprints({ id }) {
     <section id={id} className="py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
 
       {/* Section Header */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-8 gap-6">
+      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-8 gap-6 relative overflow-hidden">
+        {/* Large watermark number */}
+        <div
+          className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
+          style={{ fontSize: 160, color: 'rgba(40,75,99,0.18)', lineHeight: 1 }}
+          aria-hidden="true"
+        >01</div>
+
         <div>
+          <div className="font-mono text-[10px] text-stormy-teal-light tracking-[0.25em] uppercase mb-3">
+            // SCHEMATIC_ARCHIVE — PROJ_COUNT: {projects.length}
+          </div>
           <h2 className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
             The Blueprints
           </h2>

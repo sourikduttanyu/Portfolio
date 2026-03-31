@@ -34,19 +34,30 @@ export default function System({ id }) {
     <section id={id} className="min-h-screen py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
       
       {/* Section Header */}
-      <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-8 gap-6">
-        <div>
-          <h2 className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
-            The System
-          </h2>
-          <p className="font-mono text-alabaster/80 mt-4 text-sm max-w-xl leading-relaxed">
-            Operational capability matrices. Brutalist block structure
-            representing foundational to advanced proficiency.
-          </p>
+      <div className="mb-16 relative">
+        {/* Separator with section number */}
+        <div className="flex items-center gap-3 mb-8">
+          <span className="font-mono text-xs text-yale-blue-light font-bold tracking-widest">03</span>
+          <div className="flex-1 h-px bg-yale-blue" />
+          <span className="font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">CAPABILITY_MATRIX</span>
+          <div className="w-12 h-px bg-yale-blue-light/50" />
         </div>
-        <div className="font-mono text-xs text-stormy-teal-light text-right hidden md:block font-semibold tracking-wider">
-          NODE_COUNT: {skillCategories.reduce((acc, cat) => acc + cat.skills.length, 0)} <br />
-          INTEGRITY: 100%
+
+        <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6">
+          <div>
+            <h2 className="text-4xl sm:text-5xl font-sans font-extrabold tracking-tight uppercase">
+              <span style={{ WebkitTextStroke: '2px rgba(96,153,190,0.85)', color: 'transparent' }}>THE </span>
+              <span className="text-brand-white">SYSTEM</span>
+            </h2>
+            <p className="font-mono text-alabaster/80 mt-4 text-sm max-w-xl leading-relaxed">
+              Operational capability matrices. Brutalist block structure
+              representing foundational to advanced proficiency.
+            </p>
+          </div>
+          <div className="font-mono text-xs text-stormy-teal-light text-right hidden md:block font-semibold tracking-wider">
+            NODE_COUNT: {skillCategories.reduce((acc, cat) => acc + cat.skills.length, 0)} <br />
+            INTEGRITY: 100%
+          </div>
         </div>
       </div>
 

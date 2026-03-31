@@ -49,19 +49,36 @@ export default function ServiceLogs({ id }) {
     <section id={id} className="min-h-screen py-32 border-b border-yale-blue relative z-10">
 
       {/* Section Header */}
-      <div className="mb-16 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-8 gap-6">
-        <div>
-          <h2 className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
-            Service Logs
-          </h2>
-          <p className="font-mono text-alabaster/80 mt-4 text-sm max-w-lg leading-relaxed">
-            Career telemetry & operational history. <br />
-            Chronological documentation of professional deployments.
-          </p>
+      <div className="mb-16 relative">
+        {/* Separator with section number */}
+        <div className="flex items-center gap-3 mb-8">
+          <span className="font-mono text-xs text-stormy-teal-light font-bold tracking-widest">02</span>
+          <div className="flex-1 h-px bg-yale-blue" />
+          <span className="font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">CAREER_TELEMETRY</span>
+          <div className="w-12 h-px bg-stormy-teal-light/50" />
         </div>
-        <div className="font-mono text-xs text-stormy-teal-light text-right hidden md:block font-semibold tracking-wider">
-          RECORDS: {experienceLog.length} <br />
-          STATE: VERIFIED
+
+        <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6">
+          <div>
+            <h2 className="text-4xl sm:text-5xl font-sans font-extrabold tracking-tight uppercase">
+              <span className="text-brand-white">Service </span>
+              <span style={{ WebkitTextStroke: '2px #539a9e', color: 'transparent' }}>Logs</span>
+            </h2>
+            <div className="font-mono text-xs mt-5 space-y-1.5">
+              <p>
+                <span className="text-stormy-teal-light mr-2">$</span>
+                <span className="text-alabaster/55">query --table=work_history --order=DESC --format=highlights</span>
+              </p>
+              <p>
+                <span className="text-yale-blue-light mr-2">→</span>
+                <span className="text-alabaster/45">{experienceLog.length} records found | DRI certified | chronological</span>
+              </p>
+            </div>
+          </div>
+          <div className="font-mono text-xs text-stormy-teal-light text-right hidden md:block font-semibold tracking-wider">
+            RECORDS: {experienceLog.length} <br />
+            STATE: VERIFIED
+          </div>
         </div>
       </div>
 
