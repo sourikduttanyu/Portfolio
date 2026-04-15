@@ -115,7 +115,12 @@ function TechBadge({ name, category }) {
   return (
     <div
       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-mono text-[11px] font-semibold"
-      style={{ backgroundColor: bg, color, border: `1px solid ${color}33` }}
+      style={{
+        backgroundColor: bg,
+        color,
+        border: `1px solid ${color}44`,
+        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.09), 0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px ${color}18`,
+      }}
     >
       <Icon size={11} strokeWidth={2.5} />
       {name}
@@ -302,7 +307,7 @@ export default function Blueprints({ id }) {
   }
 
   return (
-    <section id={id} className="py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
+    <section id={id} aria-labelledby="blueprints-heading" className="py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
 
       {/* Section Header */}
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-8 gap-6 relative overflow-hidden">
@@ -317,7 +322,7 @@ export default function Blueprints({ id }) {
           <div className="font-mono text-[10px] text-stormy-teal-light tracking-[0.25em] uppercase mb-3">
             // SCHEMATIC_ARCHIVE — PROJ_COUNT: {projects.length}
           </div>
-          <h2 className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
+          <h2 id="blueprints-heading" className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
             The Blueprints
           </h2>
           <p className="font-mono text-alabaster/75 mt-4 text-sm max-w-lg leading-relaxed">
@@ -352,15 +357,17 @@ export default function Blueprints({ id }) {
           <div className="flex gap-2">
             <button
               onClick={() => scrollTo(-1)}
+              aria-label="Previous project"
               className="p-2 border border-yale-blue hover:border-stormy-teal-light text-alabaster/50 hover:text-stormy-teal-light transition-colors duration-150"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={18} aria-hidden="true" />
             </button>
             <button
               onClick={() => scrollTo(1)}
+              aria-label="Next project"
               className="p-2 border border-yale-blue hover:border-stormy-teal-light text-alabaster/50 hover:text-stormy-teal-light transition-colors duration-150"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={18} aria-hidden="true" />
             </button>
           </div>
 

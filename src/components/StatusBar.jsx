@@ -46,8 +46,16 @@ export default function StatusBar() {
     return () => observer.disconnect()
   }, [])
 
+  const ariaLabels = {
+    hero:       'Go to introduction',
+    blueprints: 'Go to projects',
+    logs:       'Go to experience',
+    system:     'Go to skills',
+    contact:    'Go to contact',
+  }
+
   return (
-    <nav className="fixed right-0 top-0 bottom-0 z-50 flex flex-col items-center w-12 sm:w-16 border-l border-yale-blue bg-graphite-100 w-[48px] sm:w-[64px]">
+    <nav aria-label="Page sections" className="fixed right-0 top-0 bottom-0 z-50 flex flex-col items-center w-12 sm:w-16 border-l border-yale-blue bg-graphite-100 w-[48px] sm:w-[64px]">
       {/* Background Track */}
       <div className="absolute top-0 bottom-0 left-1/2 w-px bg-yale-blue -translate-x-1/2" />
       
@@ -66,11 +74,12 @@ export default function StatusBar() {
             <a
               key={item.id}
               href={`#${item.id}`}
+              aria-label={ariaLabels[item.id]}
+              aria-current={isActive ? 'true' : undefined}
               className={cn(
                 "relative group flex items-center justify-center w-full transition-all duration-200 ease-out",
                 isActive ? "text-brand-white" : "text-yale-blue-light hover:text-stormy-teal-light"
               )}
-              title={item.label}
             >
               <div 
                 className={cn(

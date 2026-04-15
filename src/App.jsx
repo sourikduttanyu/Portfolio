@@ -10,6 +10,7 @@ import SideEffects from './components/SideEffects'
 export default function App() {
   return (
     <div className="relative min-h-screen bg-graphite-100 text-alabaster selection:bg-stormy-teal-light selection:text-graphite-100 font-sans antialiased sm:pr-16 pr-12">
+      <a href="#hero" className="skip-link">Skip to content</a>
 
       {/* Layer 1: floating network nodes + aurora + side waves */}
       <ParticleField />

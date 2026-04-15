@@ -38,6 +38,8 @@ export default function SideEffects() {
   const rightPaths = useMemo(() => RIGHT_WAVES.map(w => genPath(55, w.amp, w.freq, w.phase)), [])
 
   useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
     const ctx = gsap.context(() => {
       leftRef.current.querySelectorAll('path').forEach((path, i) => {
         gsap.to(path, {
@@ -67,28 +69,25 @@ export default function SideEffects() {
         style={{ zIndex: 1 }}
         aria-hidden="true"
       >
-        {/* Left column — blobs positioned ~70% in-frame */}
+        {/* Left column — no filter:blur, soft gradient stops handle falloff */}
         <div style={{
           position: 'fixed', left: -30, top: '6%',
           width: 460, height: 520,
-          background: 'radial-gradient(circle, rgba(83,154,158,0.45) 0%, transparent 65%)',
-          filter: 'blur(40px)',
+          background: 'radial-gradient(circle, rgba(83,154,158,0.28) 0%, rgba(83,154,158,0.12) 40%, rgba(83,154,158,0.04) 65%, transparent 80%)',
           borderRadius: '50%',
           animation: 'aurora-a 20s ease-in-out infinite',
         }} />
         <div style={{
           position: 'fixed', left: -20, top: '44%',
           width: 360, height: 420,
-          background: 'radial-gradient(circle, rgba(96,153,190,0.38) 0%, transparent 65%)',
-          filter: 'blur(35px)',
+          background: 'radial-gradient(circle, rgba(96,153,190,0.24) 0%, rgba(96,153,190,0.10) 40%, rgba(96,153,190,0.03) 65%, transparent 80%)',
           borderRadius: '50%',
           animation: 'aurora-b 28s ease-in-out infinite',
         }} />
         <div style={{
           position: 'fixed', left: -25, top: '76%',
           width: 400, height: 360,
-          background: 'radial-gradient(circle, rgba(83,154,158,0.32) 0%, transparent 65%)',
-          filter: 'blur(38px)',
+          background: 'radial-gradient(circle, rgba(83,154,158,0.20) 0%, rgba(83,154,158,0.08) 40%, rgba(83,154,158,0.02) 65%, transparent 80%)',
           borderRadius: '50%',
           animation: 'aurora-c 35s ease-in-out infinite',
         }} />
@@ -97,24 +96,21 @@ export default function SideEffects() {
         <div style={{
           position: 'fixed', right: 30, top: '15%',
           width: 420, height: 480,
-          background: 'radial-gradient(circle, rgba(96,153,190,0.40) 0%, transparent 65%)',
-          filter: 'blur(40px)',
+          background: 'radial-gradient(circle, rgba(96,153,190,0.26) 0%, rgba(96,153,190,0.11) 40%, rgba(96,153,190,0.03) 65%, transparent 80%)',
           borderRadius: '50%',
           animation: 'aurora-b 24s ease-in-out infinite reverse',
         }} />
         <div style={{
           position: 'fixed', right: 25, top: '58%',
           width: 380, height: 380,
-          background: 'radial-gradient(circle, rgba(83,154,158,0.35) 0%, transparent 65%)',
-          filter: 'blur(36px)',
+          background: 'radial-gradient(circle, rgba(83,154,158,0.22) 0%, rgba(83,154,158,0.09) 40%, rgba(83,154,158,0.02) 65%, transparent 80%)',
           borderRadius: '50%',
           animation: 'aurora-a 30s ease-in-out infinite reverse',
         }} />
         <div style={{
           position: 'fixed', right: 35, top: '82%',
           width: 320, height: 320,
-          background: 'radial-gradient(circle, rgba(167,139,250,0.28) 0%, transparent 65%)',
-          filter: 'blur(38px)',
+          background: 'radial-gradient(circle, rgba(167,139,250,0.18) 0%, rgba(167,139,250,0.07) 40%, rgba(167,139,250,0.02) 65%, transparent 80%)',
           borderRadius: '50%',
           animation: 'aurora-c 22s ease-in-out infinite',
         }} />

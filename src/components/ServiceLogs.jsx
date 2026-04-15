@@ -46,7 +46,7 @@ const experienceLog = [
 
 export default function ServiceLogs({ id }) {
   return (
-    <section id={id} className="min-h-screen py-32 border-b border-yale-blue relative z-10">
+    <section id={id} aria-labelledby="logs-heading" className="min-h-screen py-32 border-b border-yale-blue relative z-10">
 
       {/* Section Header */}
       <div className="mb-16 relative">
@@ -60,7 +60,7 @@ export default function ServiceLogs({ id }) {
 
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6">
           <div>
-            <h2 className="text-4xl sm:text-5xl font-sans font-extrabold tracking-tight uppercase">
+            <h2 id="logs-heading" className="text-4xl sm:text-5xl font-sans font-extrabold tracking-tight uppercase">
               <span className="text-brand-white">Service </span>
               <span style={{ WebkitTextStroke: '2px #539a9e', color: 'transparent' }}>Logs</span>
             </h2>
