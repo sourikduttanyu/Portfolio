@@ -67,10 +67,10 @@ export default function CommandCenter({ id }) {
     'transition-colors duration-200 py-2.5 pl-6 pr-2 disabled:opacity-40'
 
   return (
-    <section id={id} className="py-32 relative z-10">
+    <section id={id} className="py-16 sm:py-24 lg:py-32 relative z-10">
 
       {/* Section number marker */}
-      <div className="flex items-center gap-3 mb-12">
+      <div className="flex items-center gap-3 mb-8 sm:mb-12">
         <span className="font-mono text-xs text-alabaster/25 font-bold tracking-widest">04</span>
         <div className="flex-1 h-px bg-yale-blue/30" />
         <span className="font-mono text-[10px] text-alabaster/20 tracking-[0.2em] uppercase">DIRECT_LINE</span>
@@ -105,7 +105,7 @@ export default function CommandCenter({ id }) {
             </div>
 
             {/* Form body */}
-            <form onSubmit={handleSubmit} className="flex flex-col flex-1 p-8 gap-8">
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1 p-5 sm:p-8 gap-6 sm:gap-8">
 
               <div>
                 <h2 className="text-3xl sm:text-4xl font-sans font-extrabold tracking-tight leading-tight">

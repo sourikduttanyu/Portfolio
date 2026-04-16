@@ -31,12 +31,12 @@ const skillCategories = [
 
 export default function System({ id }) {
   return (
-    <section id={id} aria-labelledby="system-heading" className="min-h-screen py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
+    <section id={id} aria-labelledby="system-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
       
       {/* Section Header */}
-      <div className="mb-16 relative">
+      <div className="mb-10 sm:mb-16 relative">
         {/* Separator with section number */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-5 sm:mb-8">
           <span className="font-mono text-xs text-yale-blue-light font-bold tracking-widest">03</span>
           <div className="flex-1 h-px bg-yale-blue" />
           <span className="font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">CAPABILITY_MATRIX</span>
@@ -49,7 +49,7 @@ export default function System({ id }) {
               <span style={{ WebkitTextStroke: '2px rgba(96,153,190,0.85)', color: 'transparent' }}>THE </span>
               <span className="text-brand-white">SYSTEM</span>
             </h2>
-            <p className="font-mono text-alabaster/80 mt-4 text-sm max-w-xl leading-relaxed">
+            <p className="font-mono text-alabaster/90 mt-4 text-sm max-w-xl leading-relaxed">
               Operational capability matrices. Brutalist block structure
               representing foundational to advanced proficiency.
             </p>
@@ -109,7 +109,7 @@ export default function System({ id }) {
                     <span className="font-mono text-[9px] text-stormy-teal-light/35 group-hover:text-stormy-teal-light/65 transition-colors duration-200 select-none">
                       {String(skillIdx + 1).padStart(2, '0')}
                     </span>
-                    <span className="font-sans text-sm text-alabaster/80 group-hover:text-brand-white transition-colors duration-200 font-medium">
+                    <span className="font-sans text-sm text-alabaster/90 group-hover:text-brand-white transition-colors duration-200 font-medium">
                       {skill}
                     </span>
                   </div>

@@ -6,7 +6,7 @@ const ease = [0.16, 1, 0.3, 1]
 
 export default function Hero({ id }) {
   return (
-    <section id={id} aria-labelledby="hero-heading" className="min-h-screen flex flex-col justify-center py-20 border-b border-yale-blue relative z-10">
+    <section id={id} aria-labelledby="hero-heading" className="min-h-screen flex flex-col justify-center py-14 sm:py-20 border-b border-yale-blue relative z-10">
       <div className="max-w-4xl">
 
         {/* System Status Label */}
@@ -50,7 +50,7 @@ export default function Hero({ id }) {
           className="relative max-w-2xl"
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-stormy-teal-light" />
-          <p className="font-mono text-alabaster/85 text-sm sm:text-base leading-relaxed pl-4 sm:pl-0">
+          <p className="font-mono text-alabaster/90 text-sm sm:text-base leading-relaxed pl-4 sm:pl-0">
             Software Engineer with 2+ years of experience building high-throughput distributed
             backend services. Strong focus on performance, telemetry, and reliability across cloud
             environments (Azure, AWS). MS in Computer Science at New York University.
