@@ -46,12 +46,12 @@ const experienceLog = [
 
 export default function ServiceLogs({ id }) {
   return (
-    <section id={id} aria-labelledby="logs-heading" className="min-h-screen py-32 border-b border-yale-blue relative z-10">
+    <section id={id} aria-labelledby="logs-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10">
 
       {/* Section Header */}
-      <div className="mb-16 relative">
+      <div className="mb-10 sm:mb-16 relative">
         {/* Separator with section number */}
-        <div className="flex items-center gap-3 mb-8">
+        <div className="flex items-center gap-3 mb-5 sm:mb-8">
           <span className="font-mono text-xs text-stormy-teal-light font-bold tracking-widest">02</span>
           <div className="flex-1 h-px bg-yale-blue" />
           <span className="font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">CAREER_TELEMETRY</span>
@@ -67,7 +67,7 @@ export default function ServiceLogs({ id }) {
             <div className="font-mono text-xs mt-5 space-y-1.5">
               <p>
                 <span className="text-stormy-teal-light mr-2">$</span>
-                <span className="text-alabaster/55">query --table=work_history --order=DESC --format=highlights</span>
+                <span className="text-alabaster/70">query --table=work_history --order=DESC --format=highlights</span>
               </p>
               <p>
                 <span className="text-yale-blue-light mr-2">→</span>
@@ -108,7 +108,7 @@ export default function ServiceLogs({ id }) {
                       {exp.role}
                     </h3>
                     {exp.subtitle && (
-                      <p className="font-mono text-xs text-alabaster/50 mt-0.5 tracking-wide">{exp.subtitle}</p>
+                      <p className="font-mono text-xs text-alabaster/65 mt-0.5 tracking-wide">{exp.subtitle}</p>
                     )}
                     <div className="flex items-center gap-2 text-stormy-teal-light font-mono text-sm uppercase mt-2 font-semibold tracking-wide">
                       <Briefcase size={13} />
@@ -116,7 +116,7 @@ export default function ServiceLogs({ id }) {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:items-end gap-1 font-mono text-xs text-alabaster/65 font-semibold flex-shrink-0">
+                  <div className="flex flex-col sm:items-end gap-1 font-mono text-xs text-alabaster/80 font-semibold flex-shrink-0">
                     <div className="flex items-center gap-2">
                       <Calendar size={12} />
                       {exp.period}
@@ -129,7 +129,7 @@ export default function ServiceLogs({ id }) {
               {/* Highlights */}
               <ul className="space-y-3">
                 {exp.highlights.map((highlight, hIdx) => (
-                  <li key={hIdx} className="flex items-start gap-4 text-sm font-sans text-alabaster/85 group-hover:text-alabaster transition-colors duration-200 leading-relaxed">
+                  <li key={hIdx} className="flex items-start gap-4 text-sm font-sans text-alabaster/90 group-hover:text-alabaster transition-colors duration-200 leading-relaxed">
                     <span className="font-mono text-stormy-teal-light mt-1 flex-shrink-0">&gt;</span>
                     <span>{highlight}</span>
                   </li>

@@ -143,8 +143,8 @@ function ProjectCard({ project, idx }) {
       onHoverEnd={() => setHovered(false)}
       className="relative flex-shrink-0 flex flex-col overflow-hidden"
       style={{
-        width: 'min(72vw, 660px)',
-        minWidth: 300,
+        width: 'min(80vw, 660px)',
+        minWidth: 260,
         scrollSnapAlign: 'start',
         background: `linear-gradient(135deg, #151515 0%, rgba(${accentRgb},0.04) 100%)`,
         borderLeft: `3px solid ${accent}`,
@@ -208,7 +208,7 @@ function ProjectCard({ project, idx }) {
         </div>
 
         {/* Description */}
-        <p className="font-sans text-alabaster/80 text-sm leading-relaxed">
+        <p className="font-sans text-alabaster/90 text-sm leading-relaxed">
           {project.description}
         </p>
 
@@ -307,10 +307,10 @@ export default function Blueprints({ id }) {
   }
 
   return (
-    <section id={id} aria-labelledby="blueprints-heading" className="py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
+    <section id={id} aria-labelledby="blueprints-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
 
       {/* Section Header */}
-      <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-8 gap-6 relative overflow-hidden">
+      <div className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-6 sm:pb-8 gap-4 sm:gap-6 relative overflow-hidden">
         {/* Large watermark number */}
         <div
           className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
@@ -325,7 +325,7 @@ export default function Blueprints({ id }) {
           <h2 id="blueprints-heading" className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
             The Blueprints
           </h2>
-          <p className="font-mono text-alabaster/75 mt-4 text-sm max-w-lg leading-relaxed">
+          <p className="font-mono text-alabaster/85 mt-4 text-sm max-w-lg leading-relaxed">
             Technical schematics & constructed architectures.
             Scroll to navigate — hover to extract metadata.
           </p>
