@@ -107,6 +107,34 @@ const projects = [
       { label: 'UI',       value: 'Streamlit Analysis Dash' },
     ],
   },
+  {
+    id: 'PRJ-04',
+    title: 'GO_PUBSUB_BROKER',
+    subtitle: 'Lightweight In-Memory Pub/Sub Engine',
+    description: 'Built a Go pub/sub broker from scratch mirroring Google Cloud Pub/Sub semantics — at-least-once delivery, per-subscription goroutine fan-out, configurable retry budget, dead-letter queue, and graceful shutdown. Designed so handler panics can\'t crash the delivery loop.',
+    accent: '#22c55e',
+    accentRgb: '34,197,94',
+    stats: [
+      { value: '256',        label: 'inbox buffer' },
+      { value: 'at-least-1', label: 'delivery guarantee' },
+      { value: 'DLQ',        label: 'dead-letter queue' },
+      { value: 'O(subs)',    label: 'goroutine model' },
+    ],
+    stack: [
+      { name: 'Go',          category: 'lang' },
+      { name: 'Goroutines',  category: 'compute' },
+      { name: 'Channels',    category: 'stream' },
+      { name: 'RWMutex',     category: 'infra' },
+      { name: 'Dead-Letter', category: 'database' },
+      { name: 'TUI / CLI',   category: 'ui' },
+    ],
+    metadata: [
+      { label: 'ARCH',      value: 'In-Memory Pub/Sub Broker' },
+      { label: 'CONCURR',   value: 'Goroutine fan-out, RWMutex' },
+      { label: 'DELIVERY',  value: 'At-least-once, Retry + DLQ' },
+      { label: 'INSPIRED',  value: 'Google Cloud Pub/Sub' },
+    ],
+  },
 ]
 
 function TechBadge({ name, category }) {
