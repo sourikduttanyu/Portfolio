@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-  --color-graphite-100: #0b0b0b;
-  --color-graphite-200: #151515;
-  --color-graphite: #353535;
-  --color-stormy-teal: #3c6e71;
-  --color-stormy-teal-light: #539a9e;
-  --color-yale-blue: #284b63;
-  --color-yale-blue-light: #6099be;
-  --color-alabaster: #d9d9d9;
-  --color-brand-white: #ffffff;
+  --color-graphite-100: #07111f;
+  --color-graphite-200: #0c1a30;
+  --color-graphite: #1a3354;
+  --color-stormy-teal: #0a87a3;
+  --color-stormy-teal-light: #2dd4f0;
+  --color-yale-blue: #1a3a6a;
+  --color-yale-blue-light: #5ba4f5;
+  --color-alabaster: #dde8f5;
+  --color-brand-white: #f0f8ff;
 
   --font-sans: "Exo 2", sans-serif;
   --font-mono: "Fira Code", "JetBrains Mono", monospace;
@@ -34,9 +34,9 @@
 @layer utilities {
   .grid-bg {
     background-size: 40px 40px;
-    background-image: 
-      linear-gradient(to right, rgba(40, 75, 99, 0.4) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(40, 75, 99, 0.4) 1px, transparent 1px);
+    background-image:
+      linear-gradient(to right, rgba(26, 58, 106, 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(26, 58, 106, 0.5) 1px, transparent 1px);
     mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
   }
 
@@ -113,6 +113,32 @@ body::after {
 /* ── Scrollbar hide ─────────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* Signal track — traveling data dots on side rails */
+@keyframes signal-down {
+  0%   { transform: translateY(0);     opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(86vh);  opacity: 0; }
+}
+@keyframes signal-down-b {
+  0%   { transform: translateY(0);     opacity: 0; }
+  8%   { opacity: 0.8; }
+  92%  { opacity: 0.8; }
+  100% { transform: translateY(64vh);  opacity: 0; }
+}
+@keyframes signal-up {
+  0%   { transform: translateY(0);      opacity: 0; }
+  8%   { opacity: 0.9; }
+  92%  { opacity: 0.9; }
+  100% { transform: translateY(-86vh);  opacity: 0; }
+}
+@keyframes signal-up-b {
+  0%   { transform: translateY(0);      opacity: 0; }
+  8%   { opacity: 0.75; }
+  92%  { opacity: 0.75; }
+  100% { transform: translateY(-68vh);  opacity: 0; }
 }
 
 /* Aurora blob drift animations */

@@ -62,7 +62,7 @@ export default function ServiceLogs({ id }) {
           <div>
             <h2 id="logs-heading" className="text-4xl sm:text-5xl font-sans font-extrabold tracking-tight uppercase">
               <span className="text-brand-white">Service </span>
-              <span style={{ WebkitTextStroke: '2px #539a9e', color: 'transparent' }}>Logs</span>
+              <span style={{ WebkitTextStroke: '2px #2dd4f0', color: 'transparent' }}>Logs</span>
             </h2>
             <div className="font-mono text-xs mt-5 space-y-1.5">
               <p>

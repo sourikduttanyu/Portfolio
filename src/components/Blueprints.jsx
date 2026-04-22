@@ -16,7 +16,7 @@ const CATEGORY = {
   stream:  { color: '#3b82f6', bg: 'rgba(59,130,246,0.13)', Icon: Radio },
   infra:   { color: '#94a3b8', bg: 'rgba(148,163,184,0.13)',Icon: Server },
   cloud:   { color: '#60a5fa', bg: 'rgba(96,165,250,0.13)', Icon: Cloud },
-  algo:    { color: '#a78bfa', bg: 'rgba(167,139,250,0.13)',Icon: GitBranch },
+  algo:    { color: '#14b8a6', bg: 'rgba(20,184,166,0.13)', Icon: GitBranch },
   lang:    { color: '#fbbf24', bg: 'rgba(251,191,36,0.13)', Icon: Code2 },
   storage: { color: '#34d399', bg: 'rgba(52,211,153,0.13)', Icon: HardDrive },
   ui:      { color: '#fb923c', bg: 'rgba(251,146,60,0.13)', Icon: Monitor },
