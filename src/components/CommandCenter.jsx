@@ -110,7 +110,7 @@ export default function CommandCenter({ id }) {
               <div>
                 <h2 className="text-3xl sm:text-4xl font-sans font-extrabold tracking-tight leading-tight">
                   <span className="text-brand-white">Establish</span>{' '}
-                  <span style={{ WebkitTextStroke: '1.5px #539a9e', color: 'transparent' }}>Connection</span>
+                  <span style={{ WebkitTextStroke: '1.5px #2dd4f0', color: 'transparent' }}>Connection</span>
                 </h2>
                 <p className="font-mono text-[11px] text-alabaster/35 mt-3 leading-loose">
                   $ READY_FOR_INPUT. Awaiting protocol initiation.
