@@ -10,10 +10,10 @@ const experienceLog = [
     period: 'Jan 2023 – Nov 2023',
     location: 'Remote',
     highlights: [
-      'Architected a production LLM-as-a-service platform on Azure, deploying .NET and Java Spring Boot microservices on AKS with circuit breaking, exponential backoff, and Redis response caching — enabling governed GenAI tooling access for 13,000+ teammates.',
-      'Built an AIOps telemetry pipeline on Azure Event Hubs ingesting production signals into Z-Score and EWMA anomaly detection models containerized on AKS, routing pre-escalation alerts to PagerDuty before SLO breach.',
-      'Sustained 99.86% SLO at 3,412 concurrent req/sec across 12,143 production signals by root-causing HttpClientFactory TIME_WAIT exhaustion, repartitioning Kafka from 12→48 partitions, and codifying DRI runbooks as version-controlled decision trees.',
-      'Delivered an Angular 15 real-time ops dashboard with WebSocket-driven signal feeds via Azure SignalR, OnPush change detection for 60fps under high-frequency data, and Entra ID RBAC-gated views — primary operational interface for the AIOps platform org-wide.',
+      'Architected a production LLM-as-a-service platform on Azure — independently scalable .NET 7 and Java Spring Boot 3 microservices on AKS behind Azure API Management, with Polly and Resilience4j circuit breaking, exponential backoff with jitter, and Redis prompt-hash-keyed response caching — enabling governed GenAI tooling access for 13,000+ teammates.',
+      'Built an AIOps telemetry pipeline on Azure Event Hubs ingesting production signals into Z-Score (spike detection) and EWMA (trend-drift) anomaly models containerized on AKS, routing pre-escalation P1/P2/P3 alerts to PagerDuty and Teams Adaptive Cards before SLO breach — false positive rate held below 5% after SRE threshold tuning.',
+      'Sustained 99.86% SLO at 3,412 concurrent req/sec across 12,143 production signals by root-causing HttpClientFactory TIME_WAIT socket exhaustion, repartitioning Kafka from 12→48 partitions to unblock consumer throughput, and codifying DRI runbooks as version-controlled decision trees validated via quarterly Azure Chaos Studio experiments.',
+      'Delivered an Angular 15 real-time ops dashboard with WebSocket-driven signal feeds via Azure SignalR, OnPush change detection for 60fps under high-frequency data, lazy-loaded modules, and Entra ID OIDC RBAC-gated views — the primary operational interface for the AIOps platform org-wide.',
     ]
   },
   {
@@ -24,10 +24,10 @@ const experienceLog = [
     period: 'Jan 2022 – Jan 2023',
     location: 'Remote',
     highlights: [
-      'Sustained sub-100ms p95 latency under millions of enterprise API requests by profiling C# .NET hot paths with dotnet-trace, eliminating GC pressure via Span<T> and ArrayPool<T>, redesigning CosmosDB partition keys, and centralizing OAuth 2.0 at the Azure APIM gateway.',
-      'Drove critical SAST findings to zero and raised unit test coverage 21% by engineering GitHub Actions pipelines with Semgrep SAST gates, Gitleaks secrets scanning, and SonarQube coverage enforcement — pipeline template adopted by 4 additional service teams.',
-      'Cut Azure infrastructure costs 18% over 3 months by running Databricks Spark analytics on Cost Analysis exports to right-size over-provisioned VMs and idle AKS node pools via Terraform and custom-metric VMSS autoscaling — CI/CD velocity improved 27%.',
-      'Built a React 18 internal tooling dashboard with live GitHub Actions and Azure Cost Analysis REST API feeds, Recharts visualizations, and Entra ID OAuth 2.0 PKCE auth delivering RBAC-gated SAST and FinOps visibility to Security, FinOps, and Engineering managers.',
+      'Sustained sub-100ms p95 latency under millions of enterprise API requests by profiling C# .NET hot paths with dotnet-trace, eliminating per-request heap allocations via Span<T> and ArrayPool<T>, redesigning CosmosDB partition keys from single-tenant to composite (tenantId + entityType) to eliminate hot-partition throttling, and centralizing OAuth 2.0 token validation at the Azure APIM gateway across 5+ downstream services.',
+      'Drove critical SAST findings to zero and raised unit test coverage 21% by engineering GitHub Actions pipelines with Semgrep SAST gates (custom .NET/OWASP Top 10 rules), Gitleaks secrets scanning, and SonarQube coverage delta enforcement — pipeline template adopted by 4 additional service teams.',
+      'Cut Azure infrastructure costs 18% in 3 months by running Databricks Spark analytics on Cost Analysis exports joined with Azure Monitor utilization data, right-sizing via Terraform, and configuring VMSS autoscaling on custom metrics (queue depth, CPU p90) — CI/CD velocity improved 27% through microservice blueprint adoption.',
+      'Built a React 18 internal tooling dashboard with live GitHub Actions and Azure Cost Analysis REST API feeds, Recharts time-series visualizations, and Entra ID OAuth 2.0 PKCE auth — delivering RBAC-gated SAST and FinOps visibility to Security, FinOps, and Engineering managers in a single interface.',
     ]
   },
   {
