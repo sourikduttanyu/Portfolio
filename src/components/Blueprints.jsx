@@ -1,7 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import {
-  ChevronLeft, ChevronRight,
   Cpu, Globe, Database, Search, Sparkles, TrendingUp,
   Radio, Server, Cloud, GitBranch, Code2, HardDrive, Monitor,
 } from 'lucide-react'
@@ -109,6 +108,35 @@ const projects = [
   },
   {
     id: 'PRJ-04',
+    title: 'JOB_TRACKER',
+    subtitle: 'Gmail Job Classification & Analytics Pipeline',
+    description: 'Auto-scans Gmail inbox, classifies job application emails into Applied / Interview / Offer / Rejected / Unknown via regex with an optional local LLM fallback (Ollama), deduplicates on Message ID, exports colour-coded jobs.xlsx, and serves an interactive Streamlit dashboard — zero manual entry.',
+    accent: '#f43f5e',
+    accentRgb: '244,63,94',
+    stats: [
+      { value: '95%+',  label: 'regex accuracy' },
+      { value: '0',     label: 'manual entry' },
+      { value: '5',     label: 'status classes' },
+      { value: 'local', label: 'LLM inference' },
+    ],
+    stack: [
+      { name: 'Python',            category: 'lang' },
+      { name: 'Gmail API',         category: 'api' },
+      { name: 'Ollama / LLaMA',    category: 'ai' },
+      { name: 'Streamlit',         category: 'ui' },
+      { name: 'pandas / openpyxl', category: 'storage' },
+      { name: 'GitHub Actions',    category: 'infra' },
+    ],
+    metadata: [
+      { label: 'INGEST',    value: 'Gmail API (OAuth 2.0)' },
+      { label: 'CLASSIFY',  value: 'Regex-first + Ollama LLM fallback' },
+      { label: 'OUTPUT',    value: 'pandas + openpyxl (jobs.xlsx)' },
+      { label: 'DASHBOARD', value: 'Streamlit — filters, charts, editable' },
+    ],
+    github: 'https://github.com/sourikduttanyu/gmail-job-tracker-ollama',
+  },
+  {
+    id: 'PRJ-05',
     title: 'GO_PUBSUB_BROKER',
     subtitle: 'Lightweight In-Memory Pub/Sub Engine',
     description: 'Built a Go pub/sub broker from scratch mirroring Google Cloud Pub/Sub semantics — at-least-once delivery, per-subscription goroutine fan-out, configurable retry budget, dead-letter queue, and graceful shutdown. Designed so handler panics can\'t crash the delivery loop.',
@@ -129,10 +157,10 @@ const projects = [
       { name: 'TUI / CLI',   category: 'ui' },
     ],
     metadata: [
-      { label: 'ARCH',      value: 'In-Memory Pub/Sub Broker' },
-      { label: 'CONCURR',   value: 'Goroutine fan-out, RWMutex' },
-      { label: 'DELIVERY',  value: 'At-least-once, Retry + DLQ' },
-      { label: 'INSPIRED',  value: 'Google Cloud Pub/Sub' },
+      { label: 'ARCH',     value: 'In-Memory Pub/Sub Broker' },
+      { label: 'CONCURR',  value: 'Goroutine fan-out, RWMutex' },
+      { label: 'DELIVERY', value: 'At-least-once, Retry + DLQ' },
+      { label: 'INSPIRED', value: 'Google Cloud Pub/Sub' },
     ],
   },
 ]
@@ -156,49 +184,35 @@ function TechBadge({ name, category }) {
   )
 }
 
-function ProjectCard({ project, idx }) {
-  const [hovered, setHovered] = useState(false)
+function ProjectDetail({ project }) {
   const { accent, accentRgb } = project
-
   return (
-    <motion.div
-      data-card
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.7, delay: idx * 0.12 }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      className="relative flex-shrink-0 flex flex-col overflow-hidden"
+    <div
+      className="relative flex flex-col overflow-hidden h-full"
       style={{
-        width: 'min(80vw, 660px)',
-        minWidth: 260,
-        scrollSnapAlign: 'start',
-        background: `linear-gradient(135deg, #151515 0%, rgba(${accentRgb},0.04) 100%)`,
-        borderLeft: `3px solid ${accent}`,
+        background: `linear-gradient(135deg, #151515 0%, rgba(${accentRgb},0.05) 100%)`,
         border: `1px solid rgba(${accentRgb},0.18)`,
         borderLeftWidth: 3,
-        boxShadow: hovered
-          ? `0 0 40px rgba(${accentRgb},0.12), 0 0 0 1px rgba(${accentRgb},0.25)`
-          : `0 0 0 1px rgba(${accentRgb},0.1)`,
-        transition: 'box-shadow 0.3s ease',
+        borderLeftColor: accent,
+        borderLeftStyle: 'solid',
       }}
     >
-      {/* Top accent gradient bar */}
+      {/* Top accent bar */}
       <div
         className="absolute top-0 inset-x-0 h-px"
         style={{ background: `linear-gradient(to right, ${accent}, rgba(${accentRgb},0.1), transparent)` }}
       />
 
-      {/* Watermark project number */}
+      {/* Watermark */}
       <div
-        className="absolute top-3 right-5 font-mono font-black leading-none pointer-events-none select-none"
-        style={{ fontSize: 96, color: `rgba(${accentRgb},0.05)` }}
+        className="absolute top-2 right-6 font-mono font-black leading-none pointer-events-none select-none"
+        style={{ fontSize: 120, color: `rgba(${accentRgb},0.04)` }}
+        aria-hidden="true"
       >
-        {String(idx + 1).padStart(2, '0')}
+        {project.id.replace('PRJ-0', '')}
       </div>
 
-      <div className="relative z-10 p-7 flex flex-col gap-5 h-full">
+      <div className="relative z-10 p-6 sm:p-8 flex flex-col gap-5 h-full">
 
         {/* Header */}
         <div>
@@ -208,23 +222,23 @@ function ProjectCard({ project, idx }) {
           >
             {project.id} — {project.subtitle}
           </div>
-          <h3 className="font-sans text-2xl font-extrabold tracking-tight text-brand-white leading-tight">
+          <h3 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-white leading-tight">
             {project.title}
           </h3>
         </div>
 
-        {/* Stats grid */}
-        <div className="grid grid-cols-4 gap-2">
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {project.stats.map((s, i) => (
             <div
               key={i}
-              className="flex flex-col gap-1 p-2.5"
+              className="flex flex-col gap-1 p-3"
               style={{
                 background: `rgba(${accentRgb},0.07)`,
                 borderTop: `1px solid rgba(${accentRgb},0.3)`,
               }}
             >
-              <span className="font-mono font-bold text-xs text-brand-white leading-tight">{s.value}</span>
+              <span className="font-mono font-bold text-sm text-brand-white leading-tight">{s.value}</span>
               <span
                 className="font-mono text-[9px] uppercase tracking-widest leading-tight"
                 style={{ color: `rgba(${accentRgb},0.65)` }}
@@ -252,94 +266,54 @@ function ProjectCard({ project, idx }) {
           </div>
         </div>
 
-        {/* Metadata revealer */}
-        <motion.div
-          className="mt-auto overflow-hidden"
-          animate={{ height: hovered ? 148 : 40 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        {/* Metadata — always visible */}
+        <div
+          className="mt-auto pt-4"
           style={{ borderTop: `1px solid rgba(${accentRgb},0.2)` }}
         >
-          <div className="pt-3 font-mono text-xs">
-            <AnimatePresence mode="wait">
-              {!hovered ? (
-                <motion.div
-                  key="hint"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15 }}
-                  className="flex items-center gap-2"
-                  style={{ color: `rgba(${accentRgb},0.45)` }}
-                >
-                  <div
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ backgroundColor: accent, opacity: 0.5 }}
-                  />
-                  <span className="text-[10px] uppercase tracking-widest">hover for specs</span>
-                </motion.div>
-              ) : (
-                <motion.div
-                  key="meta"
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.2, delay: 0.1 }}
-                  className="flex flex-col gap-2"
-                >
-                  {project.metadata.map((m, i) => (
-                    <div key={i} className="flex gap-3">
-                      <span className="min-w-[70px] font-bold text-[11px]" style={{ color: accent }}>
-                        {m.label}
-                      </span>
-                      <span className="text-alabaster/80 text-[11px]">{m.value}</span>
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2 font-mono text-xs">
+            {project.metadata.map((m, i) => (
+              <div key={i} className="flex gap-3">
+                <span className="min-w-[70px] font-bold text-[11px]" style={{ color: accent }}>
+                  {m.label}
+                </span>
+                <span className="text-alabaster/80 text-[11px]">{m.value}</span>
+              </div>
+            ))}
           </div>
-        </motion.div>
+
+          {project.github && (
+            <a
+              href={project.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 mt-4 font-mono text-[10px] uppercase tracking-widest transition-opacity hover:opacity-100 opacity-50"
+              style={{ color: accent }}
+            >
+              ↗ View on GitHub
+            </a>
+          )}
+        </div>
 
       </div>
 
       {/* Corner glow */}
       <div
-        className="absolute bottom-0 right-0 w-24 h-24 pointer-events-none"
-        style={{
-          background: `radial-gradient(circle at bottom right, rgba(${accentRgb},0.1), transparent 70%)`,
-        }}
+        className="absolute bottom-0 right-0 w-32 h-32 pointer-events-none"
+        style={{ background: `radial-gradient(circle at bottom right, rgba(${accentRgb},0.1), transparent 70%)` }}
       />
-    </motion.div>
+    </div>
   )
 }
 
 export default function Blueprints({ id }) {
-  const scrollRef = useRef(null)
   const [activeIndex, setActiveIndex] = useState(0)
 
-  const scrollTo = (dir) => {
-    const el = scrollRef.current
-    if (!el) return
-    const card = el.querySelector('[data-card]')
-    const cardW = (card?.offsetWidth ?? 660) + 24
-    el.scrollBy({ left: dir * cardW, behavior: 'smooth' })
-  }
-
-  const handleScroll = () => {
-    const el = scrollRef.current
-    if (!el) return
-    const card = el.querySelector('[data-card]')
-    const cardW = (card?.offsetWidth ?? 660) + 24
-    const idx = Math.round(el.scrollLeft / cardW)
-    setActiveIndex(Math.max(0, Math.min(idx, projects.length - 1)))
-  }
-
   return (
-    <section id={id} aria-labelledby="blueprints-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
+    <section id={id} aria-labelledby="blueprints-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10">
 
       {/* Section Header */}
       <div className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-6 sm:pb-8 gap-4 sm:gap-6 relative overflow-hidden">
-        {/* Large watermark number */}
         <div
           className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
           style={{ fontSize: 160, color: 'rgba(40,75,99,0.18)', lineHeight: 1 }}
@@ -354,74 +328,65 @@ export default function Blueprints({ id }) {
             The Blueprints
           </h2>
           <p className="font-mono text-alabaster/85 mt-4 text-sm max-w-lg leading-relaxed">
-            Technical schematics & constructed architectures.
-            Scroll to navigate — hover to extract metadata.
+            Technical schematics & constructed architectures. Select to inspect.
           </p>
         </div>
 
-        <div className="flex items-center gap-4">
-          {/* Pill indicators */}
-          <div className="flex items-center gap-2">
-            {projects.map((p, i) => (
-              <motion.div
-                key={i}
-                animate={{
-                  width: i === activeIndex ? 28 : 8,
-                  backgroundColor: i === activeIndex ? p.accent : 'rgba(217,217,217,0.2)',
-                }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className="h-2 rounded-full cursor-pointer"
-                onClick={() => {
-                  const el = scrollRef.current
-                  const card = el?.querySelector('[data-card]')
-                  const cardW = (card?.offsetWidth ?? 660) + 24
-                  el?.scrollTo({ left: i * cardW, behavior: 'smooth' })
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Arrow buttons */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => scrollTo(-1)}
-              aria-label="Previous project"
-              className="p-2 border border-yale-blue hover:border-stormy-teal-light text-alabaster/50 hover:text-stormy-teal-light transition-colors duration-150"
-            >
-              <ChevronLeft size={18} aria-hidden="true" />
-            </button>
-            <button
-              onClick={() => scrollTo(1)}
-              aria-label="Next project"
-              className="p-2 border border-yale-blue hover:border-stormy-teal-light text-alabaster/50 hover:text-stormy-teal-light transition-colors duration-150"
-            >
-              <ChevronRight size={18} aria-hidden="true" />
-            </button>
-          </div>
-
-          <div className="font-mono text-xs text-stormy-teal-light hidden md:block font-semibold tracking-wider">
-            {String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
-          </div>
+        <div className="font-mono text-xs text-stormy-teal-light hidden md:block font-semibold tracking-wider text-right">
+          {String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
         </div>
       </div>
 
-      {/* Horizontal scroll track — bleeds to container edge */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="flex gap-6 overflow-x-auto pb-4 no-scrollbar -mx-4 px-4 lg:-mx-12 lg:px-12"
-        style={{ scrollSnapType: 'x mandatory', scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-      >
-        {projects.map((project, idx) => (
-          <ProjectCard key={project.id} project={project} idx={idx} />
-        ))}
-        {/* trailing space so last card can fully snap */}
-        <div className="flex-shrink-0 w-4 lg:w-8" aria-hidden="true" />
-      </div>
+      {/* Selector + Detail */}
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
-      <p className="mt-5 text-center font-mono text-[10px] text-alabaster/25 uppercase tracking-[0.2em]">
-        ← scroll or use arrows →
-      </p>
+        {/* Left: project selector rail */}
+        <div className="flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0 lg:w-52 flex-shrink-0">
+          {projects.map((p, i) => (
+            <button
+              key={p.id}
+              onClick={() => setActiveIndex(i)}
+              className="group flex-shrink-0 lg:flex-shrink flex flex-col text-left px-3 py-3 transition-colors duration-150 relative"
+              style={{
+                borderLeft: `2px solid ${i === activeIndex ? p.accent : 'rgba(255,255,255,0.08)'}`,
+                background: i === activeIndex ? `rgba(${p.accentRgb},0.07)` : 'transparent',
+                minWidth: 130,
+              }}
+            >
+              <span
+                className="font-mono text-[9px] tracking-[0.2em] uppercase transition-opacity"
+                style={{ color: p.accent, opacity: i === activeIndex ? 1 : 0.45 }}
+              >
+                {p.id}
+              </span>
+              <span
+                className={`font-mono text-xs font-bold mt-0.5 transition-colors ${
+                  i === activeIndex ? 'text-brand-white' : 'text-alabaster/40 group-hover:text-alabaster/65'
+                }`}
+              >
+                {p.title}
+              </span>
+            </button>
+          ))}
+        </div>
+
+        {/* Right: detail panel */}
+        <div className="flex-1" style={{ minHeight: 480 }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeIndex}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              className="h-full"
+            >
+              <ProjectDetail project={projects[activeIndex]} />
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+      </div>
 
     </section>
   )
