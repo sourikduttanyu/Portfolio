@@ -26,7 +26,7 @@ const projects = [
     id: 'PRJ-01',
     title: 'FEAST_FLEET',
     subtitle: 'Serverless Food Delivery & Logistics Platform',
-    description: 'Reduced order processing latency by 43% for 1,248 concurrent users by designing a serverless microservices architecture on AWS Lambda with decoupled, independently deployable services.',
+    description: 'Reduced order processing latency by 43% for 1,248 concurrent users via fault-tolerant serverless AWS Lambda architecture with MLOps-aligned CI/CD and production telemetry. Autonomous order routing via LangChain RAG pipelines integrating Claude and OpenAI APIs for failure prediction, demand forecasting, and a natural language ops interface via Amazon Lex with proactive rerouting and pre-warmed Lambda capacity.',
     accent: '#f59e0b',
     accentRgb: '245,158,11',
     stats: [
@@ -37,7 +37,7 @@ const projects = [
     ],
     stack: [
       { name: 'AWS Lambda',  category: 'compute' },
-      { name: 'API Gateway', category: 'api' },
+      { name: 'LangChain',   category: 'ai' },
       { name: 'DynamoDB',    category: 'database' },
       { name: 'OpenSearch',  category: 'search' },
       { name: 'Amazon Lex',  category: 'ai' },
@@ -45,9 +45,9 @@ const projects = [
     ],
     metadata: [
       { label: 'ARCH',    value: 'Serverless Microservices' },
-      { label: 'COMPUTE', value: 'AWS Lambda, API Gateway' },
+      { label: 'AI/ML',   value: 'LangChain RAG, Claude, OpenAI, SageMaker' },
       { label: 'DATA',    value: 'DynamoDB, OpenSearch' },
-      { label: 'AI/ML',   value: 'Amazon Lex, SageMaker' },
+      { label: 'NLP',     value: 'Amazon Lex (natural language ops interface)' },
     ],
   },
   {

@@ -5,43 +5,44 @@ const experienceLog = [
   {
     id: 'exp-01',
     role: 'Software Engineer',
-    subtitle: 'App Modernization & Azure',
+    subtitle: 'Full Stack Systems & Cloud Architecture',
     company: 'Insight Enterprises',
-    period: 'Jan 2022 – Nov 2023',
+    period: 'Jan 2023 – Nov 2023',
     location: 'Remote',
     highlights: [
-      'Accomplished a highly scalable distributed backend serving millions of users, sustaining 3,412 concurrent authentication requests per second by decomposing monolithic integrations into Java Spring Boot microservices with distributed consensus algorithms across multi-region environments.',
-      'Improved system reliability and cost efficiency — 21% increase in unit test coverage and 18% reduction in cloud budget via Azure Monitor right-sizing and auto-scaling by eliminating over-provisioned infrastructure for Entra ID service modules.',
-      'Achieved 99.86% SLA availability as Designated Responsible Individual (DRI), monitoring 12,143 production signals across a millions-scale user base by executing incident playbooks and enforcing GitHub Actions security workflows with SAST and secrets scanning.',
-      'Accelerated feature delivery velocity by 32% by partnering cross-functionally to ship complex distributed work items and codifying reusable, maintainable components for directory services.'
+      'Architected a production LLM-as-a-service platform on Azure — independently scalable .NET 7 and Java Spring Boot 3 microservices on AKS behind Azure API Management, with Polly and Resilience4j circuit breaking, exponential backoff with jitter, and Redis prompt-hash-keyed response caching — enabling governed GenAI tooling access for 13,000+ teammates.',
+      'Built an AIOps telemetry pipeline on Azure Event Hubs ingesting production signals into Z-Score (spike detection) and EWMA (trend-drift) anomaly models containerized on AKS, routing pre-escalation P1/P2/P3 alerts to PagerDuty and Teams Adaptive Cards before SLO breach — false positive rate held below 5% after SRE threshold tuning.',
+      'Sustained 99.86% SLO at 3,412 concurrent req/sec across 12,143 production signals by root-causing HttpClientFactory TIME_WAIT socket exhaustion, repartitioning Kafka from 12→48 partitions to unblock consumer throughput, and codifying DRI runbooks as version-controlled decision trees validated via quarterly Azure Chaos Studio experiments.',
+      'Delivered an Angular 15 real-time ops dashboard with WebSocket-driven signal feeds via Azure SignalR, OnPush change detection for 60fps under high-frequency data, lazy-loaded modules, and Entra ID OIDC RBAC-gated views — the primary operational interface for the AIOps platform org-wide.',
     ]
   },
   {
     id: 'exp-02',
-    role: 'Software Engineering Intern',
-    subtitle: null,
-    company: 'Ernst & Young',
-    period: 'May 2021 – Jul 2021',
+    role: 'Software Engineer',
+    subtitle: 'API Development & Cloud Security',
+    company: 'Hanu Software (acquired by Insight Enterprises)',
+    period: 'Jan 2022 – Jan 2023',
     location: 'Remote',
     highlights: [
-      'Built a high-throughput IoT ingestion pipeline processing 1,842 daily sensor signals by implementing MQTT brokers and Apache Kafka for distributed message streaming on AWS.',
-      'Decreased data access latency by 212ms — dropping dashboard queries from 250ms to 2ms — by introducing a Redis caching layer with TTL-based invalidation in front of Apache Spark SQL aggregations.',
-      'Reduced manual reporting overhead by 38% (14-hour weekly reduction in triage time) by building React dashboards with WebSocket-driven real-time alerts and live equipment health visualization using a Flask backend.',
-      'Streamlined distributed deployment cadence by 27% by codifying reusable architectural blueprints for containerized microservices and NoSQL data synchronization across client environments.'
+      'Sustained sub-100ms p95 latency under millions of enterprise API requests by profiling C# .NET hot paths with dotnet-trace, eliminating per-request heap allocations via Span<T> and ArrayPool<T>, redesigning CosmosDB partition keys from single-tenant to composite (tenantId + entityType) to eliminate hot-partition throttling, and centralizing OAuth 2.0 token validation at the Azure APIM gateway across 5+ downstream services.',
+      'Drove critical SAST findings to zero and raised unit test coverage 21% by engineering GitHub Actions pipelines with Semgrep SAST gates (custom .NET/OWASP Top 10 rules), Gitleaks secrets scanning, and SonarQube coverage delta enforcement — pipeline template adopted by 4 additional service teams.',
+      'Cut Azure infrastructure costs 18% in 3 months by running Databricks Spark analytics on Cost Analysis exports joined with Azure Monitor utilization data, right-sizing via Terraform, and configuring VMSS autoscaling on custom metrics (queue depth, CPU p90) — CI/CD velocity improved 27% through microservice blueprint adoption.',
+      'Built a React 18 internal tooling dashboard with live GitHub Actions and Azure Cost Analysis REST API feeds, Recharts time-series visualizations, and Entra ID OAuth 2.0 PKCE auth — delivering RBAC-gated SAST and FinOps visibility to Security, FinOps, and Engineering managers in a single interface.',
     ]
   },
   {
     id: 'exp-03',
-    role: 'Graduate Assistant',
-    subtitle: null,
-    company: 'New York University',
-    period: 'May 2025 – Sep 2025',
-    location: 'New York, NY',
+    role: 'Software Engineer Intern',
+    subtitle: 'Data & Backend Infrastructure',
+    company: 'Ernst & Young',
+    period: 'May 2021 – Jul 2021',
+    location: 'Remote',
     highlights: [
-      'Accomplished a 30% acceleration in operational workflows across 52 departmental offerings by engineering a Java backend microservice with Slack API integrations.',
-      'Achieved 100% data integrity and enhanced cross-platform scalability by deploying automated CI/CD validation pipelines.'
+      'Processed 1,842 daily industrial IoT sensor signals by implementing MQTT broker ingestion and a 3-topic Apache Kafka distributed streaming pipeline on AWS, enabling high-throughput delivery to multiple downstream consumer groups.',
+      'Reduced mean time to detection across 3 production services by building an AIOps telemetry pipeline with Z-Score and EWMA anomaly detection as containerized inference microservices, shifting triage from reactive paging to automated pre-escalation routing.',
+      'Reduced deployment risk across 4 production services by codifying containerized microservice blueprints and NoSQL synchronization runbooks, achieving zero-downtime blue-green release cadence throughout the internship.',
     ]
-  }
+  },
 ]
 
 export default function ServiceLogs({ id }) {

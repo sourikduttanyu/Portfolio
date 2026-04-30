@@ -12,15 +12,15 @@
 
 | Role | Company | Period |
 |---|---|---|
-| Software Engineer | Insight Enterprises | Jan 2022 – Nov 2023 |
-| Software Engineering Intern | Ernst & Young | May – Jul 2021 |
-| Graduate Assistant | New York University | May – Sep 2025 |
+| Software Engineer — Full Stack Systems & Cloud Architecture | Insight Enterprises | Jan 2023 – Nov 2023 |
+| Software Engineer — API Development & Cloud Security | Hanu Software (acq. by Insight) | Jan 2022 – Jan 2023 |
+| Software Engineer Intern — Data & Backend Infrastructure | Ernst & Young | May – Jul 2021 |
 
-**Insight Enterprises** — Built Java Spring Boot microservices sustaining 3,412 concurrent auth requests/sec across multi-region Azure environments. Maintained 99.86% SLA as DRI monitoring 12,143 production signals. Reduced cloud spend 18% via Azure Monitor right-sizing.
+**Insight Enterprises** — Architected production LLM-as-a-service on Azure (AKS, .NET + Spring Boot, Redis, circuit breaking). Built AIOps telemetry pipeline via Azure Event Hubs → Z-Score/EWMA anomaly detection → PagerDuty pre-escalation. Sustained 99.86% SLO at 3,412 req/sec across 12,143 signals. Delivered Angular 15 + Azure SignalR real-time ops dashboard with Entra ID RBAC.
 
-**Ernst & Young** — IoT ingestion pipeline processing 1,842 daily sensor signals via MQTT + Apache Kafka on AWS. Introduced Redis caching layer that dropped dashboard query latency from 250ms → 2ms. Built React + WebSocket real-time dashboards backed by Flask.
+**Hanu Software** — Sub-100ms p95 latency under millions of enterprise API calls via C# .NET hot-path profiling (Span\<T\>, ArrayPool\<T\>), CosmosDB partition key redesign, OAuth 2.0 centralised at Azure APIM. Drove SAST findings to zero (Semgrep + Gitleaks + SonarQube). Cut Azure spend 18% via Databricks Spark cost analysis + Terraform right-sizing.
 
-**NYU Graduate Assistant** — Java microservice with Slack API integrations that accelerated operational workflows 30% across 52 departmental offerings.
+**Ernst & Young** — MQTT + 3-topic Kafka pipeline on AWS processing 1,842 daily IoT signals. AIOps pipeline with Z-Score/EWMA anomaly detection. Zero-downtime blue-green releases across 4 services via containerised microservice blueprints.
 
 ---
 
