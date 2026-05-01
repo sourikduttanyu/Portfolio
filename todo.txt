@@ -1,0 +1,4 @@
+## update the system section with all skills and priority
+## update so hover changes selected previewed project
+## update so buttons or hover areas for project names are bigger
+## overall bigger fonts

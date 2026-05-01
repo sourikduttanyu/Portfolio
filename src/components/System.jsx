@@ -1,41 +1,77 @@
 import { motion } from 'framer-motion'
-import { Server, Cpu, Layers, Layout, Globe, Code2 } from 'lucide-react'
+import { Sparkles, Code2, Cloud, Server, Database, Monitor, Shield } from 'lucide-react'
 
 const skillCategories = [
   {
+    category: "AGENTIC AI & LLM",
+    icon: Sparkles,
+    skills: [
+      "LangChain", "RAG Pipelines", "LLM-as-a-Service", "Azure OpenAI",
+      "OpenAI API", "Claude API", "Ollama", "Prompt Engineering",
+      "AIOps", "Z-Score / EWMA Anomaly Detection", "Amazon SageMaker", "NLP"
+    ]
+  },
+  {
     category: "LANGUAGES",
     icon: Code2,
-    skills: ["Python", "C++", "Java", "C#", "SQL", "JavaScript", "TypeScript", "Bash"]
+    skills: [
+      "Python", "Java", "Go", "C++", "C#", "TypeScript", "JavaScript", "SQL", "Bash"
+    ]
   },
   {
-    category: "CLOUD & DEVOPS",
-    icon: Globe,
-    skills: ["AWS", "Azure", "Docker", "CI/CD Pipelines", "Serverless"]
+    category: "CLOUD & INFRA",
+    icon: Cloud,
+    skills: [
+      "Azure AKS", "Azure API Management", "Azure Event Hubs", "Azure CosmosDB",
+      "Azure SignalR", "Azure OpenAI Service", "Azure Chaos Studio",
+      "AWS Lambda", "AWS DynamoDB", "AWS S3", "GCP",
+      "Docker", "Kubernetes", "Terraform", "Helm"
+    ]
   },
   {
-    category: "BACKEND & STREAM",
+    category: "BACKEND & DISTRIBUTED",
     icon: Server,
-    skills: ["RESTful APIs", "Flask", "Microservices", "Apache Kafka", "PySpark"]
+    skills: [
+      "Java Spring Boot", ".NET 7", "FastAPI", "Flask", "GraphQL", "REST APIs",
+      "Apache Kafka", "PySpark", "Redis", "OAuth 2.0 / PKCE",
+      "Polly", "Resilience4j", "Microservices", "Circuit Breaking"
+    ]
   },
   {
-    category: "FRONTEND & DB",
-    icon: Layout,
-    skills: ["React", "HTML5/CSS3", "PostgreSQL", "NoSQL", "OpenSearch"]
+    category: "DATA & ML OPS",
+    icon: Database,
+    skills: [
+      "Azure Databricks", "Apache Spark SQL", "PostgreSQL", "Azure CosmosDB",
+      "DynamoDB", "OpenSearch", "SQLite", "Azure Data Lake",
+      "pandas", "NumPy", "SciPy", "openpyxl"
+    ]
   },
   {
-    category: "PRACTICES & AI",
-    icon: Cpu,
-    skills: ["Agile/Scrum", "TDD", "Git", "GitHub Copilot", "Prompt Engineering"]
-  }
+    category: "FRONTEND",
+    icon: Monitor,
+    skills: [
+      "Angular 15", "React 18", "RxJS", "TypeScript",
+      "WebSockets", "Azure SignalR", "Recharts", "Tailwind CSS",
+      "Framer Motion", "Storybook", "Vite"
+    ]
+  },
+  {
+    category: "DEVSECOPS",
+    icon: Shield,
+    skills: [
+      "GitHub Actions", "Semgrep", "Gitleaks", "SonarQube",
+      "k6 Load Testing", "Azure Chaos Studio", "Azure DevOps",
+      "SAST / Secrets Scanning", "CI/CD", "Blue-Green Deployments", "DRI Runbooks"
+    ]
+  },
 ]
 
 export default function System({ id }) {
   return (
     <section id={id} aria-labelledby="system-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10 transition-colors duration-200">
-      
+
       {/* Section Header */}
       <div className="mb-10 sm:mb-16 relative">
-        {/* Separator with section number */}
         <div className="flex items-center gap-3 mb-5 sm:mb-8">
           <span className="font-mono text-xs text-yale-blue-light font-bold tracking-widest">03</span>
           <div className="flex-1 h-px bg-yale-blue" />
@@ -61,7 +97,7 @@ export default function System({ id }) {
         </div>
       </div>
 
-      {/* Capability Manifest — full-width module rows */}
+      {/* Capability Manifest */}
       <div>
         {skillCategories.map((group, idx) => {
           const Icon = group.icon
@@ -72,10 +108,10 @@ export default function System({ id }) {
               initial={{ opacity: 0, x: -24 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: '-50px' }}
-              transition={{ ease: 'easeOut', duration: 0.4, delay: idx * 0.09 }}
+              transition={{ ease: 'easeOut', duration: 0.4, delay: idx * 0.07 }}
               className="group relative border-b border-yale-blue last:border-b-0 overflow-hidden"
             >
-              {/* Ghost category watermark */}
+              {/* Ghost watermark */}
               <div
                 className="absolute inset-y-0 right-0 flex items-center pointer-events-none select-none"
                 aria-hidden="true"
