@@ -1,12 +1,66 @@
 import { motion } from 'framer-motion'
 import { Terminal } from 'lucide-react'
 
-// easeOutExpo — fast start, very smooth, organic settle
 const ease = [0.16, 1, 0.3, 1]
+
+const TECH_COLS = [
+  [
+    'Python', 'LangChain', 'Apache Kafka', 'Azure AKS', 'Go',
+    'Kubernetes', 'RAG Pipelines', 'Redis', 'Terraform', 'Spring Boot 3',
+    'PySpark', 'Docker', '.NET 7', 'OpenAI API', 'Grafana', 'k6',
+  ],
+  [
+    'TypeScript', 'Ollama', 'Azure OpenAI', 'SLO / SLA', 'React 18',
+    'Polly', 'GitHub Actions', 'DynamoDB', 'Spark SQL', 'Semgrep',
+    'Angular 15', 'CosmosDB', 'PagerDuty', 'Resilience4j', 'Databricks', 'Helm',
+  ],
+]
+
+function ScrollColumn({ terms, duration, dimmer }) {
+  const doubled = [...terms, ...terms]
+  return (
+    <div className="overflow-hidden flex-1" style={{ height: '100%' }}>
+      <motion.div
+        animate={{ y: ['0%', '-50%'] }}
+        transition={{ duration, ease: 'linear', repeat: Infinity }}
+        className="flex flex-col gap-5"
+      >
+        {doubled.map((term, i) => (
+          <span
+            key={i}
+            className="font-mono text-[11px] tracking-widest whitespace-nowrap uppercase"
+            style={{
+              color: dimmer
+                ? `rgba(180,220,230,${i % 3 === 0 ? 0.18 : 0.10})`
+                : `rgba(180,220,230,${i % 3 === 0 ? 0.28 : 0.15})`,
+            }}
+          >
+            {term}
+          </span>
+        ))}
+      </motion.div>
+    </div>
+  )
+}
 
 export default function Hero({ id }) {
   return (
-    <section id={id} aria-labelledby="hero-heading" className="min-h-screen flex flex-col justify-center py-14 sm:py-20 border-b border-yale-blue relative z-10">
+    <section id={id} aria-labelledby="hero-heading" className="min-h-screen flex flex-col justify-center py-14 sm:py-20 border-b border-yale-blue relative z-10 overflow-hidden">
+
+      {/* Scrolling tech columns — right side, desktop only */}
+      <div
+        className="absolute right-0 top-0 bottom-0 hidden lg:flex gap-6 pointer-events-none"
+        style={{
+          width: '28%',
+          WebkitMaskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
+          maskImage: 'linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)',
+        }}
+        aria-hidden="true"
+      >
+        <ScrollColumn terms={TECH_COLS[0]} duration={22} dimmer={false} />
+        <ScrollColumn terms={TECH_COLS[1]} duration={31} dimmer={true} />
+      </div>
+
       <div className="max-w-4xl">
 
         {/* System Status Label */}
@@ -31,9 +85,7 @@ export default function Hero({ id }) {
           transition={{ ease, duration: 1.0, delay: 0.5 }}
           className="relative"
         >
-          {/* Decorative architectural line */}
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-yale-blue" />
-
           <h1 id="hero-heading" className="text-5xl sm:text-7xl md:text-8xl font-sans font-extrabold leading-none tracking-tight text-brand-white mb-6">
             Sourik <br className="hidden sm:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-stormy-teal-light to-yale-blue-light">
@@ -42,7 +94,7 @@ export default function Hero({ id }) {
           </h1>
         </motion.div>
 
-        {/* Subtitle / Description */}
+        {/* Subtitle */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
@@ -57,7 +109,7 @@ export default function Hero({ id }) {
           </p>
         </motion.div>
 
-        {/* Call to Action Buttons */}
+        {/* CTA Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
