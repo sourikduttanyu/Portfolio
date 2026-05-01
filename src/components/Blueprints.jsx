@@ -341,26 +341,27 @@ export default function Blueprints({ id }) {
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
         {/* Left: project selector rail */}
-        <div className="flex lg:flex-col gap-2 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0 lg:w-52 flex-shrink-0">
+        <div className="flex lg:flex-col gap-1 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0 lg:w-64 flex-shrink-0">
           {projects.map((p, i) => (
             <button
               key={p.id}
+              onMouseEnter={() => setActiveIndex(i)}
               onClick={() => setActiveIndex(i)}
-              className="group flex-shrink-0 lg:flex-shrink flex flex-col text-left px-3 py-3 transition-colors duration-150 relative"
+              className="group flex-shrink-0 lg:flex-shrink flex flex-col text-left px-4 py-4 transition-colors duration-150 relative"
               style={{
                 borderLeft: `2px solid ${i === activeIndex ? p.accent : 'rgba(255,255,255,0.08)'}`,
                 background: i === activeIndex ? `rgba(${p.accentRgb},0.07)` : 'transparent',
-                minWidth: 130,
+                minWidth: 160,
               }}
             >
               <span
-                className="font-mono text-[9px] tracking-[0.2em] uppercase transition-opacity"
+                className="font-mono text-[10px] tracking-[0.2em] uppercase transition-opacity"
                 style={{ color: p.accent, opacity: i === activeIndex ? 1 : 0.45 }}
               >
                 {p.id}
               </span>
               <span
-                className={`font-mono text-xs font-bold mt-0.5 transition-colors ${
+                className={`font-mono text-sm font-bold mt-1 transition-colors ${
                   i === activeIndex ? 'text-brand-white' : 'text-alabaster/40 group-hover:text-alabaster/65'
                 }`}
               >
