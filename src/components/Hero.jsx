@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Terminal } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 const ease = [0.16, 1, 0.3, 1]
 
@@ -44,6 +45,14 @@ function ScrollColumn({ terms, duration, dimmer }) {
 }
 
 export default function Hero({ id }) {
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => { if (window.scrollY > 40) setScrolled(true) }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
     <section id={id} aria-labelledby="hero-heading" className="min-h-screen flex flex-col justify-center py-14 sm:py-20 border-b border-yale-blue relative z-10 overflow-hidden">
 
@@ -165,6 +174,33 @@ export default function Hero({ id }) {
         </motion.div>
 
       </div>
+
+      {/* Scroll indicator — fades on first scroll */}
+      <AnimatePresence>
+        {!scrolled && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6, delay: 2 }}
+            className="absolute bottom-10 left-0 flex flex-col items-center gap-2 pointer-events-none"
+            aria-hidden="true"
+          >
+            <span className="font-mono text-[9px] tracking-[0.3em] uppercase text-alabaster/25">
+              scroll
+            </span>
+            <div className="relative w-px h-10 bg-yale-blue/30 overflow-hidden">
+              <motion.div
+                className="absolute top-0 left-0 w-full bg-stormy-teal-light"
+                animate={{ y: ['-100%', '400%'] }}
+                transition={{ duration: 1.4, ease: 'easeInOut', repeat: Infinity, repeatDelay: 0.6 }}
+                style={{ height: '40%' }}
+              />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </section>
   )
 }
