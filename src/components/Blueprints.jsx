@@ -345,6 +345,7 @@ export default function Blueprints({ id }) {
           {projects.map((p, i) => (
             <button
               key={p.id}
+              onMouseEnter={() => setActiveIndex(i)}
               onClick={() => setActiveIndex(i)}
               className="group flex-shrink-0 lg:flex-shrink flex flex-col text-left px-3 py-3 transition-colors duration-150 relative"
               style={{
