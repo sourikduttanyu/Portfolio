@@ -122,7 +122,7 @@ export default function CommandCenter({ id }) {
                 {/* Name */}
                 <div>
                   <label htmlFor="cc-name" className="font-mono text-[9px] text-alabaster/30 tracking-[0.22em] uppercase block mb-2">
-                    DESIGNATOR
+                    NAME
                   </label>
                   <div className="relative flex items-center">
                     <span aria-hidden="true" className="absolute left-0 font-mono text-stormy-teal-light text-base leading-none select-none">›</span>
@@ -143,7 +143,7 @@ export default function CommandCenter({ id }) {
                 {/* Email */}
                 <div>
                   <label htmlFor="cc-email" className="font-mono text-[9px] text-alabaster/30 tracking-[0.22em] uppercase block mb-2">
-                    RETURN_ADDRESS
+                    EMAIL
                   </label>
                   <div className="relative flex items-center">
                     <span aria-hidden="true" className="absolute left-0 font-mono text-stormy-teal-light text-base leading-none select-none">›</span>
@@ -164,7 +164,7 @@ export default function CommandCenter({ id }) {
                 {/* Message */}
                 <div>
                   <label htmlFor="cc-message" className="font-mono text-[9px] text-alabaster/30 tracking-[0.22em] uppercase block mb-2">
-                    PAYLOAD
+                    MESSAGE
                   </label>
                   <div className="relative flex items-start">
                     <span aria-hidden="true" className="absolute left-0 font-mono text-stormy-teal-light text-base leading-none select-none mt-2.5">›</span>

@@ -129,7 +129,7 @@ export default function System({ id }) {
               >
                 <span
                   className="font-sans font-black uppercase leading-none"
-                  style={{ fontSize: '4.5rem', color: 'rgba(40,75,99,0.14)', letterSpacing: '-0.04em' }}
+                  style={{ fontSize: '4.5rem', color: 'rgba(40,75,99,0.07)', letterSpacing: '-0.04em' }}
                 >
                   {group.category}
                 </span>

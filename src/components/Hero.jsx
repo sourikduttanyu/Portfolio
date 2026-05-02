@@ -112,9 +112,10 @@ export default function Hero({ id }) {
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-stormy-teal-light" />
           <p className="font-mono text-alabaster/90 text-sm sm:text-base leading-relaxed pl-4 sm:pl-0">
-            Software Engineer with 2+ years of experience building high-throughput distributed
-            backend services. Strong focus on performance, telemetry, and reliability across cloud
-            environments (Azure, AWS). MS in Computer Science at New York University.
+            Software Engineer with 2+ years shipping distributed backend systems at production scale —
+            LLM-as-a-service platforms, AIOps telemetry pipelines, and agentic RAG architectures on
+            Azure and AWS. Focused on reliability, observability, and AI-native system design.
+            MS Computer Science, New York University.
           </p>
         </motion.div>
 
@@ -151,27 +152,6 @@ export default function Hero({ id }) {
           </a>
         </motion.div>
 
-        {/* Metrics block */}
-        <motion.div
-          initial={{ opacity: 0, scaleY: 0 }}
-          animate={{ opacity: 1, scaleY: 1 }}
-          transition={{ ease, duration: 0.8, delay: 1.4 }}
-          style={{ originY: 1 }}
-          className="absolute bottom-10 right-0 hidden lg:flex gap-4 border-l border-yale-blue pl-4"
-        >
-          <div className="flex flex-col">
-            <span className="font-mono text-xs text-alabaster/50 mb-1 tracking-widest uppercase">LATENCY</span>
-            <span className="font-mono text-sm font-semibold text-brand-white">12ms</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-mono text-xs text-alabaster/50 mb-1 tracking-widest uppercase">UPTIME</span>
-            <span className="font-mono text-sm font-semibold text-stormy-teal-light">99.9%</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-mono text-xs text-alabaster/50 mb-1 tracking-widest uppercase">STATUS</span>
-            <span className="font-mono text-sm font-semibold text-brand-white">O/K</span>
-          </div>
-        </motion.div>
 
       </div>
 

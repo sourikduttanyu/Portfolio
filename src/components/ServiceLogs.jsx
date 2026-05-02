@@ -65,16 +65,9 @@ export default function ServiceLogs({ id }) {
               <span className="text-brand-white">Service </span>
               <span style={{ WebkitTextStroke: '2px #2dd4f0', color: 'transparent' }}>Logs</span>
             </h2>
-            <div className="font-mono text-xs mt-5 space-y-1.5">
-              <p>
-                <span className="text-stormy-teal-light mr-2">$</span>
-                <span className="text-alabaster/70">query --table=work_history --order=DESC --format=highlights</span>
-              </p>
-              <p>
-                <span className="text-yale-blue-light mr-2">→</span>
-                <span className="text-alabaster/45">{experienceLog.length} records found | DRI certified | chronological</span>
-              </p>
-            </div>
+            <p className="font-mono text-xs text-alabaster/40 mt-4">
+              {experienceLog.length} roles · chronological · DRI certified
+            </p>
           </div>
           <div className="font-mono text-xs text-stormy-teal-light text-right hidden md:block font-semibold tracking-wider">
             RECORDS: {experienceLog.length} <br />
