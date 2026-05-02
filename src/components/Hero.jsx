@@ -111,7 +111,7 @@ export default function Hero({ id }) {
           className="relative max-w-2xl"
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-stormy-teal-light" />
-          <p className="font-mono text-alabaster/90 text-sm sm:text-base leading-relaxed pl-4 sm:pl-0">
+          <p className="font-mono text-alabaster/90 text-base leading-relaxed pl-4 sm:pl-0">
             Software Engineer with 2+ years shipping distributed backend systems at production scale —
             LLM-as-a-service platforms, AIOps telemetry pipelines, and agentic RAG architectures on
             Azure and AWS. Focused on reliability, observability, and AI-native system design.

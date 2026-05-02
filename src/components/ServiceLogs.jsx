@@ -121,9 +121,9 @@ export default function ServiceLogs({ id }) {
               </div>
 
               {/* Highlights */}
-              <ul className="space-y-3">
+              <ul className="space-y-3 max-w-3xl">
                 {exp.highlights.map((highlight, hIdx) => (
-                  <li key={hIdx} className="flex items-start gap-4 text-sm font-sans text-alabaster/90 group-hover:text-alabaster transition-colors duration-200 leading-relaxed">
+                  <li key={hIdx} className="flex items-start gap-4 text-base font-sans text-alabaster/90 group-hover:text-alabaster transition-colors duration-200 leading-relaxed">
                     <span className="font-mono text-stormy-teal-light mt-1 flex-shrink-0">&gt;</span>
                     <span>{highlight}</span>
                   </li>

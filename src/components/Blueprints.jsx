@@ -250,7 +250,7 @@ function ProjectDetail({ project }) {
         </div>
 
         {/* Description */}
-        <p className="font-sans text-alabaster/90 text-sm leading-relaxed">
+        <p className="font-sans text-alabaster/90 text-base leading-relaxed">
           {project.description}
         </p>
 
