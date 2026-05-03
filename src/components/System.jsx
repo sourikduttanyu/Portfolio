@@ -86,8 +86,8 @@ export default function System({ id }) {
         <div className="flex items-center gap-3 mb-5 sm:mb-8">
           <span className="font-mono text-xs text-yale-blue-light font-bold tracking-widest">03</span>
           <div className="flex-1 h-px bg-yale-blue" />
-          <span className="font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">CAPABILITY_MATRIX</span>
-          <div className="w-12 h-px bg-yale-blue-light/50" />
+          <span className="hidden sm:inline font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">CAPABILITY_MATRIX</span>
+          <div className="hidden sm:block w-12 h-px bg-yale-blue-light/50" />
         </div>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6">

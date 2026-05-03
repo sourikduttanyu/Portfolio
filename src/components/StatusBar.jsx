@@ -78,7 +78,7 @@ export default function StatusBar() {
               aria-label={ariaLabels[item.id]}
               aria-current={isActive ? 'true' : undefined}
               className={cn(
-                "relative group flex items-center justify-center w-full transition-all duration-200 ease-out",
+                "relative group flex items-center justify-center w-full py-2 transition-all duration-200 ease-out",
                 isActive ? "text-brand-white" : "text-yale-blue-light hover:text-stormy-teal-light"
               )}
             >

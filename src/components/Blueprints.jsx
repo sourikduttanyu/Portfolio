@@ -313,8 +313,8 @@ export default function Blueprints({ id }) {
         <div className="flex items-center gap-3 mb-5 sm:mb-8">
           <span className="font-mono text-xs text-stormy-teal-light font-bold tracking-widest">01</span>
           <div className="flex-1 h-px bg-yale-blue" />
-          <span className="font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">SCHEMATIC_ARCHIVE</span>
-          <div className="w-12 h-px bg-stormy-teal-light/50" />
+          <span className="hidden sm:inline font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">SCHEMATIC_ARCHIVE</span>
+          <div className="hidden sm:block w-12 h-px bg-stormy-teal-light/50" />
         </div>
 
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 sm:pb-8 border-b border-yale-blue gap-4 sm:gap-6 relative overflow-hidden">
@@ -373,7 +373,7 @@ export default function Blueprints({ id }) {
         </div>
 
         {/* Right: detail panel */}
-        <div className="flex-1" style={{ minHeight: 480 }}>
+        <div className="flex-1 min-h-[360px] sm:min-h-[480px]">
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}

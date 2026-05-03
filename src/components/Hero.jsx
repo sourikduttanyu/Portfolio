@@ -139,7 +139,7 @@ export default function Hero({ id }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </a>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <a href="https://github.com/sourikduttanyu" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile (opens in new tab)" className="group inline-flex items-center justify-center px-8 py-4 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out">
               <span className="font-mono text-sm tracking-wider text-alabaster group-hover:text-stormy-teal-light transition-colors duration-200">
                 [ GITHUB_NODE ]
