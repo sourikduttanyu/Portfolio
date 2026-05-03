@@ -325,7 +325,7 @@ export default function Blueprints({ id }) {
           >01</div>
 
           <div>
-            <h2 id="blueprints-heading" className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
+            <h2 id="blueprints-heading" className="text-[clamp(2.25rem,5.5vw,4.5rem)] font-sans font-extrabold text-brand-white tracking-tight uppercase">
               The <span style={{ WebkitTextStroke: '2px #2dd4f0', color: 'transparent' }}>Blueprints</span>
             </h2>
             <p className="font-mono text-alabaster/40 mt-4 text-xs tracking-wider">

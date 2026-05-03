@@ -70,7 +70,7 @@ export default function Hero({ id }) {
         <ScrollColumn terms={TECH_COLS[1]} duration={31} dimmer={true} />
       </div>
 
-      <div className="max-w-4xl">
+      <div className="max-w-5xl">
 
         {/* System Status Label */}
         <motion.div
@@ -95,7 +95,7 @@ export default function Hero({ id }) {
           className="relative"
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-yale-blue" />
-          <h1 id="hero-heading" className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-sans font-extrabold leading-none tracking-tight text-brand-white mb-6">
+          <h1 id="hero-heading" className="text-[clamp(3.5rem,12vw,10.5rem)] font-sans font-extrabold leading-none tracking-tight text-brand-white mb-10">
             Sourik <br className="hidden sm:block" />
             <span style={{ WebkitTextStroke: '3px #2dd4f0', color: 'transparent' }}>
               Dutta.
@@ -124,7 +124,7 @@ export default function Hero({ id }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ease, duration: 0.9, delay: 1.1 }}
-          className="mt-12 flex items-center gap-8 flex-wrap"
+          className="mt-16 flex items-center gap-8 flex-wrap"
         >
           <a href="#blueprints" aria-label="View my projects" className="group inline-flex items-center justify-center px-8 py-4 bg-stormy-teal-light border border-stormy-teal-light text-graphite-100 hover:bg-stormy-teal-light/85 transition-colors duration-200 ease-out">
             <span className="font-mono text-sm tracking-wider font-semibold">

@@ -92,7 +92,7 @@ export default function System({ id }) {
 
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6">
           <div>
-            <h2 id="system-heading" className="text-4xl sm:text-5xl font-sans font-extrabold tracking-tight uppercase">
+            <h2 id="system-heading" className="text-[clamp(2.25rem,5.5vw,4.5rem)] font-sans font-extrabold tracking-tight uppercase">
               <span style={{ WebkitTextStroke: '2px rgba(91,164,245,0.85)', color: 'transparent' }}>THE </span>
               <span className="text-brand-white">SYSTEM</span>
             </h2>

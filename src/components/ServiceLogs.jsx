@@ -59,9 +59,9 @@ export default function ServiceLogs({ id }) {
           <div className="hidden sm:block w-12 h-px bg-stormy-teal-light/50" />
         </div>
 
-        <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6 relative overflow-hidden">
           <div>
-            <h2 id="logs-heading" className="text-4xl sm:text-5xl font-sans font-extrabold tracking-tight uppercase">
+            <h2 id="logs-heading" className="text-[clamp(2.25rem,5.5vw,4.5rem)] font-sans font-extrabold tracking-tight uppercase">
               <span className="text-brand-white">Service </span>
               <span style={{ WebkitTextStroke: '2px #2dd4f0', color: 'transparent' }}>Logs</span>
             </h2>
@@ -73,6 +73,12 @@ export default function ServiceLogs({ id }) {
             RECORDS: {experienceLog.length} <br />
             STATE: VERIFIED
           </div>
+
+          <div
+            className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
+            style={{ fontSize: 160, color: 'rgba(45,212,240,0.04)', lineHeight: 1 }}
+            aria-hidden="true"
+          >02</div>
         </div>
       </div>
 
