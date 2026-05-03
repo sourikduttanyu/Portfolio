@@ -32,8 +32,8 @@ function ScrollColumn({ terms, duration, dimmer }) {
             className="font-mono text-[11px] tracking-widest whitespace-nowrap uppercase"
             style={{
               color: dimmer
-                ? `rgba(180,220,230,${i % 3 === 0 ? 0.18 : 0.10})`
-                : `rgba(180,220,230,${i % 3 === 0 ? 0.28 : 0.15})`,
+                ? `rgba(180,220,230,${i % 3 === 0 ? 0.26 : 0.14})`
+                : `rgba(180,220,230,${i % 3 === 0 ? 0.40 : 0.22})`,
             }}
           >
             {term}
@@ -95,9 +95,9 @@ export default function Hero({ id }) {
           className="relative"
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-yale-blue" />
-          <h1 id="hero-heading" className="text-5xl sm:text-7xl md:text-8xl font-sans font-extrabold leading-none tracking-tight text-brand-white mb-6">
+          <h1 id="hero-heading" className="text-5xl sm:text-7xl md:text-8xl lg:text-[9.5rem] font-sans font-extrabold leading-none tracking-tight text-brand-white mb-6">
             Sourik <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-stormy-teal-light to-yale-blue-light">
+            <span style={{ WebkitTextStroke: '3px #2dd4f0', color: 'transparent' }}>
               Dutta.
             </span>
           </h1>
@@ -126,13 +126,12 @@ export default function Hero({ id }) {
           transition={{ ease, duration: 0.9, delay: 1.1 }}
           className="mt-12 flex gap-4 flex-wrap"
         >
-          <a href="#blueprints" aria-label="View my projects" className="group relative inline-flex items-center justify-center px-8 py-4 bg-yale-blue/20 border sharp-border hover:border-stormy-teal-light transition-colors duration-200 ease-out overflow-hidden">
-            <span className="absolute inset-0 w-full h-full bg-stormy-teal-light -translate-x-full group-hover:translate-x-0 transition-transform duration-200 ease-out" />
-            <span className="relative z-10 font-mono text-sm tracking-wider text-brand-white group-hover:text-graphite-100 transition-colors duration-200">
+          <a href="#blueprints" aria-label="View my projects" className="group inline-flex items-center justify-center px-8 py-4 bg-stormy-teal-light border border-stormy-teal-light text-graphite-100 hover:bg-stormy-teal-light/85 transition-colors duration-200 ease-out">
+            <span className="font-mono text-sm tracking-wider font-semibold">
               DEPLOY_BLUEPRINTS
             </span>
             <svg
-              className="relative z-10 ml-3 w-4 h-4 text-brand-white group-hover:text-graphite-100 transform -rotate-45 group-hover:rotate-0 transition-all duration-200 ease-out"
+              className="ml-3 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-200 ease-out"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

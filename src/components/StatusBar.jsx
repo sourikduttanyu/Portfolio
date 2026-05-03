@@ -1,4 +1,4 @@
-import { motion, useScroll, useSpring } from 'framer-motion'
+import { motion, useScroll, useSpring, useReducedMotion } from 'framer-motion'
 import { Terminal, Lightbulb, Blocks, Send, ScrollText } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { clsx } from 'clsx'
@@ -24,6 +24,7 @@ export default function StatusBar() {
     restDelta: 0.001
   })
 
+  const reducedMotion = useReducedMotion()
   const [activeSection, setActiveSection] = useState('hero')
 
   useEffect(() => {
@@ -90,12 +91,16 @@ export default function StatusBar() {
                 {item.label}
               </div>
               
-              <div className={cn(
-                "relative flex items-center justify-center bg-graphite-100 w-8 h-8 rounded-none border transition-colors duration-200 ease-out",
-                isActive ? "border-stormy-teal-light outline-1 outline-brand-orange outline-offset-2" : "border-yale-blue group-hover:border-stormy-teal-light group-hover:text-stormy-teal-light text-yale-blue-light/70"
-              )}>
+              <motion.div
+                whileHover={reducedMotion ? {} : { scale: 1.12 }}
+                transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.2 }}
+                className={cn(
+                  "relative flex items-center justify-center bg-graphite-100 w-8 h-8 rounded-none border transition-colors duration-200 ease-out",
+                  isActive ? "border-stormy-teal-light outline-1 outline-brand-orange outline-offset-2" : "border-yale-blue group-hover:border-stormy-teal-light group-hover:text-stormy-teal-light text-yale-blue-light/70"
+                )}
+              >
                 <Icon size={16} strokeWidth={1.5} />
-              </div>
+              </motion.div>
             </a>
           )
         })}

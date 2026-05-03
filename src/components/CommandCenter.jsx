@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion'
-import { TerminalSquare, Send, GitBranch, Briefcase, Mail, ArrowUpRight } from 'lucide-react'
+import { TerminalSquare, Send, GitBranch, Briefcase, Mail, ArrowUpRight, Check } from 'lucide-react'
 import { useState } from 'react'
 
 // Sign up at formspree.io → create a form → paste your form ID here
@@ -13,10 +13,21 @@ const CHANNELS = [
   { label: 'DIRECT_MAIL',    href: 'mailto:sourik1999dutta@gmail.com',                Icon: Mail,      handle: 'sourik1999dutta@gmail.com' },
 ]
 
+const EMAIL = 'sourik1999dutta@gmail.com'
+
 export default function CommandCenter({ id }) {
   const [fields, setFields]   = useState({ name: '', email: '', message: '' })
   const [status, setStatus]   = useState('idle')    // idle | sending | success | error
   const [log,    setLog]      = useState([])
+  const [copied, setCopied]   = useState(false)
+
+  const copyEmail = (e) => {
+    e.preventDefault()
+    navigator.clipboard.writeText(EMAIL).then(() => {
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    })
+  }
 
   const appendLog = (msg, type = 'info') =>
     setLog(prev => [...prev, { msg, type, key: Date.now() + Math.random() }])
@@ -233,21 +244,30 @@ export default function CommandCenter({ id }) {
                 SECONDARY_CHANNELS
               </div>
               <div className="space-y-3.5">
-                {CHANNELS.map(({ href, Icon, handle }) => (
-                  <a
-                    key={handle}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center justify-between text-alabaster/45 hover:text-stormy-teal-light transition-colors duration-150"
-                  >
-                    <div className="flex items-center gap-2.5">
-                      <Icon size={12} strokeWidth={1.8} />
-                      <span className="font-mono text-xs">{handle}</span>
-                    </div>
-                    <ArrowUpRight size={11} className="opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
-                  </a>
-                ))}
+                {CHANNELS.map(({ href, Icon, handle, label }) => {
+                  const isEmail = label === 'DIRECT_MAIL'
+                  return (
+                    <a
+                      key={handle}
+                      href={href}
+                      onClick={isEmail ? copyEmail : undefined}
+                      target={isEmail ? undefined : '_blank'}
+                      rel={isEmail ? undefined : 'noopener noreferrer'}
+                      className="group flex items-center justify-between text-alabaster/45 hover:text-stormy-teal-light transition-colors duration-150 cursor-pointer"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        {isEmail && copied ? <Check size={12} strokeWidth={1.8} className="text-stormy-teal-light" /> : <Icon size={12} strokeWidth={1.8} />}
+                        <span className="font-mono text-xs">{handle}</span>
+                      </div>
+                      {isEmail
+                        ? <span className={`font-mono text-[9px] tracking-widest transition-opacity duration-150 ${copied ? 'opacity-100 text-stormy-teal-light' : 'opacity-0 group-hover:opacity-60'}`}>
+                            {copied ? 'COPIED' : 'COPY'}
+                          </span>
+                        : <ArrowUpRight size={11} className="opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                      }
+                    </a>
+                  )
+                })}
               </div>
             </div>
 

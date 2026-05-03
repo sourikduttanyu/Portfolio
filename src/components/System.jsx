@@ -129,7 +129,7 @@ export default function System({ id }) {
               >
                 <span
                   className="font-sans font-black uppercase leading-none"
-                  style={{ fontSize: '4.5rem', color: 'rgba(40,75,99,0.07)', letterSpacing: '-0.04em' }}
+                  style={{ fontSize: '4.5rem', color: 'rgba(45,212,240,0.055)', letterSpacing: '-0.04em' }}
                 >
                   {group.category}
                 </span>
@@ -152,14 +152,21 @@ export default function System({ id }) {
               {/* Skills inline */}
               <div className="relative pb-6 flex flex-wrap gap-x-8 gap-y-2.5">
                 {group.skills.map((skill, skillIdx) => (
-                  <div key={skill} className="flex items-center gap-2">
+                  <motion.div
+                    key={skill}
+                    initial={{ opacity: 0, x: -8 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4, delay: idx * 0.07 + skillIdx * 0.035 }}
+                    className="flex items-center gap-2"
+                  >
                     <span className="font-mono text-[9px] text-stormy-teal-light/35 group-hover:text-stormy-teal-light/65 transition-colors duration-200 select-none">
                       {String(skillIdx + 1).padStart(2, '0')}
                     </span>
                     <span className="font-sans text-sm text-alabaster/90 group-hover:text-brand-white transition-colors duration-200 font-medium">
                       {skill}
                     </span>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
