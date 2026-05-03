@@ -1,0 +1,181 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-02T00:00:00Z",
+  "title": "Design System: Sourik Dutta — Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "signal-teal": {
+        "role": "primary",
+        "displayName": "Signal Teal",
+        "canonical": "oklch(84% 0.14 215)",
+        "tonalRamp": ["#04232e", "#0a3c4e", "#0e6887", "#1da3c8", "#2dccec", "#2dd4f0", "#7de4f5", "#cbf5fb"]
+      },
+      "signal-teal-mid": {
+        "role": "primary-mid",
+        "displayName": "Signal Teal Mid",
+        "canonical": "oklch(56% 0.13 215)",
+        "tonalRamp": ["#021820", "#063040", "#0a5265", "#0a87a3", "#0db3d8", "#2dd4f0", "#7de4f5", "#cbf5fb"]
+      },
+      "deep-navy": {
+        "role": "neutral-bg",
+        "displayName": "Deep Navy",
+        "canonical": "oklch(9% 0.022 225)",
+        "tonalRamp": ["#010409", "#07111f", "#0c1a30", "#111f3b", "#182e53", "#2a4a75", "#5b80ad", "#aec5e0"]
+      },
+      "elevated-navy": {
+        "role": "neutral-surface",
+        "displayName": "Elevated Navy",
+        "canonical": "oklch(13% 0.028 225)",
+        "tonalRamp": ["#010409", "#07111f", "#0c1a30", "#132038", "#1c3256", "#2e517a", "#6085b5", "#b0c8e3"]
+      },
+      "yale-blue": {
+        "role": "neutral-border",
+        "displayName": "Yale Blue",
+        "canonical": "oklch(27% 0.075 255)",
+        "tonalRamp": ["#090e1c", "#102040", "#1a3a6a", "#2a5899", "#3f7ac0", "#689bd6", "#9bbfe8", "#d5e5f5"]
+      },
+      "relay-blue": {
+        "role": "secondary",
+        "displayName": "Relay Blue",
+        "canonical": "oklch(68% 0.14 250)",
+        "tonalRamp": ["#0a1830", "#132a55", "#1e447a", "#2e60a8", "#4a81cc", "#5ba4f5", "#93c3f8", "#d4eafd"]
+      },
+      "alabaster": {
+        "role": "neutral-text",
+        "displayName": "Alabaster",
+        "canonical": "oklch(92% 0.025 225)",
+        "tonalRamp": ["#111f30", "#1e3452", "#2e4d74", "#4a6e96", "#7294b8", "#a2bbd4", "#c8daea", "#dde8f5"]
+      },
+      "command-white": {
+        "role": "neutral-emphasis",
+        "displayName": "Command White",
+        "canonical": "oklch(97% 0.012 225)",
+        "tonalRamp": ["#1a2e42", "#234060", "#34608a", "#4f84b0", "#7aaed1", "#a8ceea", "#cde1f2", "#f0f8ff"]
+      }
+    },
+    "typographyMeta": {
+      "display":  { "displayName": "Display",  "purpose": "Hero name only. Stacks vertically at large breakpoints." },
+      "headline": { "displayName": "Headline", "purpose": "Section titles. Always uppercase. Stroke-paired format." },
+      "title":    { "displayName": "Title",    "purpose": "Experience role names and project names." },
+      "body":     { "displayName": "Body",     "purpose": "Experience highlights, descriptions, summary paragraph. Max 65–75ch." },
+      "label":    { "displayName": "Label",    "purpose": "All metadata, section tags, status readouts, timestamps, prompts." }
+    },
+    "shadows": [
+      {
+        "name": "teal-glow-hover",
+        "value": "0 0 10px rgba(45, 212, 240, 0.5)",
+        "purpose": "State-change signal on interactive nodes (timeline dots, nav icons) on group hover. Not decorative."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-expo-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Primary easing for all entrances, CTA hover fills, panel swaps."
+      },
+      {
+        "name": "ease-linear",
+        "value": "linear",
+        "purpose": "Infinite scroll animations only (tech stack columns in Hero)."
+      },
+      {
+        "name": "spring-scroll",
+        "value": "stiffness: 100, damping: 30, restDelta: 0.001",
+        "purpose": "StatusBar scroll progress spring. Framer Motion useSpring config."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Solid Signal Teal CTA. Used for primary navigation actions (Deploy Blueprints).",
+      "html": "<button class=\"ds-btn-primary\">DEPLOY_BLUEPRINTS <svg width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\"><path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M14 5l7 7m0 0l-7 7m7-7H3\"/></svg></button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 12px; background: #2dd4f0; color: #07111f; border: 1px solid #2dd4f0; border-radius: 0; padding: 16px 32px; font-family: 'Fira Code', 'JetBrains Mono', monospace; font-size: 0.875rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s ease-out; } .ds-btn-primary:hover { background: #26bcd9; } .ds-btn-primary svg { transition: transform 0.2s ease-out; } .ds-btn-primary:hover svg { transform: translateX(4px); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Transparent outline button for secondary actions (GitHub, LinkedIn).",
+      "html": "<button class=\"ds-btn-ghost\">[ GITHUB_NODE ]</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; background: transparent; color: #dde8f5; border: 1px solid #1a3a6a; border-radius: 0; padding: 16px 32px; font-family: 'Fira Code', 'JetBrains Mono', monospace; font-size: 0.875rem; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: border-color 0.2s ease-out, color 0.2s ease-out; } .ds-btn-ghost:hover { border-color: #2dd4f0; color: #2dd4f0; }"
+    },
+    {
+      "name": "Nav Icon",
+      "kind": "nav",
+      "refersTo": "nav-icon",
+      "description": "Fixed right-rail nav item. 32x32px icon box. Active = Signal Teal border.",
+      "html": "<div class=\"ds-nav-icon ds-nav-icon--active\"><svg width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\" viewBox=\"0 0 24 24\"><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\"/><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\"/><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\"/></svg></div>",
+      "css": ".ds-nav-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 1px solid #1a3a6a; background: #07111f; color: rgba(91,164,245,0.7); border-radius: 0; cursor: pointer; transition: border-color 0.2s, color 0.2s, transform 0.2s; } .ds-nav-icon:hover { border-color: #2dd4f0; color: #2dd4f0; transform: scale(1.12); } .ds-nav-icon--active { border-color: #2dd4f0; color: #f0f8ff; outline: 1px solid rgba(255,120,50,0.7); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Input Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Bottom-border-only input. Monospace, left-aligned with a › prompt glyph.",
+      "html": "<div class=\"ds-input-wrap\"><span class=\"ds-input-prompt\">›</span><input class=\"ds-input\" type=\"text\" placeholder=\"your name\" /></div>",
+      "css": ".ds-input-wrap { position: relative; display: flex; align-items: center; } .ds-input-prompt { position: absolute; left: 0; font-family: 'Fira Code', monospace; color: #2dd4f0; font-size: 1rem; line-height: 1; pointer-events: none; } .ds-input { width: 100%; background: transparent; border: none; border-bottom: 1px solid #1a3a6a; border-radius: 0; padding: 10px 8px 10px 24px; font-family: 'Fira Code', 'JetBrains Mono', monospace; font-size: 0.875rem; color: #f0f8ff; outline: none; transition: border-color 0.2s ease-out; } .ds-input::placeholder { color: rgba(91,164,245,0.35); } .ds-input:focus { border-bottom-color: #2dd4f0; } .ds-input:disabled { opacity: 0.4; }"
+    },
+    {
+      "name": "Section Separator",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Signature section opener. Number chip + full-width rule + machine tag. Identical grammar across all four sections.",
+      "html": "<div class=\"ds-section-sep\"><span class=\"ds-section-sep__num\">02</span><div class=\"ds-section-sep__line\"></div><span class=\"ds-section-sep__tag\">CAREER_TELEMETRY</span><div class=\"ds-section-sep__accent\"></div></div>",
+      "css": ".ds-section-sep { display: flex; align-items: center; gap: 12px; } .ds-section-sep__num { font-family: 'Fira Code', monospace; font-size: 0.75rem; font-weight: 700; color: #2dd4f0; letter-spacing: 0.2em; flex-shrink: 0; } .ds-section-sep__line { flex: 1; height: 1px; background: #1a3a6a; } .ds-section-sep__tag { font-family: 'Fira Code', monospace; font-size: 0.625rem; color: rgba(221,232,245,0.3); letter-spacing: 0.2em; text-transform: uppercase; flex-shrink: 0; } .ds-section-sep__accent { width: 48px; height: 1px; background: rgba(45,212,240,0.5); flex-shrink: 0; }"
+    },
+    {
+      "name": "Timeline Entry",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "Experience log entry. Left-border timeline with square node, role header, and bulleted highlights.",
+      "html": "<div class=\"ds-timeline\"><div class=\"ds-timeline__node\"></div><div class=\"ds-timeline__connector\"></div><div class=\"ds-timeline__body\"><div class=\"ds-timeline__header\"><strong class=\"ds-timeline__role\">Software Engineer</strong><span class=\"ds-timeline__company\">Insight Enterprises</span></div><ul class=\"ds-timeline__highlights\"><li><span class=\"ds-timeline__prompt\">›</span><span>Architected a production LLM-as-a-service platform on Azure.</span></li></ul></div></div>",
+      "css": ".ds-timeline { position: relative; padding-left: 32px; border-left: 1px solid #1a3a6a; } .ds-timeline__node { position: absolute; left: -5px; top: 4px; width: 8px; height: 8px; background: #1a3a6a; transition: background 0.2s, transform 0.2s, box-shadow 0.2s; } .ds-timeline:hover .ds-timeline__node { background: #2dd4f0; transform: scale(1.5); box-shadow: 0 0 10px rgba(45,212,240,0.5); } .ds-timeline__connector { position: absolute; left: -32px; top: 6px; width: 32px; height: 1px; background: #1a3a6a; transition: background 0.2s; } .ds-timeline:hover .ds-timeline__connector { background: #2dd4f0; } .ds-timeline__body { padding-left: 24px; } .ds-timeline__role { display: block; font-family: 'Exo 2', sans-serif; font-size: 1.25rem; font-weight: 700; color: #f0f8ff; } .ds-timeline__company { display: block; font-family: 'Fira Code', monospace; font-size: 0.75rem; color: #2dd4f0; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 4px; } .ds-timeline__highlights { list-style: none; padding: 0; margin-top: 12px; } .ds-timeline__highlights li { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 8px; font-family: 'Exo 2', sans-serif; font-size: 1rem; color: rgba(221,232,245,0.9); line-height: 1.6; } .ds-timeline__prompt { font-family: 'Fira Code', monospace; color: #2dd4f0; flex-shrink: 0; margin-top: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Operational Manifest",
+    "overview": "This is not a portfolio — it is a live capability record. The aesthetic comes from mission-critical production dashboards, not creative showcases. Every section has an ID, a section number, and a status indicator. The typography is geometric-military: Exo 2 for structure, Fira Code for signal. The palette is a deep navy void with a single high-chroma teal accent that reads like a status LED, not a brand color.\n\nThe system rewards the kind of reader who inspects devtools. Section labels are alphanumeric. Ghost watermarks behind section headers are teal-tinted at near-zero opacity. Console output is styled. Tab title changes on blur. These are details that surface only to engineers who look — which is precisely the audience.\n\nDensity signals credibility. Sparse, airy layouts read as junior. The skill matrix has 97 nodes. The experience entries carry architecture specifics. The design holds that weight without becoming unreadable.",
+    "keyCharacteristics": [
+      "Sharp corners throughout — border-radius: 0 on every interactive element",
+      "Two-font system: geometric sans display + monospace labels",
+      "Tonal layering for depth; no drop shadows",
+      "Section grammar: number chip + rule + tag label, identical across all sections",
+      "All headings uppercase; section labels in ALL_CAPS_WITH_UNDERSCORES",
+      "Grid background at 0.4 opacity, pulsing slowly — structural, never decorative"
+    ],
+    "rules": [
+      { "name": "The Signal Rule", "body": "Signal Teal (#2dd4f0) is the only color that communicates an active, selected, or actionable state. Relay Blue signals secondary hierarchy, never action.", "section": "colors" },
+      { "name": "The Opacity Ladder Rule", "body": "Text secondary hierarchy is expressed through opacity steps on Alabaster only. Standard ladder: full → /90 → /65 → /40 → /25. Do not invent new values.", "section": "colors" },
+      { "name": "The Flat-By-Default Rule", "body": "All surfaces are flat at rest. Tonal layering communicates elevation. Glows are reserved for hover state on interactive nodes. Ambient decorative shadows are prohibited.", "section": "elevation" },
+      { "name": "The Two-Font Rule", "body": "Every text element uses either Exo 2 or Fira Code. No system fallback fonts, no third faces.", "section": "typography" },
+      { "name": "The Stroke Pair Rule", "body": "Section headlines always have two parts: one word in solid command-white, one word in WebkitTextStroke. Never gradient text, never background-clip: text.", "section": "typography" },
+      { "name": "The No-Card-Grid Rule", "body": "Cards are not used in grids of identical siblings. Use selector+detail, grouped rows, or timeline patterns instead.", "section": "components" }
+    ],
+    "dos": [
+      "Do use WebkitTextStroke + color: transparent for outlined display text.",
+      "Do enforce opacity ladder on Alabaster for text hierarchy: full → /90 → /65 → /40 → /25.",
+      "Do keep all interactive corners sharp (border-radius: 0).",
+      "Do prefix all section labels with a zero-padded number and use ALL_CAPS_WITH_UNDERSCORES for machine identifiers.",
+      "Do use Fira Code exclusively for all metadata, labels, status readouts, section tags, and timestamps.",
+      "Do keep Signal Teal below 15% of any given screen surface area."
+    ],
+    "donts": [
+      "Don't use background-clip: text with a gradient. Outlined text uses WebkitTextStroke only.",
+      "Don't use glassmorphism. No backdrop-filter: blur() on any surface.",
+      "Don't build a card grid with identical siblings.",
+      "Don't use the hero-metric template (big number, small label, gradient accent).",
+      "Don't add a border-left wider than 1px as a decorative colored accent stripe.",
+      "Don't use generic glassmorphism portfolios, soft pastel aesthetics, over-animated scrollytelling, or any layout a recruiter would describe as 'cute'.",
+      "Don't introduce a third typeface.",
+      "Don't use Relay Blue for action states or active indicators."
+    ]
+  }
+}

@@ -175,7 +175,6 @@ function TechBadge({ name, category }) {
         backgroundColor: bg,
         color,
         border: `1px solid ${color}44`,
-        boxShadow: `inset 0 1px 0 rgba(255,255,255,0.09), 0 2px 6px rgba(0,0,0,0.35), 0 0 0 1px ${color}18`,
       }}
     >
       <Icon size={11} strokeWidth={2.5} />
@@ -190,11 +189,8 @@ function ProjectDetail({ project }) {
     <div
       className="relative flex flex-col overflow-hidden h-full"
       style={{
-        background: `linear-gradient(135deg, #151515 0%, rgba(${accentRgb},0.05) 100%)`,
+        background: `rgba(${accentRgb},0.04)`,
         border: `1px solid rgba(${accentRgb},0.18)`,
-        borderLeftWidth: 3,
-        borderLeftColor: accent,
-        borderLeftStyle: 'solid',
       }}
     >
       {/* Top accent bar */}
@@ -313,27 +309,33 @@ export default function Blueprints({ id }) {
     <section id={id} aria-labelledby="blueprints-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10">
 
       {/* Section Header */}
-      <div className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-end justify-between border-b border-yale-blue pb-6 sm:pb-8 gap-4 sm:gap-6 relative overflow-hidden">
-        <div
-          className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
-          style={{ fontSize: 160, color: 'rgba(40,75,99,0.18)', lineHeight: 1 }}
-          aria-hidden="true"
-        >01</div>
-
-        <div>
-          <div className="font-mono text-[10px] text-stormy-teal-light tracking-[0.25em] uppercase mb-3">
-            // SCHEMATIC_ARCHIVE — PROJ_COUNT: {projects.length}
-          </div>
-          <h2 id="blueprints-heading" className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
-            The Blueprints
-          </h2>
-          <p className="font-mono text-alabaster/85 mt-4 text-sm max-w-lg leading-relaxed">
-            Technical schematics & constructed architectures. Select to inspect.
-          </p>
+      <div className="mb-8 sm:mb-10 relative">
+        <div className="flex items-center gap-3 mb-5 sm:mb-8">
+          <span className="font-mono text-xs text-stormy-teal-light font-bold tracking-widest">01</span>
+          <div className="flex-1 h-px bg-yale-blue" />
+          <span className="font-mono text-[10px] text-alabaster/30 tracking-[0.2em] uppercase">SCHEMATIC_ARCHIVE</span>
+          <div className="w-12 h-px bg-stormy-teal-light/50" />
         </div>
 
-        <div className="font-mono text-xs text-stormy-teal-light hidden md:block font-semibold tracking-wider text-right">
-          {String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
+        <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 sm:pb-8 border-b border-yale-blue gap-4 sm:gap-6 relative overflow-hidden">
+          <div
+            className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
+            style={{ fontSize: 160, color: 'rgba(45,212,240,0.04)', lineHeight: 1 }}
+            aria-hidden="true"
+          >01</div>
+
+          <div>
+            <h2 id="blueprints-heading" className="text-4xl sm:text-5xl font-sans font-extrabold text-brand-white tracking-tight uppercase">
+              The <span style={{ WebkitTextStroke: '2px #2dd4f0', color: 'transparent' }}>Blueprints</span>
+            </h2>
+            <p className="font-mono text-alabaster/40 mt-4 text-xs tracking-wider">
+              PROJ_COUNT: {projects.length} · technical schematics · select to inspect
+            </p>
+          </div>
+
+          <div className="font-mono text-xs text-stormy-teal-light hidden md:block font-semibold tracking-wider text-right">
+            {String(activeIndex + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}
+          </div>
         </div>
       </div>
 
@@ -349,8 +351,7 @@ export default function Blueprints({ id }) {
               onClick={() => setActiveIndex(i)}
               className="group flex-shrink-0 lg:flex-shrink flex flex-col text-left px-4 py-4 transition-colors duration-150 relative"
               style={{
-                borderLeft: `2px solid ${i === activeIndex ? p.accent : 'rgba(255,255,255,0.08)'}`,
-                background: i === activeIndex ? `rgba(${p.accentRgb},0.07)` : 'transparent',
+                background: i === activeIndex ? `rgba(${p.accentRgb},0.08)` : 'transparent',
                 minWidth: 160,
               }}
             >

@@ -124,7 +124,7 @@ export default function Hero({ id }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ease, duration: 0.9, delay: 1.1 }}
-          className="mt-12 flex gap-4 flex-wrap"
+          className="mt-12 flex items-center gap-8 flex-wrap"
         >
           <a href="#blueprints" aria-label="View my projects" className="group inline-flex items-center justify-center px-8 py-4 bg-stormy-teal-light border border-stormy-teal-light text-graphite-100 hover:bg-stormy-teal-light/85 transition-colors duration-200 ease-out">
             <span className="font-mono text-sm tracking-wider font-semibold">
@@ -139,16 +139,18 @@ export default function Hero({ id }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </a>
-          <a href="https://github.com/sourikduttanyu" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile (opens in new tab)" className="group relative inline-flex items-center justify-center px-8 py-4 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out">
-            <span className="font-mono text-sm tracking-wider text-alabaster group-hover:text-stormy-teal-light transition-colors duration-200">
-              [ GITHUB_NODE ]
-            </span>
-          </a>
-          <a href="https://linkedin.com/in/sourik-dutta-71a34a17b/" target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile (opens in new tab)" className="group relative inline-flex items-center justify-center px-8 py-4 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out">
-            <span className="font-mono text-sm tracking-wider text-alabaster group-hover:text-stormy-teal-light transition-colors duration-200">
-              [ LINKEDIN_NODE ]
-            </span>
-          </a>
+          <div className="flex gap-3">
+            <a href="https://github.com/sourikduttanyu" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile (opens in new tab)" className="group inline-flex items-center justify-center px-8 py-4 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out">
+              <span className="font-mono text-sm tracking-wider text-alabaster group-hover:text-stormy-teal-light transition-colors duration-200">
+                [ GITHUB_NODE ]
+              </span>
+            </a>
+            <a href="https://linkedin.com/in/sourik-dutta-71a34a17b/" target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile (opens in new tab)" className="group inline-flex items-center justify-center px-8 py-4 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out">
+              <span className="font-mono text-sm tracking-wider text-alabaster group-hover:text-stormy-teal-light transition-colors duration-200">
+                [ LINKEDIN_NODE ]
+              </span>
+            </a>
+          </div>
         </motion.div>
 
 
