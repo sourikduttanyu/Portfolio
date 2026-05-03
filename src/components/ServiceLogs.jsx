@@ -110,7 +110,7 @@ export default function ServiceLogs({ id }) {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:items-end gap-1 font-mono text-xs text-alabaster/80 font-semibold flex-shrink-0">
+                  <div className="flex flex-col sm:items-end gap-1 font-mono text-xs text-yale-blue-light font-semibold flex-shrink-0">
                     <div className="flex items-center gap-2">
                       <Calendar size={12} />
                       {exp.period}

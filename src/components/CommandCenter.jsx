@@ -231,8 +231,8 @@ export default function CommandCenter({ id }) {
                 <div>
                   <span className="font-mono text-[9px] text-alabaster/25 tracking-wider uppercase block mb-1.5">STATUS</span>
                   <div className="flex items-center gap-2">
-                    <div className="w-1.5 h-1.5 rounded-full bg-stormy-teal-light animate-pulse" />
-                    <span className="font-mono text-xs text-stormy-teal-light">ONLINE · OPEN_TO_WORK</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-signal-green animate-pulse" />
+                    <span className="font-mono text-xs text-signal-green">ONLINE · OPEN_TO_WORK</span>
                   </div>
                 </div>
               </div>
