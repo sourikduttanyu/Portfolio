@@ -274,11 +274,28 @@ function ProjectDetail({ project }) {
 
         {/* Header */}
         <div>
-          <div
-            className="font-mono text-[10px] font-bold tracking-[0.18em] uppercase mb-2"
-            style={{ color: accent }}
-          >
-            {project.id} — {project.subtitle}
+          <div className="flex items-start justify-between gap-4 mb-2">
+            <div
+              className="font-mono text-[10px] font-bold tracking-[0.18em] uppercase"
+              style={{ color: accent }}
+            >
+              {project.id} — {project.subtitle}
+            </div>
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-widest transition-all duration-150 hover:opacity-90 active:scale-95"
+                style={{
+                  color: accent,
+                  border: `1px solid ${accent}`,
+                  background: `rgba(${accentRgb},0.1)`,
+                }}
+              >
+                ↗ GitHub
+              </a>
+            )}
           </div>
           <h3 className="font-sans text-2xl sm:text-3xl font-extrabold tracking-tight text-brand-white leading-tight">
             {project.title}
@@ -340,21 +357,6 @@ function ProjectDetail({ project }) {
             ))}
           </div>
 
-          {project.github && (
-            <a
-              href={project.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-5 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-widest transition-all duration-150 hover:opacity-90 active:scale-95"
-              style={{
-                color: accent,
-                border: `1px solid ${accent}`,
-                background: `rgba(${accentRgb},0.08)`,
-              }}
-            >
-              ↗ View on GitHub
-            </a>
-          )}
         </div>
 
       </div>
