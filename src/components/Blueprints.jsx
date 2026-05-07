@@ -49,6 +49,7 @@ const projects = [
       { label: 'PATTERN',  value: 'Parallel agents + HITL interrupt' },
       { label: 'INSPIRED', value: 'GitHub Code Review Automation' },
     ],
+    github: 'https://github.com/sourikduttanyu/Sentinel',
   },
   {
     id: 'PRJ-07',
@@ -77,6 +78,7 @@ const projects = [
       { label: 'LLM',      value: 'Ollama llama3.2 — local, no API egress' },
       { label: 'FAIRNESS', value: 'fairlearn MetricFrame (gender, age, marital)' },
     ],
+    github: 'https://github.com/sourikduttanyu/retainiq',
   },
   {
     id: 'PRJ-01',
@@ -105,6 +107,7 @@ const projects = [
       { label: 'DATA',    value: 'DynamoDB, OpenSearch' },
       { label: 'NLP',     value: 'Amazon Lex (natural language ops interface)' },
     ],
+    github: 'https://github.com/sourikduttanyu/FeastFleetDeliveryApp',
   },
   {
     id: 'PRJ-02',
@@ -133,6 +136,7 @@ const projects = [
       { label: 'SCALE',  value: '112M+ daily signals, <2 dropped' },
       { label: 'CLOUD',  value: 'AWS / Azure Multi-Cloud' },
     ],
+    github: 'https://github.com/sourikduttanyu/routesavvy-bigdata-project',
   },
   {
     id: 'PRJ-03',
@@ -161,6 +165,7 @@ const projects = [
       { label: 'INDEXING', value: 'AWS DynamoDB, SQLite' },
       { label: 'UI',       value: 'Streamlit Analysis Dash' },
     ],
+    github: 'https://github.com/sourikduttanyu/Prototype-Reddit-NYU-Abuse',
   },
   {
     id: 'PRJ-04',
@@ -218,6 +223,7 @@ const projects = [
       { label: 'DELIVERY', value: 'At-least-once, Retry + DLQ' },
       { label: 'INSPIRED', value: 'Google Cloud Pub/Sub' },
     ],
+    github: 'https://github.com/sourikduttanyu/go-pubsub-broker',
   },
 ]
 
@@ -339,8 +345,12 @@ function ProjectDetail({ project }) {
               href={project.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 mt-4 font-mono text-[10px] uppercase tracking-widest transition-opacity hover:opacity-100 opacity-50"
-              style={{ color: accent }}
+              className="inline-flex items-center gap-2 mt-5 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-widest transition-all duration-150 hover:opacity-90 active:scale-95"
+              style={{
+                color: accent,
+                border: `1px solid ${accent}`,
+                background: `rgba(${accentRgb},0.08)`,
+              }}
             >
               ↗ View on GitHub
             </a>
