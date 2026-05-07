@@ -23,6 +23,34 @@ const CATEGORY = {
 
 const projects = [
   {
+    id: 'PRJ-06',
+    title: 'SENTINEL',
+    subtitle: 'Agentic Multi-Agent PR Review System',
+    description: 'Multi-agent PR review system running Semgrep static analysis and Claude LLM reasoning in parallel across security, docs, and performance agents — coordinated by a SupervisorAgent that deduplicates and ranks findings. Graph pauses for human approval (HITL) before posting to GitHub. On a real PR, Claude caught a contextual RCE that Semgrep missed: debug endpoints marked "not for production" still registered as live routes.',
+    accent: '#d946ef',
+    accentRgb: '217,70,239',
+    stats: [
+      { value: '3',       label: 'parallel agents' },
+      { value: '$0.016',  label: 'cost per review' },
+      { value: '15.13s',  label: 'peak latency' },
+      { value: 'HITL',    label: 'human-in-loop' },
+    ],
+    stack: [
+      { name: 'LangGraph',    category: 'ai' },
+      { name: 'Claude Haiku', category: 'ai' },
+      { name: 'Semgrep',      category: 'search' },
+      { name: 'FastAPI',      category: 'api' },
+      { name: 'LangSmith',    category: 'ai' },
+      { name: 'Prometheus',   category: 'infra' },
+    ],
+    metadata: [
+      { label: 'ARCH',     value: 'LangGraph StateGraph + SqliteSaver' },
+      { label: 'PIPELINE', value: 'Semgrep → Claude → SupervisorAgent' },
+      { label: 'PATTERN',  value: 'Parallel agents + HITL interrupt' },
+      { label: 'INSPIRED', value: 'GitHub Code Review Automation' },
+    ],
+  },
+  {
     id: 'PRJ-01',
     title: 'FEAST_FLEET',
     subtitle: 'Serverless Food Delivery & Logistics Platform',
