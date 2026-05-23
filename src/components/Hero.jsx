@@ -117,8 +117,8 @@ export default function Hero({ id }) {
             </span>
           </div>
           <span className="font-mono text-[11px] text-alabaster/40 tracking-wider hidden sm:inline">
-            SWE · SRE · Agentic AI · Targeting Google, scale-stage tech
-          </span>
+              SWE · SRE · Agentic AI · Large-scale distributed systems
+            </span>
         </motion.div>
 
         {/* Subtitle */}
