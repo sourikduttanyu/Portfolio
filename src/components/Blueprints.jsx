@@ -26,7 +26,7 @@ const projects = [
     id: 'PRJ-06',
     title: 'SENTINEL',
     subtitle: 'Agentic Multi-Agent PR Review System',
-    description: 'Multi-agent PR review system running Semgrep static analysis and Claude LLM reasoning in parallel across security, docs, and performance agents — coordinated by a SupervisorAgent that deduplicates and ranks findings. Graph pauses for human approval (HITL) before posting to GitHub. On a real PR, Claude caught a contextual RCE that Semgrep missed: debug endpoints marked "not for production" still registered as live routes.',
+    description: 'Multi-agent PR review system combining Semgrep static analysis with Claude LLM contextual reasoning — three specialized agents (Security, Docs, Performance) run in parallel via a LangGraph StateGraph, writing to isolated state keys to avoid collision. A SupervisorAgent deduplicates and severity-ranks findings before the graph pauses for human approval (HITL interrupt_before=[\"post_comment\"], checkpointed to SQLite) — nothing posts to GitHub without a human gate. On a real PR, Claude caught an RCE Semgrep structurally cannot detect: a debug route still registered live, where the vulnerability was in the gap between what the comment said and what the code did.',
     accent: '#d946ef',
     accentRgb: '217,70,239',
     stats: [
@@ -84,7 +84,7 @@ const projects = [
     id: 'PRJ-01',
     title: 'FEAST_FLEET',
     subtitle: 'Serverless Food Delivery & Logistics Platform',
-    description: 'Reduced order processing latency by 43% for 1,248 concurrent users via fault-tolerant serverless AWS Lambda architecture with MLOps-aligned CI/CD and production telemetry. Autonomous order routing via LangChain RAG pipelines integrating Claude and OpenAI APIs for failure prediction, demand forecasting, and a natural language ops interface via Amazon Lex with proactive rerouting and pre-warmed Lambda capacity.',
+    description: '24-Lambda serverless food delivery platform built entirely on AWS with deliberate architectural decisions under ambiguity. Order processing uses SQS async decoupling — placement Lambda validates and enqueues, a separate consumer handles fulfillment — so downstream failures (SES, DynamoDB) are invisible to the user at placement time. Restaurant search uses OpenSearch with dedicated indexes (restaurants_index, menu_items_index) instead of DynamoDB scans, chosen for the query pattern: partial matching, cuisine filtering, relevance ranking. 43% latency reduction for 1,248 concurrent users; 74% NLP intent resolution via Amazon Lex.',
     accent: '#f59e0b',
     accentRgb: '245,158,11',
     stats: [
