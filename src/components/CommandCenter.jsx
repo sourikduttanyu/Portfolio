@@ -5,7 +5,7 @@ import { useState } from 'react'
 // Sign up at formspree.io → create a form → paste your form ID here
 const FORMSPREE_ID = 'YOUR_FORM_ID'
 
-const ease = [0.16, 1, 0.3, 1]
+const ease = [0.22, 1, 0.36, 1]
 
 const CHANNELS = [
   { label: 'GITHUB_NODE',    href: 'https://github.com/sourikduttanyu',               Icon: GitBranch, handle: '/sourikduttanyu' },
@@ -89,10 +89,10 @@ export default function CommandCenter({ id }) {
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 28 }}
+        initial={{ opacity: 0, y: 48 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ ease, duration: 0.55 }}
+        transition={{ ease, duration: 1.0 }}
         className="border border-yale-blue overflow-hidden"
       >
         <div className="grid grid-cols-1 lg:grid-cols-5">
@@ -292,9 +292,9 @@ export default function CommandCenter({ id }) {
                     log.map((entry) => (
                       <motion.div
                         key={entry.key}
-                        initial={{ opacity: 0, x: -10 }}
+                        initial={{ opacity: 0, x: -16 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2 }}
+                        transition={{ duration: 0.45, ease }}
                         className="flex gap-2 leading-relaxed"
                       >
                         <span className="text-yale-blue-light flex-shrink-0">›</span>

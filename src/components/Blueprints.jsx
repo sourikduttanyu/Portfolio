@@ -441,7 +441,7 @@ export default function Blueprints({ id }) {
                     layoutId="selector-bar"
                     className="absolute left-0 top-0 bottom-0 w-0.5 hidden lg:block"
                     style={{ background: p.accent }}
-                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   />
                 )}
                 {isActive && (
@@ -449,7 +449,7 @@ export default function Blueprints({ id }) {
                     layoutId="selector-bar-mobile"
                     className="absolute bottom-0 left-2 right-2 h-0.5 lg:hidden"
                     style={{ background: p.accent }}
-                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                   />
                 )}
                 <span
@@ -479,10 +479,10 @@ export default function Blueprints({ id }) {
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}
-              initial={{ opacity: 0, y: 10 }}
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
               className="h-full"
             >
               <ProjectDetail project={projects[activeIndex]} />

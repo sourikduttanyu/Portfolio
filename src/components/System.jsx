@@ -95,21 +95,21 @@ const skillCategories = [
 
 const containerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08 } },
+  visible: { transition: { staggerChildren: 0.13 } },
 }
 
 const rowVariants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { ease: [0.16, 1, 0.3, 1], duration: 0.5 } },
+  hidden: { opacity: 0, y: 32 },
+  visible: { opacity: 1, y: 0, transition: { ease: [0.22, 1, 0.36, 1], duration: 0.8 } },
 }
 
 function SkillPill({ skill, accent, accentRgb, index }) {
   return (
     <motion.span
-      initial={{ opacity: 0, scale: 0.88 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, scale: 0.82, y: 10 }}
+      whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.4, delay: index * 0.025 }}
+      transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.55, delay: index * 0.038 }}
       className="skill-pill group inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs font-semibold select-none cursor-default transition-all duration-200"
       style={{
         background: `rgba(${accentRgb},0.07)`,

@@ -87,10 +87,10 @@ export default function ServiceLogs({ id }) {
         {experienceLog.map((exp, idx) => (
           <motion.div
             key={exp.id}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ ease: "easeOut", duration: 0.3, delay: idx * 0.1 }}
+            initial={{ opacity: 0, y: 40, x: -16 }}
+            whileInView={{ opacity: 1, y: 0, x: 0 }}
+            viewport={{ once: true, margin: "-60px" }}
+            transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.9, delay: idx * 0.18 }}
             className="group relative"
           >
             {/* Timeline Node */}

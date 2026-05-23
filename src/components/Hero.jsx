@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Terminal } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-const ease = [0.16, 1, 0.3, 1]
+const ease = [0.22, 1, 0.36, 1]
 
 const TECH_COLS = [
   [
@@ -74,9 +74,9 @@ export default function Hero({ id }) {
 
         {/* System Status Label */}
         <motion.div
-          initial={{ opacity: 0, y: -16 }}
+          initial={{ opacity: 0, y: -24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ease, duration: 0.9, delay: 0.2 }}
+          transition={{ ease, duration: 1.1, delay: 0.15 }}
           className="flex items-center gap-3 mb-8"
         >
           <div className="flex items-center justify-center bg-stormy-teal-light w-6 h-6 rounded-none">
@@ -89,9 +89,9 @@ export default function Hero({ id }) {
 
         {/* Main Identity Statement */}
         <motion.div
-          initial={{ opacity: 0, x: -50 }}
+          initial={{ opacity: 0, x: -60 }}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ ease, duration: 1.0, delay: 0.5 }}
+          transition={{ ease, duration: 1.3, delay: 0.45 }}
           className="relative"
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-yale-blue" />
@@ -105,9 +105,9 @@ export default function Hero({ id }) {
 
         {/* Open to work badge */}
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ease, duration: 0.7, delay: 0.75 }}
+          transition={{ ease, duration: 1.0, delay: 0.7 }}
           className="flex items-center gap-3 mt-6 mb-2"
         >
           <div className="flex items-center gap-2 px-3 py-1.5 border border-signal-green/40" style={{ background: 'rgba(34,197,94,0.08)' }}>
@@ -123,9 +123,9 @@ export default function Hero({ id }) {
 
         {/* Subtitle */}
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 32 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ease, duration: 0.9, delay: 0.9 }}
+          transition={{ ease, duration: 1.1, delay: 0.85 }}
           className="relative max-w-2xl mt-5"
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-stormy-teal-light" />
@@ -139,9 +139,9 @@ export default function Hero({ id }) {
 
         {/* CTA Buttons */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ease, duration: 0.9, delay: 1.1 }}
+          transition={{ ease, duration: 1.1, delay: 1.05 }}
           className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4"
         >
           <a
@@ -197,7 +197,7 @@ export default function Hero({ id }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.6, delay: 2 }}
+            transition={{ duration: 1.2, delay: 2.2 }}
             className="absolute bottom-10 left-0 flex flex-col items-center gap-2 pointer-events-none"
             aria-hidden="true"
           >
@@ -208,7 +208,7 @@ export default function Hero({ id }) {
               <motion.div
                 className="absolute top-0 left-0 w-full bg-stormy-teal-light"
                 animate={{ y: ['-100%', '400%'] }}
-                transition={{ duration: 1.4, ease: 'easeInOut', repeat: Infinity, repeatDelay: 0.6 }}
+                transition={{ duration: 1.8, ease: 'easeInOut', repeat: Infinity, repeatDelay: 0.9 }}
                 style={{ height: '40%' }}
               />
             </div>
