@@ -63,3 +63,34 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 ---
 
 **These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+---
+
+## Project: sourik.dev Portfolio
+
+**Stack:** React 19 · Vite · Tailwind CSS v4 · Framer Motion · GSAP · Lucide · No UI component libraries.
+
+**Commands:**
+```bash
+npm run dev       # dev server → http://localhost:5173
+npm run build     # production build → dist/
+npm run preview   # preview production build
+npm run lint      # ESLint
+```
+
+**Architecture:**
+- `src/App.jsx` — root; composes all sections and global effects
+- `src/components/` — one file per section: `Hero`, `Blueprints`, `ServiceLogs`, `System`, `CommandCenter`, `StatusBar`, `ParticleField`, `SideEffects`
+- `src/index.css` — global styles, custom Tailwind tokens
+- `DESIGN.md` — full design system (colors, typography, spacing, component specs)
+- `PRODUCT.md` — product brief, brand personality, anti-references, accessibility requirements
+
+**Design constraints (from PRODUCT.md / DESIGN.md):**
+- Terminal-native ops aesthetic — vocabulary from command-line tools and production dashboards
+- No gradient text, no glassmorphism, no generic developer portfolio patterns
+- WCAG AA minimum; `prefers-reduced-motion` must be respected everywhere
+- Density signals credibility — don't thin out layouts
+
+**Gotchas:**
+- Tailwind v4 is config-file-free; tokens live in `src/index.css` via `@theme`, not `tailwind.config.js`
+- `screenshot.mjs` is a Puppeteer utility script, not part of the app build

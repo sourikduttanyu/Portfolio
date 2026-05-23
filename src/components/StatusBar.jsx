@@ -56,7 +56,7 @@ export default function StatusBar() {
   }
 
   return (
-    <nav aria-label="Page sections" className="fixed right-0 top-0 bottom-0 z-50 flex flex-col items-center w-12 sm:w-16 border-l border-yale-blue bg-graphite-100 w-[48px] sm:w-[64px]">
+    <nav aria-label="Page sections" className="fixed right-0 top-0 bottom-0 z-50 flex flex-col items-center w-10 sm:w-14 border-l border-yale-blue bg-graphite-100">
       {/* Background Track */}
       <div className="absolute top-0 bottom-0 left-1/2 w-px bg-yale-blue -translate-x-1/2" />
       
@@ -66,7 +66,7 @@ export default function StatusBar() {
         style={{ scaleY, bottom: 0 }}
       />
 
-      <div className="flex flex-col justify-center items-center h-full gap-12 sm:gap-16 w-full relative z-10">
+      <div className="flex flex-col justify-center items-center h-full gap-8 sm:gap-12 w-full relative z-10">
         {navItems.map((item) => {
           const isActive = activeSection === item.id
           const Icon = item.icon
@@ -78,13 +78,14 @@ export default function StatusBar() {
               aria-label={ariaLabels[item.id]}
               aria-current={isActive ? 'true' : undefined}
               className={cn(
-                "relative group flex items-center justify-center w-full py-2 transition-all duration-200 ease-out",
+                "relative group flex flex-col items-center justify-center w-full py-1.5 gap-1 transition-all duration-200 ease-out",
                 isActive ? "text-brand-white" : "text-yale-blue-light hover:text-stormy-teal-light"
               )}
             >
+              {/* Desktop tooltip — appears to the left on hover */}
               <div 
                 className={cn(
-                  "absolute right-full mr-4 px-2 py-1 bg-graphite-100 border sharp-border text-xs font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out whitespace-nowrap hidden sm:block pointer-events-none",
+                  "absolute right-full mr-3 px-2 py-1 bg-graphite-100 border text-[10px] font-mono opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-out whitespace-nowrap pointer-events-none",
                   isActive ? "border-stormy-teal-light text-stormy-teal-light" : "border-yale-blue text-yale-blue-light"
                 )}
               >
@@ -95,11 +96,11 @@ export default function StatusBar() {
                 whileHover={reducedMotion ? {} : { scale: 1.12 }}
                 transition={{ ease: [0.16, 1, 0.3, 1], duration: 0.2 }}
                 className={cn(
-                  "relative flex items-center justify-center bg-graphite-100 w-8 h-8 rounded-none border transition-colors duration-200 ease-out",
-                  isActive ? "border-stormy-teal-light outline-1 outline-brand-orange outline-offset-2" : "border-yale-blue group-hover:border-stormy-teal-light group-hover:text-stormy-teal-light text-yale-blue-light/70"
+                  "relative flex items-center justify-center bg-graphite-100 w-7 h-7 sm:w-8 sm:h-8 rounded-none border transition-colors duration-200 ease-out",
+                  isActive ? "border-stormy-teal-light" : "border-yale-blue group-hover:border-stormy-teal-light group-hover:text-stormy-teal-light text-yale-blue-light/70"
                 )}
               >
-                <Icon size={16} strokeWidth={1.5} />
+                <Icon size={14} strokeWidth={1.5} />
               </motion.div>
             </a>
           )

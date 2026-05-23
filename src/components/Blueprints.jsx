@@ -411,37 +411,71 @@ export default function Blueprints({ id }) {
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
 
         {/* Left: project selector rail */}
-        <div className="flex lg:flex-col gap-1 overflow-x-auto no-scrollbar lg:overflow-visible pb-1 lg:pb-0 lg:w-64 flex-shrink-0">
-          {projects.map((p, i) => (
-            <button
-              key={p.id}
-              onMouseEnter={() => setActiveIndex(i)}
-              onClick={() => setActiveIndex(i)}
-              className="group flex-shrink-0 lg:flex-shrink flex flex-col text-left px-4 py-4 transition-colors duration-150 relative"
-              style={{
-                background: i === activeIndex ? `rgba(${p.accentRgb},0.08)` : 'transparent',
-                minWidth: 160,
-              }}
-            >
-              <span
-                className="font-mono text-[10px] tracking-[0.2em] uppercase transition-opacity"
-                style={{ color: p.accent, opacity: i === activeIndex ? 1 : 0.45 }}
+        {/* Mobile: horizontal pill tabs with visible active indicator */}
+        {/* Desktop: vertical list */}
+        <div
+          className="flex lg:flex-col gap-1.5 overflow-x-auto no-scrollbar lg:overflow-visible pb-2 lg:pb-0 lg:w-64 flex-shrink-0"
+          role="tablist"
+          aria-label="Projects"
+        >
+          {projects.map((p, i) => {
+            const isActive = i === activeIndex
+            return (
+              <button
+                key={p.id}
+                role="tab"
+                aria-selected={isActive}
+                aria-controls="project-detail-panel"
+                onMouseEnter={() => setActiveIndex(i)}
+                onClick={() => setActiveIndex(i)}
+                className="group flex-shrink-0 lg:flex-shrink flex flex-col text-left px-4 py-3.5 lg:py-4 transition-all duration-150 relative min-h-[56px] lg:min-h-0 focus-visible:outline-none"
+                style={{
+                  background: isActive ? `rgba(${p.accentRgb},0.1)` : 'transparent',
+                  border: isActive ? `1px solid rgba(${p.accentRgb},0.35)` : '1px solid transparent',
+                  minWidth: 140,
+                }}
               >
-                {p.id}
-              </span>
-              <span
-                className={`font-mono text-sm font-bold mt-1 transition-colors ${
-                  i === activeIndex ? 'text-brand-white' : 'text-alabaster/40 group-hover:text-alabaster/65'
-                }`}
-              >
-                {p.title}
-              </span>
-            </button>
-          ))}
+                {/* Active left bar (desktop) / bottom bar (mobile) */}
+                {isActive && (
+                  <motion.div
+                    layoutId="selector-bar"
+                    className="absolute left-0 top-0 bottom-0 w-0.5 hidden lg:block"
+                    style={{ background: p.accent }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                )}
+                {isActive && (
+                  <motion.div
+                    layoutId="selector-bar-mobile"
+                    className="absolute bottom-0 left-2 right-2 h-0.5 lg:hidden"
+                    style={{ background: p.accent }}
+                    transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                )}
+                <span
+                  className="font-mono text-[10px] tracking-[0.2em] uppercase transition-opacity"
+                  style={{ color: p.accent, opacity: isActive ? 1 : 0.45 }}
+                >
+                  {p.id}
+                </span>
+                <span
+                  className={`font-mono text-sm font-bold mt-0.5 transition-colors leading-tight ${
+                    isActive ? 'text-brand-white' : 'text-alabaster/45 group-hover:text-alabaster/70'
+                  }`}
+                >
+                  {p.title}
+                </span>
+              </button>
+            )
+          })}
         </div>
 
         {/* Right: detail panel */}
-        <div className="flex-1 min-h-[360px] sm:min-h-[480px]">
+        <div
+          id="project-detail-panel"
+          role="tabpanel"
+          className="flex-1 min-h-[420px] sm:min-h-[520px]"
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={activeIndex}

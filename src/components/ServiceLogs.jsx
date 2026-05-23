@@ -83,7 +83,7 @@ export default function ServiceLogs({ id }) {
       </div>
 
       {/* Experience Timeline */}
-      <div className="space-y-12 pl-4 sm:pl-8 border-l border-yale-blue relative">
+      <div className="space-y-10 sm:space-y-14 pl-4 sm:pl-8 border-l border-yale-blue relative">
         {experienceLog.map((exp, idx) => (
           <motion.div
             key={exp.id}
@@ -94,44 +94,52 @@ export default function ServiceLogs({ id }) {
             className="group relative"
           >
             {/* Timeline Node */}
-            <div className="absolute -left-4 sm:-left-8 top-1 w-2 h-2 bg-yale-blue group-hover:bg-stormy-teal-light transition-all duration-200 shadow-[0_0_10px_rgba(83,154,158,0)] group-hover:shadow-[0_0_10px_rgba(83,154,158,0.5)] -translate-x-1/2 group-hover:scale-150" />
-            <div className="absolute -left-4 sm:-left-8 top-1.5 w-8 h-px bg-yale-blue group-hover:bg-stormy-teal-light transition-colors duration-200" />
+            <div className="absolute -left-4 sm:-left-8 top-5 w-2.5 h-2.5 bg-yale-blue group-hover:bg-stormy-teal-light transition-all duration-200 group-hover:shadow-[0_0_12px_rgba(45,212,240,0.5)] -translate-x-1/2 group-hover:scale-125" />
+            <div className="absolute -left-4 sm:-left-8 top-6 w-8 h-px bg-yale-blue group-hover:bg-stormy-teal-light/60 transition-colors duration-200" />
 
-            <div className="pl-6 sm:pl-8">
+            <div className="pl-5 sm:pl-8">
               {/* Header Box */}
-              <div className="mb-6 p-4 border sharp-border bg-graphite-100 relative overflow-hidden group-hover:border-yale-blue transition-colors duration-200">
-                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-stormy-teal-light/5 to-transparent pointer-events-none" />
+              <div className="mb-5 p-4 sm:p-5 border sharp-border bg-graphite-200/60 relative overflow-hidden group-hover:border-stormy-teal-light/30 transition-colors duration-300">
+                <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-stormy-teal-light/20 via-transparent to-transparent" />
 
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                <div className="flex flex-col gap-3">
+                  {/* Role + company */}
                   <div>
-                    <h3 className="font-sans text-xl font-bold text-brand-white tracking-tight">
-                      {exp.role}
-                    </h3>
-                    {exp.subtitle && (
-                      <p className="font-mono text-xs text-alabaster/65 mt-0.5 tracking-wide">{exp.subtitle}</p>
-                    )}
-                    <div className="flex items-center gap-2 text-stormy-teal-light font-mono text-sm uppercase mt-2 font-semibold tracking-wide">
-                      <Briefcase size={13} />
-                      <span>{exp.company}</span>
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <h3 className="font-sans text-lg sm:text-xl font-bold text-brand-white tracking-tight">
+                        {exp.role}
+                      </h3>
+                      {exp.subtitle && (
+                        <span className="font-mono text-[10px] text-alabaster/50 tracking-widest uppercase hidden sm:inline">
+                          — {exp.subtitle}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Briefcase size={12} className="text-stormy-teal-light flex-shrink-0" />
+                      <span className="font-mono text-sm text-stormy-teal-light font-semibold tracking-wide">
+                        {exp.company}
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:items-end gap-1 font-mono text-xs text-yale-blue-light font-semibold flex-shrink-0">
-                    <div className="flex items-center gap-2">
-                      <Calendar size={12} />
-                      {exp.period}
+                  {/* Period + location row */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center gap-1.5 font-mono text-xs text-yale-blue-light font-semibold">
+                      <Calendar size={11} />
+                      <span>{exp.period}</span>
                     </div>
-                    <div className="uppercase tracking-widest">{exp.location}</div>
+                    <span className="font-mono text-[10px] text-alabaster/30 uppercase tracking-widest">{exp.location}</span>
                   </div>
                 </div>
               </div>
 
               {/* Highlights */}
-              <ul className="space-y-3 max-w-3xl">
+              <ul className="space-y-4 max-w-3xl">
                 {exp.highlights.map((highlight, hIdx) => (
-                  <li key={hIdx} className="flex items-start gap-4 text-base font-sans text-alabaster/90 group-hover:text-alabaster transition-colors duration-200 leading-relaxed">
-                    <span className="font-mono text-stormy-teal-light mt-1 flex-shrink-0">&gt;</span>
-                    <span>{highlight}</span>
+                  <li key={hIdx} className="flex items-start gap-3 sm:gap-4 text-[15px] sm:text-base font-sans text-alabaster/85 leading-relaxed">
+                    <span className="font-mono text-stormy-teal-light mt-0.5 flex-shrink-0 text-base leading-none">›</span>
+                    <span className="group-hover:text-alabaster transition-colors duration-200">{highlight}</span>
                   </li>
                 ))}
               </ul>

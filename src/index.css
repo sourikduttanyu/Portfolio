@@ -21,6 +21,7 @@
   html {
     font-size: 16px;
     -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
   }
   body {
     @apply bg-graphite-100 text-alabaster font-sans antialiased selection:bg-stormy-teal selection:text-brand-white overflow-x-hidden;
@@ -125,6 +126,12 @@ body::after {
 /* ── Scrollbar hide ─────────────────────────────────────── */
 .no-scrollbar::-webkit-scrollbar {
   display: none;
+}
+
+/* ── Skill pill hover glow ──────────────────────────────── */
+.skill-pill:hover {
+  box-shadow: 0 0 14px var(--glow-color, rgba(45,212,240,0.3));
+  transform: translateY(-1px);
 }
 
 /* Signal track — traveling data dots on side rails */

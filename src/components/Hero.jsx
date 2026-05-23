@@ -103,12 +103,30 @@ export default function Hero({ id }) {
           </h1>
         </motion.div>
 
+        {/* Open to work badge */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ ease, duration: 0.7, delay: 0.75 }}
+          className="flex items-center gap-3 mt-6 mb-2"
+        >
+          <div className="flex items-center gap-2 px-3 py-1.5 border border-signal-green/40" style={{ background: 'rgba(34,197,94,0.08)' }}>
+            <span className="w-1.5 h-1.5 rounded-full bg-signal-green animate-pulse" />
+            <span className="font-mono text-xs text-signal-green font-bold tracking-widest uppercase">
+              Open to Work
+            </span>
+          </div>
+          <span className="font-mono text-[11px] text-alabaster/40 tracking-wider hidden sm:inline">
+            SWE · SRE · Agentic AI · Targeting Google, scale-stage tech
+          </span>
+        </motion.div>
+
         {/* Subtitle */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ ease, duration: 0.9, delay: 0.8 }}
-          className="relative max-w-2xl"
+          transition={{ ease, duration: 0.9, delay: 0.9 }}
+          className="relative max-w-2xl mt-5"
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-stormy-teal-light" />
           <p className="font-mono text-alabaster/90 text-base leading-relaxed pl-4 sm:pl-0">
@@ -124,9 +142,13 @@ export default function Hero({ id }) {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ ease, duration: 0.9, delay: 1.1 }}
-          className="mt-16 flex items-center gap-8 flex-wrap"
+          className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4"
         >
-          <a href="#blueprints" aria-label="View my projects" className="group inline-flex items-center justify-center px-8 py-4 bg-stormy-teal-light border border-stormy-teal-light text-graphite-100 hover:bg-stormy-teal-light/85 transition-colors duration-200 ease-out">
+          <a
+            href="#blueprints"
+            aria-label="View my projects"
+            className="group inline-flex items-center justify-center px-7 py-3.5 bg-stormy-teal-light border border-stormy-teal-light text-graphite-100 hover:bg-stormy-teal-light/85 transition-colors duration-200 ease-out w-full sm:w-auto"
+          >
             <span className="font-mono text-sm tracking-wider font-semibold">
               DEPLOY_BLUEPRINTS
             </span>
@@ -139,15 +161,27 @@ export default function Hero({ id }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
           </a>
-          <div className="flex flex-wrap gap-3">
-            <a href="https://github.com/sourikduttanyu" target="_blank" rel="noopener noreferrer" aria-label="View GitHub profile (opens in new tab)" className="group inline-flex items-center justify-center px-8 py-4 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out">
+          <div className="flex gap-3 w-full sm:w-auto">
+            <a
+              href="https://github.com/sourikduttanyu"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View GitHub profile (opens in new tab)"
+              className="group inline-flex flex-1 sm:flex-none items-center justify-center px-6 py-3.5 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out"
+            >
               <span className="font-mono text-sm tracking-wider text-alabaster group-hover:text-stormy-teal-light transition-colors duration-200">
-                [ GITHUB_NODE ]
+                GitHub
               </span>
             </a>
-            <a href="https://linkedin.com/in/sourik-dutta-71a34a17b/" target="_blank" rel="noopener noreferrer" aria-label="View LinkedIn profile (opens in new tab)" className="group inline-flex items-center justify-center px-8 py-4 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out">
+            <a
+              href="https://linkedin.com/in/sourik-dutta-71a34a17b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="View LinkedIn profile (opens in new tab)"
+              className="group inline-flex flex-1 sm:flex-none items-center justify-center px-6 py-3.5 bg-transparent border border-yale-blue hover:border-stormy-teal-light transition-colors duration-200 ease-out"
+            >
               <span className="font-mono text-sm tracking-wider text-alabaster group-hover:text-stormy-teal-light transition-colors duration-200">
-                [ LINKEDIN_NODE ]
+                LinkedIn
               </span>
             </a>
           </div>
