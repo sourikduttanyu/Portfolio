@@ -23,10 +23,39 @@ const CATEGORY = {
 
 const projects = [
   {
+    id: 'PRJ-08',
+    title: 'LUMISYNTH',
+    subtitle: 'Browser-Based Real-Time Video Instrument',
+    description: 'Real-time browser video instrument built with vanilla JavaScript, raw WebGL2, Canvas 2D, Vite, Playwright, and Cloudflare Pages Functions. It takes a local video, image, or webcam feed, detects visual regions in real time, tracks them across frames with stable identities, runs a GPU shader pipeline, and draws expressive tracking overlays on top. The architecture exposes the browser platform directly: CPU blob detection, Kalman + One Euro smoothing, a shared WebGL2 context with ping-pong FBOs, STRUCTURE effects, a chained COLOR rack, Canvas overlays, export gating, local internal auth fallback, Cloudflare API scaffolding, smoke tests, linting, and deployment setup.',
+    accent: '#2dd4f0',
+    accentRgb: '45,212,240',
+    stats: [
+      { value: 'WebGL2', label: 'render core' },
+      { value: '7',      label: 'track modes' },
+      { value: '3',      label: 'color slots' },
+      { value: 'D1',     label: 'auth scaffold' },
+    ],
+    stack: [
+      { name: 'JavaScript',  category: 'lang' },
+      { name: 'WebGL2',      category: 'ui' },
+      { name: 'Canvas 2D',   category: 'ui' },
+      { name: 'Vite',        category: 'ui' },
+      { name: 'Playwright',  category: 'infra' },
+      { name: 'Cloudflare',  category: 'cloud' },
+    ],
+    metadata: [
+      { label: 'PIPELINE', value: 'Blob detection → tracking → GL shader chain → Canvas overlays' },
+      { label: 'MEDIA',    value: 'Local video, image, or webcam; media stays in browser' },
+      { label: 'TRACK',    value: 'Motion, luma, dark, saturation, edge, sharp, color-key' },
+      { label: 'EXPORT',   value: 'PNG snapshot + MediaRecorder clip with gated flows' },
+    ],
+    github: 'https://github.com/sourikduttanyu/LumiSynth',
+  },
+  {
     id: 'PRJ-06',
     title: 'SENTINEL',
     subtitle: 'Agentic Multi-Agent PR Review System',
-    description: 'Multi-agent PR review system combining Semgrep static analysis with Claude LLM contextual reasoning — three specialized agents (Security, Docs, Performance) run in parallel via a LangGraph StateGraph, writing to isolated state keys to avoid collision. A SupervisorAgent deduplicates and severity-ranks findings before the graph pauses for human approval (HITL interrupt_before=[\"post_comment\"], checkpointed to SQLite) — nothing posts to GitHub without a human gate. On a real PR, Claude caught an RCE Semgrep structurally cannot detect: a debug route still registered live, where the vulnerability was in the gap between what the comment said and what the code did.',
+    description: 'Multi-agent PR review system combining Semgrep static analysis with Claude LLM contextual reasoning — three specialized agents (Security, Docs, Performance) run in parallel via a LangGraph StateGraph, writing to isolated state keys to avoid collision. A SupervisorAgent deduplicates and severity-ranks findings before the graph pauses for human approval (HITL interrupt_before=["post_comment"], checkpointed to SQLite) — nothing posts to GitHub without a human gate. On a real PR, Claude caught an RCE Semgrep structurally cannot detect: a debug route still registered live, where the vulnerability was in the gap between what the comment said and what the code did.',
     accent: '#d946ef',
     accentRgb: '217,70,239',
     stats: [
