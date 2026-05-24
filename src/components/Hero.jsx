@@ -97,7 +97,7 @@ export default function Hero({ id }) {
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-yale-blue" />
           <h1 id="hero-heading" className="text-[clamp(3.5rem,12vw,10.5rem)] font-sans font-extrabold leading-none tracking-tight text-brand-white mb-10">
             Sourik <br className="hidden sm:block" />
-            <span style={{ WebkitTextStroke: '3px #2dd4f0', color: 'transparent' }}>
+            <span style={{ WebkitTextStroke: '3px #509ba8', color: 'transparent' }}>
               Dutta.
             </span>
           </h1>

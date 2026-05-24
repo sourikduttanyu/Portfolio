@@ -14,9 +14,9 @@ const TITLE_IDLE    = '[ SYSTEM IDLE ] — Sourik Dutta'
 export default function App() {
   useEffect(() => {
     // Console easter egg
-    const s1 = 'background:#07111f;color:#2dd4f0;font-size:13px;font-family:monospace;padding:4px 8px;border-left:3px solid #2dd4f0'
+    const s1 = 'background:#07111f;color:#509ba8;font-size:13px;font-family:monospace;padding:4px 8px;border-left:3px solid #509ba8'
     const s2 = 'background:#07111f;color:#dde8f5;font-size:11px;font-family:monospace;padding:2px 8px'
-    const s3 = 'background:#07111f;color:#5ba4f5;font-size:11px;font-family:monospace;padding:2px 8px'
+    const s3 = 'background:#07111f;color:#708da8;font-size:11px;font-family:monospace;padding:2px 8px'
     console.log('%c SYSTEM INTRUSION DETECTED', s1)
     console.log('%c Operator: Sourik Dutta — Software Engineer', s2)
     console.log('%c Stack: React · Framer Motion · Tailwind CSS v4 · Vite', s2)

@@ -5,8 +5,8 @@ const skillCategories = [
   {
     category: "AGENTIC AI & LLM",
     icon: Sparkles,
-    accent: '#d946ef',
-    accentRgb: '217,70,239',
+    accent: '#a85d95',
+    accentRgb: '168,93,149',
     skills: [
       "LangChain", "LangGraph", "RAG Pipelines", "LLM-as-a-Service", "Azure OpenAI",
       "OpenAI API", "Claude API", "Ollama", "Amazon SageMaker",
@@ -16,8 +16,8 @@ const skillCategories = [
   {
     category: "LANGUAGES",
     icon: Code2,
-    accent: '#fbbf24',
-    accentRgb: '251,191,36',
+    accent: '#cca152',
+    accentRgb: '204,161,82',
     skills: [
       "Python", "Java", "Go", "C++", "C#", "TypeScript", "JavaScript", "SQL", "Bash", "C",
     ]
@@ -25,8 +25,8 @@ const skillCategories = [
   {
     category: "CLOUD & PLATFORM",
     icon: Cloud,
-    accent: '#60a5fa',
-    accentRgb: '96,165,250',
+    accent: '#6fa0cc',
+    accentRgb: '111,160,204',
     skills: [
       "Azure AKS", "Azure API Management", "Azure Event Hubs", "Azure CosmosDB",
       "Azure SignalR", "Azure OpenAI Service", "Azure Chaos Studio", "Azure App Configuration",
@@ -37,8 +37,8 @@ const skillCategories = [
   {
     category: "BACKEND & DISTRIBUTED",
     icon: Server,
-    accent: '#2dd4f0',
-    accentRgb: '45,212,240',
+    accent: '#509ba8',
+    accentRgb: '80,155,168',
     skills: [
       "Java Spring Boot 3", ".NET 7", "FastAPI", "Flask", "GraphQL", "REST APIs",
       "Apache Kafka", "PySpark", "Redis", "OAuth 2.0 / PKCE",
@@ -48,8 +48,8 @@ const skillCategories = [
   {
     category: "SRE & OBSERVABILITY",
     icon: Activity,
-    accent: '#22c55e',
-    accentRgb: '34,197,94',
+    accent: '#569e71',
+    accentRgb: '86,158,113',
     skills: [
       "SLO / SLA Ownership", "Error Budget Management", "Incident Command (DRI)",
       "Runbook Authoring", "Chaos Engineering", "Azure Chaos Studio",
@@ -61,8 +61,8 @@ const skillCategories = [
   {
     category: "DATA & ML OPS",
     icon: Database,
-    accent: '#a78bfa',
-    accentRgb: '167,139,250',
+    accent: '#8f81ba',
+    accentRgb: '143,129,186',
     skills: [
       "Azure Databricks", "Apache Spark SQL", "PostgreSQL", "Azure CosmosDB",
       "DynamoDB", "OpenSearch", "SQLite", "Azure Data Lake",
@@ -72,8 +72,8 @@ const skillCategories = [
   {
     category: "FRONTEND",
     icon: Monitor,
-    accent: '#fb923c',
-    accentRgb: '251,146,60',
+    accent: '#cc8258',
+    accentRgb: '204,130,88',
     skills: [
       "Angular 15", "React 18", "RxJS", "TypeScript",
       "WebSockets", "Azure SignalR", "Recharts", "Tailwind CSS",
@@ -83,8 +83,8 @@ const skillCategories = [
   {
     category: "DEVSECOPS",
     icon: Shield,
-    accent: '#f43f5e',
-    accentRgb: '244,63,94',
+    accent: '#bd5869',
+    accentRgb: '189,88,105',
     skills: [
       "GitHub Actions", "Azure DevOps", "Semgrep (SAST)", "Gitleaks",
       "SonarQube", "OWASP Top 10", "Secrets Scanning", "Branch Protection",
@@ -145,7 +145,7 @@ export default function System({ id }) {
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-8 border-b border-yale-blue gap-6">
           <div>
             <h2 id="system-heading" className="text-[clamp(2.25rem,5.5vw,4.5rem)] font-sans font-extrabold tracking-tight uppercase">
-              <span style={{ WebkitTextStroke: '2px rgba(91,164,245,0.85)', color: 'transparent' }}>THE </span>
+              <span style={{ WebkitTextStroke: '2px rgba(112,141,168,0.85)', color: 'transparent' }}>THE </span>
               <span className="text-brand-white">SYSTEM</span>
             </h2>
             <p className="font-mono text-alabaster/70 mt-4 text-sm max-w-xl leading-relaxed">

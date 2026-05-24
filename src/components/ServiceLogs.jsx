@@ -63,7 +63,7 @@ export default function ServiceLogs({ id }) {
           <div>
             <h2 id="logs-heading" className="text-[clamp(2.25rem,5.5vw,4.5rem)] font-sans font-extrabold tracking-tight uppercase">
               <span className="text-brand-white">Service </span>
-              <span style={{ WebkitTextStroke: '2px #2dd4f0', color: 'transparent' }}>Logs</span>
+              <span style={{ WebkitTextStroke: '2px #509ba8', color: 'transparent' }}>Logs</span>
             </h2>
             <p className="font-mono text-xs text-alabaster/40 mt-4">
               {experienceLog.length} roles · chronological · DRI certified
@@ -76,7 +76,7 @@ export default function ServiceLogs({ id }) {
 
           <div
             className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
-            style={{ fontSize: 160, color: 'rgba(45,212,240,0.04)', lineHeight: 1 }}
+            style={{ fontSize: 160, color: 'rgba(80,155,168,0.04)', lineHeight: 1 }}
             aria-hidden="true"
           >02</div>
         </div>
@@ -94,7 +94,7 @@ export default function ServiceLogs({ id }) {
             className="group relative"
           >
             {/* Timeline Node */}
-            <div className="absolute -left-4 sm:-left-8 top-5 w-2.5 h-2.5 bg-yale-blue group-hover:bg-stormy-teal-light transition-all duration-200 group-hover:shadow-[0_0_12px_rgba(45,212,240,0.5)] -translate-x-1/2 group-hover:scale-125" />
+            <div className="absolute -left-4 sm:-left-8 top-5 w-2.5 h-2.5 bg-yale-blue group-hover:bg-stormy-teal-light transition-all duration-200 group-hover:shadow-[0_0_12px_rgba(80,155,168,0.5)] -translate-x-1/2 group-hover:scale-125" />
             <div className="absolute -left-4 sm:-left-8 top-6 w-8 h-px bg-yale-blue group-hover:bg-stormy-teal-light/60 transition-colors duration-200" />
 
             <div className="pl-5 sm:pl-8">

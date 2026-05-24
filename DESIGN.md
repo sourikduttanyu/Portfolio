@@ -2,12 +2,12 @@
 name: Sourik Dutta — Portfolio
 description: Terminal-native ops portfolio for a senior software engineer specializing in distributed systems and agentic AI.
 colors:
-  signal-teal: "#2dd4f0"
-  signal-teal-mid: "#0a87a3"
+  signal-teal: "#509ba8"
+  signal-teal-mid: "#266c7a"
   deep-navy: "#07111f"
   elevated-navy: "#0c1a30"
-  yale-blue: "#1a3a6a"
-  relay-blue: "#5ba4f5"
+  yale-blue: "#253a54"
+  relay-blue: "#708da8"
   alabaster: "#dde8f5"
   command-white: "#f0f8ff"
 typography:
@@ -100,20 +100,20 @@ Density signals credibility. Sparse, airy layouts read as junior. The skill matr
 A near-black void with one signal-teal accent and a structural blue-navy family for borders and inactive states.
 
 ### Primary
-- **Signal Teal** (`#2dd4f0`): The system's single active-state color. Used on CTAs, hover borders, active nav icons, scroll progress bar, terminal cursor pulses, and the outlined display text technique. It appears on less than 15% of any given screen. Its scarcity is load-bearing.
+- **Signal Teal** (`#509ba8`): The system's single active-state color. Used on CTAs, hover borders, active nav icons, scroll progress bar, terminal cursor pulses, and the outlined display text technique. It appears on less than 15% of any given screen. Its scarcity is load-bearing.
 
 ### Secondary
-- **Relay Blue** (`#5ba4f5`): Secondary accent. Used on hover text, tooltip labels, and year/date indicators. Never competes with Signal Teal for hierarchy — always subordinate.
+- **Relay Blue** (`#708da8`): Secondary accent. Used on hover text, tooltip labels, and year/date indicators. Never competes with Signal Teal for hierarchy — always subordinate.
 
 ### Neutral
 - **Deep Navy** (`#07111f`): The page background. All section body color. Tinted toward navy, never pure black.
 - **Elevated Navy** (`#0c1a30`): Raised surfaces: panels, the terminal titlebar, the CommandCenter right column. One tonal step above the background.
-- **Yale Blue** (`#1a3a6a`): Structural borders, dividers, inactive nav borders, inactive timeline nodes. The grid of the system.
+- **Yale Blue** (`#253a54`): Structural borders, dividers, inactive nav borders, inactive timeline nodes. The grid of the system.
 - **Alabaster** (`#dde8f5`): Primary body text at full opacity. Used at `/90`, `/65`, `/40`, `/25` opacities for secondary text hierarchy.
 - **Command White** (`#f0f8ff`): Emphasis text, heading text, CTA label on the primary button, identity card names. Never used at reduced opacity.
 
 ### Named Rules
-**The Signal Rule.** Signal Teal (`#2dd4f0`) is the only color that communicates an active, selected, or actionable state. No other color carries that semantic role. Relay Blue signals secondary hierarchy, never action.
+**The Signal Rule.** Signal Teal (`#509ba8`) is the only color that communicates an active, selected, or actionable state. No other color carries that semantic role. Relay Blue signals secondary hierarchy, never action.
 
 **The Opacity Ladder Rule.** Text secondary hierarchy is expressed through opacity steps on Alabaster, not through separate color values. Standard ladder: `alabaster` (full) → `/90` (body) → `/65` (secondary) → `/40` (tertiary) → `/25` (ghost labels). Do not invent new values mid-ladder.
 
@@ -150,20 +150,20 @@ The one exception is a procedural **teal glow** on interactive state transitions
 ### Buttons
 Sharp corners at every size. Monospace label, uppercase, tracked wide.
 
-- **Primary:** Solid Signal Teal fill (`#2dd4f0`), Deep Navy text (`#07111f`), `border: 1px solid #2dd4f0`, zero radius, `padding: 16px 32px`. Hover: `background #26bcd9` (10% darker). Arrow icon shifts `translateX(4px)` on hover.
-- **Ghost:** Transparent background, Alabaster text, `border: 1px solid #1a3a6a` (Yale Blue). Hover: border shifts to Signal Teal, text shifts to Signal Teal. No fill.
+- **Primary:** Solid Signal Teal fill (`#509ba8`), Deep Navy text (`#07111f`), `border: 1px solid #509ba8`, zero radius, `padding: 16px 32px`. Hover: `background #3c7782` (10% darker). Arrow icon shifts `translateX(4px)` on hover.
+- **Ghost:** Transparent background, Alabaster text, `border: 1px solid #253a54` (Yale Blue). Hover: border shifts to Signal Teal, text shifts to Signal Teal. No fill.
 - **Disabled:** `opacity: 0.5`, `cursor: not-allowed`. No style change beyond opacity.
 
 ### Cards / Containers
-No rounded corners. `border: 1px solid #1a3a6a` (Yale Blue). Background either `deep-navy` or `elevated-navy` depending on depth level. Internal padding varies by section: experience entries use `p-4`, the CommandCenter panel uses `p-5 sm:p-8`.
+No rounded corners. `border: 1px solid #253a54` (Yale Blue). Background either `deep-navy` or `elevated-navy` depending on depth level. Internal padding varies by section: experience entries use `p-4`, the CommandCenter panel uses `p-5 sm:p-8`.
 
 **The No-Card-Grid Rule.** Cards are not used in grids of identical siblings. The Blueprints section uses a selector-plus-detail-panel pattern. The System section uses flat grouped rows. Identical card grids are prohibited.
 
 ### Inputs / Fields
-Bottom-border only — no full rectangle. `border-bottom: 1px solid #1a3a6a`. Transparent background. Fira Code font, `text-brand-white`. Left padding `24px` to clear the `›` prompt character. Focus: bottom border shifts to Signal Teal. Disabled: `opacity: 0.4`.
+Bottom-border only — no full rectangle. `border-bottom: 1px solid #253a54`. Transparent background. Fira Code font, `text-brand-white`. Left padding `24px` to clear the `›` prompt character. Focus: bottom border shifts to Signal Teal. Disabled: `opacity: 0.4`.
 
 ### Navigation (StatusBar)
-Fixed right rail, 48px wide (64px at sm+). Each nav item: 32x32px square icon box with `border: 1px solid #1a3a6a` and background `deep-navy`. Active state: Signal Teal border + 1px orange outline-offset ring. Hover: `scale(1.12)` via Framer Motion `whileHover`. Tooltip appears left of the icon on hover (sm+ only), monospace label in Signal Teal.
+Fixed right rail, 48px wide (64px at sm+). Each nav item: 32x32px square icon box with `border: 1px solid #253a54` and background `deep-navy`. Active state: Signal Teal border + 1px orange outline-offset ring. Hover: `scale(1.12)` via Framer Motion `whileHover`. Tooltip appears left of the icon on hover (sm+ only), monospace label in Signal Teal.
 
 ### Section Separator (Signature Component)
 Every section opens with the same grammar: monospace section number (`01`–`04`) in a small accent chip, a full-width 1px Yale Blue horizontal rule, a right-aligned `ALL_CAPS_LABEL` in Alabaster at near-zero opacity, and a short Signal Teal accent line. This repeats without variation across all sections — the repetition IS the system.
@@ -189,4 +189,4 @@ Left border: 1px Yale Blue vertical rule. Node: 8x8px Yale Blue square at the le
 - **Don't** add a `border-left` wider than 1px as a decorative colored accent stripe on list items, experience entries, or callout blocks.
 - **Don't** use generic glassmorphism developer portfolio patterns, soft pastel creative developer aesthetics, over-animated scrollytelling, or any layout a recruiter would describe as "cute" or "artistic."
 - **Don't** introduce a third typeface. The system is Exo 2 + Fira Code. Any other face breaks the Two-Font Rule.
-- **Don't** use Relay Blue (`#5ba4f5`) for action states or active indicators — that role belongs exclusively to Signal Teal.
+- **Don't** use Relay Blue (`#708da8`) for action states or active indicators — that role belongs exclusively to Signal Teal.

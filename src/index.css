@@ -4,14 +4,14 @@
   --color-graphite-100: #07111f;
   --color-graphite-200: #0c1a30;
   --color-graphite: #1a3354;
-  --color-stormy-teal: #0a87a3;
-  --color-stormy-teal-light: #2dd4f0;
-  --color-yale-blue: #1a3a6a;
-  --color-yale-blue-light: #5ba4f5;
+  --color-stormy-teal: #266c7a;
+  --color-stormy-teal-light: #509ba8;
+  --color-yale-blue: #253a54;
+  --color-yale-blue-light: #708da8;
   --color-alabaster: #dde8f5;
   --color-brand-white: #f0f8ff;
-  --color-brand-orange: #f97316;
-  --color-signal-green: #22c55e;
+  --color-brand-orange: #cc8258;
+  --color-signal-green: #569e71;
 
   --font-sans: "Exo 2", sans-serif;
   --font-mono: "Fira Code", "JetBrains Mono", monospace;
@@ -38,8 +38,8 @@
   .grid-bg {
     background-size: 40px 40px;
     background-image:
-      linear-gradient(to right, rgba(26, 58, 106, 0.5) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(26, 58, 106, 0.5) 1px, transparent 1px);
+      linear-gradient(to right, rgba(37, 58, 84, 0.5) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(37, 58, 84, 0.5) 1px, transparent 1px);
     mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
   }
 

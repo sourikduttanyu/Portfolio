@@ -6,58 +6,29 @@ import {
 } from 'lucide-react'
 
 const CATEGORY = {
-  compute: { color: '#f59e0b', bg: 'rgba(245,158,11,0.13)', Icon: Cpu },
-  api:     { color: '#06b6d4', bg: 'rgba(6,182,212,0.13)',  Icon: Globe },
-  database:{ color: '#8b5cf6', bg: 'rgba(139,92,246,0.13)', Icon: Database },
-  search:  { color: '#10b981', bg: 'rgba(16,185,129,0.13)', Icon: Search },
-  ai:      { color: '#ec4899', bg: 'rgba(236,72,153,0.13)', Icon: Sparkles },
-  ml:      { color: '#f97316', bg: 'rgba(249,115,22,0.13)', Icon: TrendingUp },
-  stream:  { color: '#3b82f6', bg: 'rgba(59,130,246,0.13)', Icon: Radio },
-  infra:   { color: '#94a3b8', bg: 'rgba(148,163,184,0.13)',Icon: Server },
-  cloud:   { color: '#60a5fa', bg: 'rgba(96,165,250,0.13)', Icon: Cloud },
-  algo:    { color: '#14b8a6', bg: 'rgba(20,184,166,0.13)', Icon: GitBranch },
-  lang:    { color: '#fbbf24', bg: 'rgba(251,191,36,0.13)', Icon: Code2 },
-  storage: { color: '#34d399', bg: 'rgba(52,211,153,0.13)', Icon: HardDrive },
-  ui:      { color: '#fb923c', bg: 'rgba(251,146,60,0.13)', Icon: Monitor },
+  compute: { color: '#cca152', bg: 'rgba(204,161,82,0.13)', Icon: Cpu },
+  api:     { color: '#509ba8', bg: 'rgba(80,155,168,0.13)',  Icon: Globe },
+  database:{ color: '#8f81ba', bg: 'rgba(143,129,186,0.13)', Icon: Database },
+  search:  { color: '#569e71', bg: 'rgba(86,158,113,0.13)', Icon: Search },
+  ai:      { color: '#a85d95', bg: 'rgba(168,93,149,0.13)', Icon: Sparkles },
+  ml:      { color: '#cc8258', bg: 'rgba(204,130,88,0.13)', Icon: TrendingUp },
+  stream:  { color: '#708da8', bg: 'rgba(112,141,168,0.13)', Icon: Radio },
+  infra:   { color: '#8f9fb0', bg: 'rgba(143,159,176,0.13)',Icon: Server },
+  cloud:   { color: '#6fa0cc', bg: 'rgba(111,160,204,0.13)', Icon: Cloud },
+  algo:    { color: '#5299a7', bg: 'rgba(82,153,167,0.13)', Icon: GitBranch },
+  lang:    { color: '#cca152', bg: 'rgba(204,161,82,0.13)', Icon: Code2 },
+  storage: { color: '#569e71', bg: 'rgba(86,158,113,0.13)', Icon: HardDrive },
+  ui:      { color: '#cc8258', bg: 'rgba(204,130,88,0.13)', Icon: Monitor },
 }
 
 const projects = [
-  {
-    id: 'PRJ-08',
-    title: 'LUMISYNTH',
-    subtitle: 'Browser-Based Real-Time Video Instrument',
-    description: 'Real-time browser video instrument built with vanilla JavaScript, raw WebGL2, Canvas 2D, Vite, Playwright, and Cloudflare Pages Functions. It takes a local video, image, or webcam feed, detects visual regions in real time, tracks them across frames with stable identities, runs a GPU shader pipeline, and draws expressive tracking overlays on top. The architecture exposes the browser platform directly: CPU blob detection, Kalman + One Euro smoothing, a shared WebGL2 context with ping-pong FBOs, STRUCTURE effects, a chained COLOR rack, Canvas overlays, export gating, local internal auth fallback, Cloudflare API scaffolding, smoke tests, linting, and deployment setup.',
-    accent: '#2dd4f0',
-    accentRgb: '45,212,240',
-    stats: [
-      { value: 'WebGL2', label: 'render core' },
-      { value: '7',      label: 'track modes' },
-      { value: '3',      label: 'color slots' },
-      { value: 'D1',     label: 'auth scaffold' },
-    ],
-    stack: [
-      { name: 'JavaScript',  category: 'lang' },
-      { name: 'WebGL2',      category: 'ui' },
-      { name: 'Canvas 2D',   category: 'ui' },
-      { name: 'Vite',        category: 'ui' },
-      { name: 'Playwright',  category: 'infra' },
-      { name: 'Cloudflare',  category: 'cloud' },
-    ],
-    metadata: [
-      { label: 'PIPELINE', value: 'Blob detection → tracking → GL shader chain → Canvas overlays' },
-      { label: 'MEDIA',    value: 'Local video, image, or webcam; media stays in browser' },
-      { label: 'TRACK',    value: 'Motion, luma, dark, saturation, edge, sharp, color-key' },
-      { label: 'EXPORT',   value: 'PNG snapshot + MediaRecorder clip with gated flows' },
-    ],
-    github: 'https://github.com/sourikduttanyu/LumiSynth',
-  },
   {
     id: 'PRJ-06',
     title: 'SENTINEL',
     subtitle: 'Agentic Multi-Agent PR Review System',
     description: 'Multi-agent PR review system combining Semgrep static analysis with Claude LLM contextual reasoning — three specialized agents (Security, Docs, Performance) run in parallel via a LangGraph StateGraph, writing to isolated state keys to avoid collision. A SupervisorAgent deduplicates and severity-ranks findings before the graph pauses for human approval (HITL interrupt_before=["post_comment"], checkpointed to SQLite) — nothing posts to GitHub without a human gate. On a real PR, Claude caught an RCE Semgrep structurally cannot detect: a debug route still registered live, where the vulnerability was in the gap between what the comment said and what the code did.',
-    accent: '#d946ef',
-    accentRgb: '217,70,239',
+    accent: '#a85d95',
+    accentRgb: '168,93,149',
     stats: [
       { value: '3',       label: 'parallel agents' },
       { value: '$0.016',  label: 'cost per review' },
@@ -81,41 +52,12 @@ const projects = [
     github: 'https://github.com/sourikduttanyu/Sentinel',
   },
   {
-    id: 'PRJ-07',
-    title: 'RETAIN_IQ',
-    subtitle: 'XGBoost Employee Attrition Prediction + RAG',
-    description: 'Predicts employee attrition probability with XGBoost (F1 0.511 on minority class), threshold-calibrated via isotonic regression at 0.368 after 50-trial Optuna HPO. Each prediction is grounded by three RAG-retrieved historical employees via ChromaDB (cosine HNSW) and explained by a local Ollama llama3.2 LLM — zero employee data leaves the system. SMOTE + scale_pos_weight lifted minority-class F1 from 0.35 to 0.511. Fairness audited across gender, age, and marital status via fairlearn MetricFrame.',
-    accent: '#6366f1',
-    accentRgb: '99,102,241',
-    stats: [
-      { value: '85.7%',  label: 'accuracy' },
-      { value: '0.789',  label: 'ROC-AUC' },
-      { value: '0.511',  label: 'F1 minority' },
-      { value: '136',    label: 'features' },
-    ],
-    stack: [
-      { name: 'XGBoost',         category: 'ml' },
-      { name: 'FastAPI',         category: 'api' },
-      { name: 'SHAP',            category: 'algo' },
-      { name: 'ChromaDB',        category: 'database' },
-      { name: 'Ollama llama3.2', category: 'ai' },
-      { name: 'Docker',          category: 'infra' },
-    ],
-    metadata: [
-      { label: 'MODEL',    value: 'XGBoost + isotonic calibration (threshold 0.368)' },
-      { label: 'RAG',      value: 'sentence-transformers → ChromaDB (cosine, HNSW)' },
-      { label: 'LLM',      value: 'Ollama llama3.2 — local, no API egress' },
-      { label: 'FAIRNESS', value: 'fairlearn MetricFrame (gender, age, marital)' },
-    ],
-    github: 'https://github.com/sourikduttanyu/retainiq',
-  },
-  {
     id: 'PRJ-01',
     title: 'FEAST_FLEET',
     subtitle: 'Serverless Food Delivery & Logistics Platform',
     description: '24-Lambda serverless food delivery platform built entirely on AWS with deliberate architectural decisions under ambiguity. Order processing uses SQS async decoupling — placement Lambda validates and enqueues, a separate consumer handles fulfillment — so downstream failures (SES, DynamoDB) are invisible to the user at placement time. Restaurant search uses OpenSearch with dedicated indexes (restaurants_index, menu_items_index) instead of DynamoDB scans, chosen for the query pattern: partial matching, cuisine filtering, relevance ranking. 43% latency reduction for 1,248 concurrent users; 74% NLP intent resolution via Amazon Lex.',
-    accent: '#f59e0b',
-    accentRgb: '245,158,11',
+    accent: '#cca152',
+    accentRgb: '204,161,82',
     stats: [
       { value: '43%',   label: 'latency drop' },
       { value: '1,248', label: 'concurrent users' },
@@ -139,12 +81,128 @@ const projects = [
     github: 'https://github.com/sourikduttanyu/FeastFleetDeliveryApp',
   },
   {
+    id: 'PRJ-07',
+    title: 'RETAIN_IQ',
+    subtitle: 'XGBoost Employee Attrition Prediction + RAG',
+    description: 'Predicts employee attrition probability with XGBoost (F1 0.511 on minority class), threshold-calibrated via isotonic regression at 0.368 after 50-trial Optuna HPO. Each prediction is grounded by three RAG-retrieved historical employees via ChromaDB (cosine HNSW) and explained by a local Ollama llama3.2 LLM — zero employee data leaves the system. SMOTE + scale_pos_weight lifted minority-class F1 from 0.35 to 0.511. Fairness audited across gender, age, and marital status via fairlearn MetricFrame.',
+    accent: '#6fa0cc',
+    accentRgb: '111,160,204',
+    stats: [
+      { value: '85.7%',  label: 'accuracy' },
+      { value: '0.789',  label: 'ROC-AUC' },
+      { value: '0.511',  label: 'F1 minority' },
+      { value: '136',    label: 'features' },
+    ],
+    stack: [
+      { name: 'XGBoost',         category: 'ml' },
+      { name: 'FastAPI',         category: 'api' },
+      { name: 'SHAP',            category: 'algo' },
+      { name: 'ChromaDB',        category: 'database' },
+      { name: 'Ollama llama3.2', category: 'ai' },
+      { name: 'Docker',          category: 'infra' },
+    ],
+    metadata: [
+      { label: 'MODEL',    value: 'XGBoost + isotonic calibration (threshold 0.368)' },
+      { label: 'RAG',      value: 'sentence-transformers → ChromaDB (cosine, HNSW)' },
+      { label: 'LLM',      value: 'Ollama llama3.2 — local, no API egress' },
+      { label: 'FAIRNESS', value: 'fairlearn MetricFrame (gender, age, marital)' },
+    ],
+    github: 'https://github.com/sourikduttanyu/retainiq',
+  },
+  {
+    id: 'PRJ-05',
+    title: 'GO_PUBSUB_BROKER',
+    subtitle: 'Lightweight In-Memory Pub/Sub Engine',
+    description: 'Built a Go pub/sub broker from scratch mirroring Google Cloud Pub/Sub semantics — at-least-once delivery, per-subscription goroutine fan-out, configurable retry budget, dead-letter queue, and graceful shutdown. Designed so handler panics can\'t crash the delivery loop.',
+    accent: '#569e71',
+    accentRgb: '86,158,113',
+    stats: [
+      { value: '256',        label: 'inbox buffer' },
+      { value: 'at-least-1', label: 'delivery guarantee' },
+      { value: 'DLQ',        label: 'dead-letter queue' },
+      { value: 'O(subs)',    label: 'goroutine model' },
+    ],
+    stack: [
+      { name: 'Go',          category: 'lang' },
+      { name: 'Goroutines',  category: 'compute' },
+      { name: 'Channels',    category: 'stream' },
+      { name: 'RWMutex',     category: 'infra' },
+      { name: 'Dead-Letter', category: 'database' },
+      { name: 'TUI / CLI',   category: 'ui' },
+    ],
+    metadata: [
+      { label: 'ARCH',     value: 'In-Memory Pub/Sub Broker' },
+      { label: 'CONCURR',  value: 'Goroutine fan-out, RWMutex' },
+      { label: 'DELIVERY', value: 'At-least-once, Retry + DLQ' },
+      { label: 'INSPIRED', value: 'Google Cloud Pub/Sub' },
+    ],
+    github: 'https://github.com/sourikduttanyu/go-pubsub-broker',
+  },
+  {
+    id: 'PRJ-04',
+    title: 'JOB_TRACKER',
+    subtitle: 'Gmail Job Classification & Analytics Pipeline',
+    description: 'Auto-scans Gmail inbox, classifies job application emails into Applied / Interview / Offer / Rejected / Unknown via regex with an optional local LLM fallback (Ollama), deduplicates on Message ID, exports colour-coded jobs.xlsx, and serves an interactive Streamlit dashboard — zero manual entry.',
+    accent: '#bd5869',
+    accentRgb: '189,88,105',
+    stats: [
+      { value: '95%+',  label: 'regex accuracy' },
+      { value: '0',     label: 'manual entry' },
+      { value: '5',     label: 'status classes' },
+      { value: 'local', label: 'LLM inference' },
+    ],
+    stack: [
+      { name: 'Python',            category: 'lang' },
+      { name: 'Gmail API',         category: 'api' },
+      { name: 'Ollama / LLaMA',    category: 'ai' },
+      { name: 'Streamlit',         category: 'ui' },
+      { name: 'pandas / openpyxl', category: 'storage' },
+      { name: 'GitHub Actions',    category: 'infra' },
+    ],
+    metadata: [
+      { label: 'INGEST',    value: 'Gmail API (OAuth 2.0)' },
+      { label: 'CLASSIFY',  value: 'Regex-first + Ollama LLM fallback' },
+      { label: 'OUTPUT',    value: 'pandas + openpyxl (jobs.xlsx)' },
+      { label: 'DASHBOARD', value: 'Streamlit — filters, charts, editable' },
+    ],
+    github: 'https://github.com/sourikduttanyu/gmail-job-tracker-ollama',
+  },
+  {
+    id: 'PRJ-08',
+    title: 'LUMISYNTH',
+    subtitle: 'Browser-Based Real-Time Video Instrument',
+    description: 'Real-time browser video instrument built with vanilla JavaScript, raw WebGL2, Canvas 2D, Vite, Playwright, and Cloudflare Pages Functions. It takes a local video, image, or webcam feed, detects visual regions in real time, tracks them across frames with stable identities, runs a GPU shader pipeline, and draws expressive tracking overlays on top. The architecture exposes the browser platform directly: CPU blob detection, Kalman + One Euro smoothing, a shared WebGL2 context with ping-pong FBOs, STRUCTURE effects, a chained COLOR rack, Canvas overlays, export gating, local internal auth fallback, Cloudflare API scaffolding, smoke tests, linting, and deployment setup.',
+    accent: '#509ba8',
+    accentRgb: '80,155,168',
+    stats: [
+      { value: 'WebGL2', label: 'render core' },
+      { value: '7',      label: 'track modes' },
+      { value: '3',      label: 'color slots' },
+      { value: 'D1',     label: 'auth scaffold' },
+    ],
+    stack: [
+      { name: 'JavaScript',  category: 'lang' },
+      { name: 'WebGL2',      category: 'ui' },
+      { name: 'Canvas 2D',   category: 'ui' },
+      { name: 'Vite',        category: 'ui' },
+      { name: 'Playwright',  category: 'infra' },
+      { name: 'Cloudflare',  category: 'cloud' },
+    ],
+    metadata: [
+      { label: 'PIPELINE', value: 'Blob detection → tracking → GL shader chain → Canvas overlays' },
+      { label: 'MEDIA',    value: 'Local video, image, or webcam; media stays in browser' },
+      { label: 'TRACK',    value: 'Motion, luma, dark, saturation, edge, sharp, color-key' },
+      { label: 'EXPORT',   value: 'PNG snapshot + MediaRecorder clip with gated flows' },
+    ],
+    github: 'https://github.com/sourikduttanyu/LumiSynth',
+  },
+  {
     id: 'PRJ-02',
     title: 'ROUTE_SAVVY',
     subtitle: 'MTA Transit Telemetry & Mobility Optimizer',
     description: 'Processes 112M+ daily signals with 99.87% system stability, cutting pathfinding latency by 17% across 14,321 simulations via distributed graph algorithms.',
-    accent: '#06b6d4',
-    accentRgb: '6,182,212',
+    accent: '#509ba8',
+    accentRgb: '80,155,168',
     stats: [
       { value: '112M+',  label: 'daily signals' },
       { value: '99.87%', label: 'uptime' },
@@ -172,8 +230,8 @@ const projects = [
     title: 'NYU_REDDIT_PIPELINE',
     subtitle: 'AWS-Powered Social Data Engineering Pipeline',
     description: 'Ingests raw social data via PRAW into S3 and indexes meta-attributes into DynamoDB for downstream toxicity analysis dashboards across large-scale Reddit collections.',
-    accent: '#a78bfa',
-    accentRgb: '167,139,250',
+    accent: '#8f81ba',
+    accentRgb: '143,129,186',
     stats: [
       { value: 'S3',        label: 'raw storage' },
       { value: 'PRAW',      label: 'ingest source' },
@@ -195,64 +253,6 @@ const projects = [
       { label: 'UI',       value: 'Streamlit Analysis Dash' },
     ],
     github: 'https://github.com/sourikduttanyu/Prototype-Reddit-NYU-Abuse',
-  },
-  {
-    id: 'PRJ-04',
-    title: 'JOB_TRACKER',
-    subtitle: 'Gmail Job Classification & Analytics Pipeline',
-    description: 'Auto-scans Gmail inbox, classifies job application emails into Applied / Interview / Offer / Rejected / Unknown via regex with an optional local LLM fallback (Ollama), deduplicates on Message ID, exports colour-coded jobs.xlsx, and serves an interactive Streamlit dashboard — zero manual entry.',
-    accent: '#f43f5e',
-    accentRgb: '244,63,94',
-    stats: [
-      { value: '95%+',  label: 'regex accuracy' },
-      { value: '0',     label: 'manual entry' },
-      { value: '5',     label: 'status classes' },
-      { value: 'local', label: 'LLM inference' },
-    ],
-    stack: [
-      { name: 'Python',            category: 'lang' },
-      { name: 'Gmail API',         category: 'api' },
-      { name: 'Ollama / LLaMA',    category: 'ai' },
-      { name: 'Streamlit',         category: 'ui' },
-      { name: 'pandas / openpyxl', category: 'storage' },
-      { name: 'GitHub Actions',    category: 'infra' },
-    ],
-    metadata: [
-      { label: 'INGEST',    value: 'Gmail API (OAuth 2.0)' },
-      { label: 'CLASSIFY',  value: 'Regex-first + Ollama LLM fallback' },
-      { label: 'OUTPUT',    value: 'pandas + openpyxl (jobs.xlsx)' },
-      { label: 'DASHBOARD', value: 'Streamlit — filters, charts, editable' },
-    ],
-    github: 'https://github.com/sourikduttanyu/gmail-job-tracker-ollama',
-  },
-  {
-    id: 'PRJ-05',
-    title: 'GO_PUBSUB_BROKER',
-    subtitle: 'Lightweight In-Memory Pub/Sub Engine',
-    description: 'Built a Go pub/sub broker from scratch mirroring Google Cloud Pub/Sub semantics — at-least-once delivery, per-subscription goroutine fan-out, configurable retry budget, dead-letter queue, and graceful shutdown. Designed so handler panics can\'t crash the delivery loop.',
-    accent: '#22c55e',
-    accentRgb: '34,197,94',
-    stats: [
-      { value: '256',        label: 'inbox buffer' },
-      { value: 'at-least-1', label: 'delivery guarantee' },
-      { value: 'DLQ',        label: 'dead-letter queue' },
-      { value: 'O(subs)',    label: 'goroutine model' },
-    ],
-    stack: [
-      { name: 'Go',          category: 'lang' },
-      { name: 'Goroutines',  category: 'compute' },
-      { name: 'Channels',    category: 'stream' },
-      { name: 'RWMutex',     category: 'infra' },
-      { name: 'Dead-Letter', category: 'database' },
-      { name: 'TUI / CLI',   category: 'ui' },
-    ],
-    metadata: [
-      { label: 'ARCH',     value: 'In-Memory Pub/Sub Broker' },
-      { label: 'CONCURR',  value: 'Goroutine fan-out, RWMutex' },
-      { label: 'DELIVERY', value: 'At-least-once, Retry + DLQ' },
-      { label: 'INSPIRED', value: 'Google Cloud Pub/Sub' },
-    ],
-    github: 'https://github.com/sourikduttanyu/go-pubsub-broker',
   },
 ]
 
@@ -417,13 +417,13 @@ export default function Blueprints({ id }) {
         <div className="flex flex-col md:flex-row md:items-end justify-between pb-6 sm:pb-8 border-b border-yale-blue gap-4 sm:gap-6 relative overflow-hidden">
           <div
             className="absolute right-0 bottom-0 font-sans font-black leading-none select-none pointer-events-none"
-            style={{ fontSize: 160, color: 'rgba(45,212,240,0.04)', lineHeight: 1 }}
+            style={{ fontSize: 160, color: 'rgba(80,155,168,0.04)', lineHeight: 1 }}
             aria-hidden="true"
           >01</div>
 
           <div>
             <h2 id="blueprints-heading" className="text-[clamp(2.25rem,5.5vw,4.5rem)] font-sans font-extrabold text-brand-white tracking-tight uppercase">
-              The <span style={{ WebkitTextStroke: '2px #2dd4f0', color: 'transparent' }}>Blueprints</span>
+              The <span style={{ WebkitTextStroke: '2px #509ba8', color: 'transparent' }}>Blueprints</span>
             </h2>
             <p className="font-mono text-alabaster/40 mt-4 text-xs tracking-wider">
               PROJ_COUNT: {projects.length} · technical schematics · select to inspect
