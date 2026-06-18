@@ -9,7 +9,7 @@ const skillCategories = [
     accentRgb: '168,93,149',
     skills: [
       "LangChain", "LangGraph", "RAG Pipelines", "LLM-as-a-Service", "Azure OpenAI",
-      "OpenAI API", "Claude API", "Ollama", "Amazon SageMaker",
+      "OpenAI API", "Claude API", "MCP Servers", "Ollama", "Amazon SageMaker",
       "Prompt Engineering", "AIOps", "Z-Score / EWMA Anomaly Detection", "NLP",
     ]
   },
@@ -75,7 +75,7 @@ const skillCategories = [
     accent: '#cc8258',
     accentRgb: '204,130,88',
     skills: [
-      "Angular 15", "React 18", "RxJS", "TypeScript",
+      "Angular 15", "React 18", "WebGL2 / GLSL", "Chrome Extension APIs", "RxJS", "TypeScript",
       "WebSockets", "Azure SignalR", "Recharts", "Tailwind CSS",
       "Framer Motion", "Storybook", "Cypress", "Vite",
     ]
@@ -88,7 +88,7 @@ const skillCategories = [
     skills: [
       "GitHub Actions", "Azure DevOps", "Semgrep (SAST)", "Gitleaks",
       "SonarQube", "OWASP Top 10", "Secrets Scanning", "Branch Protection",
-      "k6", "Blue-Green Deployments", "Feature Flags", "CI/CD Pipeline Design",
+      "k6", "Blue-Green Deployments", "Feature Flags", "CI/CD Pipeline Design", "Local Differential Privacy",
     ]
   },
 ]
