@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion'
 import { Sparkles, Code2, Cloud, Server, Database, Monitor, Shield, Activity } from 'lucide-react'
 
+// `core` = signal skills for Full-Stack + Agentic AI Engineer roles. Rendered
+// emphasized; everything else is supporting depth, rendered dimmed.
 const skillCategories = [
   {
     category: "AGENTIC AI & LLM",
@@ -11,7 +13,11 @@ const skillCategories = [
       "LangChain", "LangGraph", "RAG Pipelines", "LLM-as-a-Service", "Azure OpenAI",
       "OpenAI API", "Claude API", "MCP Servers", "Ollama", "Amazon SageMaker",
       "Prompt Engineering", "AIOps", "Z-Score / EWMA Anomaly Detection", "NLP",
-    ]
+    ],
+    core: [
+      "LangChain", "LangGraph", "RAG Pipelines", "LLM-as-a-Service",
+      "OpenAI API", "Claude API", "MCP Servers", "Prompt Engineering",
+    ],
   },
   {
     category: "LANGUAGES",
@@ -19,8 +25,9 @@ const skillCategories = [
     accent: '#cca152',
     accentRgb: '204,161,82',
     skills: [
-      "Python", "Java", "Go", "C++", "C#", "TypeScript", "JavaScript", "SQL", "Bash", "C",
-    ]
+      "TypeScript", "Python", "JavaScript", "Java", "Go", "SQL", "C++", "C#", "Bash", "C",
+    ],
+    core: ["TypeScript", "Python", "JavaScript", "Java", "Go", "SQL"],
   },
   {
     category: "CLOUD & PLATFORM",
@@ -28,11 +35,12 @@ const skillCategories = [
     accent: '#6fa0cc',
     accentRgb: '111,160,204',
     skills: [
-      "Azure AKS", "Azure API Management", "Azure Event Hubs", "Azure CosmosDB",
+      "Docker", "Kubernetes", "Azure AKS", "AWS Lambda", "Terraform",
+      "Azure API Management", "Azure Event Hubs", "Azure CosmosDB",
       "Azure SignalR", "Azure OpenAI Service", "Azure Chaos Studio", "Azure App Configuration",
-      "AWS Lambda", "AWS DynamoDB", "AWS S3", "GCP",
-      "Docker", "Kubernetes", "Terraform", "Helm",
-    ]
+      "AWS DynamoDB", "AWS S3", "GCP", "Helm",
+    ],
+    core: ["Docker", "Kubernetes", "Azure AKS", "AWS Lambda", "Terraform"],
   },
   {
     category: "BACKEND & DISTRIBUTED",
@@ -40,10 +48,11 @@ const skillCategories = [
     accent: '#509ba8',
     accentRgb: '80,155,168',
     skills: [
-      "Java Spring Boot 3", ".NET 7", "FastAPI", "Flask", "GraphQL", "REST APIs",
-      "Apache Kafka", "PySpark", "Redis", "OAuth 2.0 / PKCE",
+      "Java Spring Boot 3", ".NET 7", "FastAPI", "REST APIs", "GraphQL",
+      "Apache Kafka", "Redis", "Flask", "PySpark", "OAuth 2.0 / PKCE",
       "Polly", "Resilience4j", "Circuit Breaking", "Exponential Backoff",
-    ]
+    ],
+    core: ["Java Spring Boot 3", ".NET 7", "FastAPI", "REST APIs", "GraphQL", "Apache Kafka", "Redis"],
   },
   {
     category: "SRE & OBSERVABILITY",
@@ -56,7 +65,8 @@ const skillCategories = [
       "PagerDuty", "Grafana", "Azure Monitor", "k6 Load Testing",
       "MTTD / MTTR Reduction", "Toil Reduction", "Capacity Planning",
       "Distributed Tracing", "Pre-Escalation Alerting",
-    ]
+    ],
+    core: ["SLO / SLA Ownership", "Incident Command (DRI)", "Distributed Tracing"],
   },
   {
     category: "DATA & ML OPS",
@@ -64,10 +74,12 @@ const skillCategories = [
     accent: '#8f81ba',
     accentRgb: '143,129,186',
     skills: [
-      "Azure Databricks", "Apache Spark SQL", "PostgreSQL", "Azure CosmosDB",
+      "PostgreSQL", "ChromaDB", "pandas", "NumPy",
+      "Azure Databricks", "Apache Spark SQL", "Azure CosmosDB",
       "DynamoDB", "OpenSearch", "SQLite", "Azure Data Lake",
-      "pandas", "NumPy", "SciPy", "XGBoost", "SHAP", "ChromaDB",
-    ]
+      "SciPy", "XGBoost", "SHAP",
+    ],
+    core: ["PostgreSQL", "ChromaDB", "pandas", "NumPy"],
   },
   {
     category: "FRONTEND",
@@ -75,10 +87,11 @@ const skillCategories = [
     accent: '#cc8258',
     accentRgb: '204,130,88',
     skills: [
-      "Angular 15", "React 18", "WebGL2 / GLSL", "Chrome Extension APIs", "RxJS", "TypeScript",
-      "WebSockets", "Azure SignalR", "Recharts", "Tailwind CSS",
-      "Framer Motion", "Storybook", "Cypress", "Vite",
-    ]
+      "TypeScript", "React 18", "Angular 15", "Tailwind CSS", "WebSockets", "Vite",
+      "WebGL2 / GLSL", "Chrome Extension APIs", "RxJS",
+      "Azure SignalR", "Recharts", "Framer Motion", "Storybook", "Cypress",
+    ],
+    core: ["TypeScript", "React 18", "Angular 15", "Tailwind CSS", "WebSockets", "Vite"],
   },
   {
     category: "DEVSECOPS",
@@ -86,10 +99,11 @@ const skillCategories = [
     accent: '#bd5869',
     accentRgb: '189,88,105',
     skills: [
-      "GitHub Actions", "Azure DevOps", "Semgrep (SAST)", "Gitleaks",
+      "GitHub Actions", "CI/CD Pipeline Design", "Azure DevOps", "Semgrep (SAST)", "Gitleaks",
       "SonarQube", "OWASP Top 10", "Secrets Scanning", "Branch Protection",
-      "k6", "Blue-Green Deployments", "Feature Flags", "CI/CD Pipeline Design", "Local Differential Privacy",
-    ]
+      "k6", "Blue-Green Deployments", "Feature Flags", "Local Differential Privacy",
+    ],
+    core: ["GitHub Actions", "CI/CD Pipeline Design"],
   },
 ]
 
@@ -103,24 +117,27 @@ const rowVariants = {
   visible: { opacity: 1, y: 0, transition: { ease: [0.22, 1, 0.36, 1], duration: 0.8 } },
 }
 
-function SkillPill({ skill, accent, accentRgb, index }) {
+function SkillPill({ skill, accent, accentRgb, index, isCore }) {
   return (
     <motion.span
       initial={{ opacity: 0, scale: 0.82, y: 10 }}
       whileInView={{ opacity: 1, scale: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ ease: [0.22, 1, 0.36, 1], duration: 0.55, delay: index * 0.038 }}
-      className="skill-pill group inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs font-semibold select-none cursor-default transition-all duration-200"
+      className={`skill-pill group inline-flex items-center gap-1.5 px-3 py-1.5 font-mono text-xs select-none cursor-default transition-all duration-200 ${isCore ? 'font-bold' : 'font-medium'}`}
       style={{
-        background: `rgba(${accentRgb},0.07)`,
-        border: `1px solid rgba(${accentRgb},0.22)`,
-        color: `rgba(${accentRgb},0.85)`,
+        background: isCore ? `rgba(${accentRgb},0.14)` : `rgba(${accentRgb},0.05)`,
+        border: `1px solid rgba(${accentRgb},${isCore ? 0.5 : 0.14})`,
+        color: isCore ? `rgba(${accentRgb},1)` : `rgba(${accentRgb},0.55)`,
         '--glow-color': `rgba(${accentRgb},0.35)`,
       }}
     >
       <span
         className="w-1 h-1 rounded-full flex-shrink-0 transition-all duration-200 group-hover:scale-150"
-        style={{ background: accent }}
+        style={{
+          background: isCore ? accent : 'transparent',
+          border: isCore ? 'none' : `1px solid rgba(${accentRgb},0.4)`,
+        }}
       />
       {skill}
     </motion.span>
@@ -129,6 +146,7 @@ function SkillPill({ skill, accent, accentRgb, index }) {
 
 export default function System({ id }) {
   const totalSkills = skillCategories.reduce((acc, cat) => acc + cat.skills.length, 0)
+  const coreSkills = skillCategories.reduce((acc, cat) => acc + (cat.core?.length || 0), 0)
 
   return (
     <section id={id} aria-labelledby="system-heading" className="py-16 sm:py-24 lg:py-32 border-b border-yale-blue relative z-10">
@@ -151,9 +169,21 @@ export default function System({ id }) {
             <p className="font-mono text-alabaster/70 mt-4 text-sm max-w-xl leading-relaxed">
               Production-proven skills across distributed systems, agentic AI, and cloud infrastructure.
             </p>
+            {/* Legend: brighter pills = core role signal, dim = supporting depth */}
+            <div className="flex items-center gap-4 mt-4 font-mono text-[10px] tracking-wider">
+              <span className="inline-flex items-center gap-1.5 text-alabaster/80">
+                <span className="w-1.5 h-1.5 rounded-full bg-alabaster/80" />
+                CORE (FULL-STACK + AGENTIC AI)
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-alabaster/35">
+                <span className="w-1.5 h-1.5 rounded-full border border-alabaster/40" />
+                SUPPORTING DEPTH
+              </span>
+            </div>
           </div>
           <div className="font-mono text-xs text-stormy-teal-light text-right hidden md:block font-semibold tracking-wider shrink-0">
             NODE_COUNT: {totalSkills} <br />
+            CORE_SIGNAL: {coreSkills} <br />
             INTEGRITY: 100%
           </div>
         </div>
@@ -214,7 +244,7 @@ export default function System({ id }) {
                     border: `1px solid rgba(${group.accentRgb},0.2)`,
                   }}
                 >
-                  {String(group.skills.length).padStart(2, '0')}
+                  {String(group.core?.length || 0).padStart(2, '0')}<span style={{ opacity: 0.5 }}>/{String(group.skills.length).padStart(2, '0')}</span>
                 </span>
               </div>
 
@@ -227,6 +257,7 @@ export default function System({ id }) {
                     accent={group.accent}
                     accentRgb={group.accentRgb}
                     index={skillIdx}
+                    isCore={group.core?.includes(skill)}
                   />
                 ))}
               </div>

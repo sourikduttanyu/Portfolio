@@ -8,8 +8,8 @@ import CommandCenter from './components/CommandCenter'
 import ParticleField from './components/ParticleField'
 import SideEffects from './components/SideEffects'
 
-const TITLE_DEFAULT = 'Sourik Dutta — Software Engineer'
-const TITLE_IDLE    = '[ SYSTEM IDLE ] — Sourik Dutta'
+const TITLE_DEFAULT = 'Sourik Dutta · Software Engineer'
+const TITLE_IDLE    = '[ SYSTEM IDLE ] · Sourik Dutta'
 
 export default function App() {
   useEffect(() => {
@@ -18,7 +18,7 @@ export default function App() {
     const s2 = 'background:#07111f;color:#dde8f5;font-size:11px;font-family:monospace;padding:2px 8px'
     const s3 = 'background:#07111f;color:#708da8;font-size:11px;font-family:monospace;padding:2px 8px'
     console.log('%c SYSTEM INTRUSION DETECTED', s1)
-    console.log('%c Operator: Sourik Dutta — Software Engineer', s2)
+    console.log('%c Operator: Sourik Dutta · Software Engineer', s2)
     console.log('%c Stack: React · Framer Motion · Tailwind CSS v4 · Vite', s2)
     console.log('%c Hire signal: sourik1999dutta@gmail.com', s3)
     console.log('%c https://github.com/sourikduttanyu', s3)

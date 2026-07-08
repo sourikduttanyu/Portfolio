@@ -57,7 +57,7 @@ export default function CommandCenter({ id }) {
 
       if (res.ok) {
         appendLog('ACK received. Transmission successful.', 'success')
-        appendLog('Standby — response inbound.', 'success')
+        appendLog('Standby. Response inbound.', 'success')
         setStatus('success')
         setFields({ name: '', email: '', message: '' })
       } else {

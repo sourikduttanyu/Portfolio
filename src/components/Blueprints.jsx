@@ -26,7 +26,7 @@ const projects = [
     id: 'PRJ-06',
     title: 'SENTINEL',
     subtitle: 'Agentic Multi-Agent PR Review System',
-    description: 'Multi-agent PR review system combining Semgrep static analysis with Claude LLM contextual reasoning — three specialized agents (Security, Docs, Performance) run in parallel via a LangGraph StateGraph, writing to isolated state keys to avoid collision. A SupervisorAgent deduplicates and severity-ranks findings before the graph pauses for human approval (HITL interrupt_before=["post_comment"], checkpointed to SQLite) — nothing posts to GitHub without a human gate. On a real PR, Claude caught an RCE Semgrep structurally cannot detect: a debug route still registered live, where the vulnerability was in the gap between what the comment said and what the code did.',
+    description: 'Multi-agent PR review system combining Semgrep static analysis with Claude LLM contextual reasoning: three specialized agents (Security, Docs, Performance) run in parallel via a LangGraph StateGraph, writing to isolated state keys to avoid collision. A SupervisorAgent deduplicates and severity-ranks findings before the graph pauses for human approval (HITL interrupt_before=["post_comment"], checkpointed to SQLite); nothing posts to GitHub without a human gate. On a real PR, Claude caught an RCE Semgrep structurally cannot detect: a debug route still registered live, where the vulnerability was in the gap between what the comment said and what the code did.',
     accent: '#a85d95',
     accentRgb: '168,93,149',
     stats: [
@@ -55,7 +55,7 @@ const projects = [
     id: 'PRJ-01',
     title: 'FEAST_FLEET',
     subtitle: 'Serverless Food Delivery & Logistics Platform',
-    description: '24-Lambda serverless food delivery platform built entirely on AWS with deliberate architectural decisions under ambiguity. Order processing uses SQS async decoupling — placement Lambda validates and enqueues, a separate consumer handles fulfillment — so downstream failures (SES, DynamoDB) are invisible to the user at placement time. Restaurant search uses OpenSearch with dedicated indexes (restaurants_index, menu_items_index) instead of DynamoDB scans, chosen for the query pattern: partial matching, cuisine filtering, relevance ranking. 43% latency reduction for 1,248 concurrent users; 74% NLP intent resolution via Amazon Lex.',
+    description: '24-Lambda serverless food delivery platform built entirely on AWS with deliberate architectural decisions under ambiguity. Order processing uses SQS async decoupling: placement Lambda validates and enqueues, a separate consumer handles fulfillment, so downstream failures (SES, DynamoDB) are invisible to the user at placement time. Restaurant search uses OpenSearch with dedicated indexes (restaurants_index, menu_items_index) instead of DynamoDB scans, chosen for the query pattern: partial matching, cuisine filtering, relevance ranking. 43% latency reduction for 1,248 concurrent users; 74% NLP intent resolution via Amazon Lex.',
     accent: '#cca152',
     accentRgb: '204,161,82',
     stats: [
@@ -84,7 +84,7 @@ const projects = [
     id: 'PRJ-07',
     title: 'RETAIN_IQ',
     subtitle: 'XGBoost Employee Attrition Prediction + RAG',
-    description: 'Predicts employee attrition probability with XGBoost (F1 0.511 on minority class), threshold-calibrated via isotonic regression at 0.368 after 50-trial Optuna HPO. Each prediction is grounded by three RAG-retrieved historical employees via ChromaDB (cosine HNSW) and explained by a local Ollama llama3.2 LLM — zero employee data leaves the system. SMOTE + scale_pos_weight lifted minority-class F1 from 0.35 to 0.511. Fairness audited across gender, age, and marital status via fairlearn MetricFrame.',
+    description: 'Predicts employee attrition probability with XGBoost (F1 0.511 on minority class), threshold-calibrated via isotonic regression at 0.368 after 50-trial Optuna HPO. Each prediction is grounded by three RAG-retrieved historical employees via ChromaDB (cosine HNSW) and explained by a local Ollama llama3.2 LLM; zero employee data leaves the system. SMOTE + scale_pos_weight lifted minority-class F1 from 0.35 to 0.511. Fairness audited across gender, age, and marital status via fairlearn MetricFrame.',
     accent: '#6fa0cc',
     accentRgb: '111,160,204',
     stats: [
@@ -104,7 +104,7 @@ const projects = [
     metadata: [
       { label: 'MODEL',    value: 'XGBoost + isotonic calibration (threshold 0.368)' },
       { label: 'RAG',      value: 'sentence-transformers → ChromaDB (cosine, HNSW)' },
-      { label: 'LLM',      value: 'Ollama llama3.2 — local, no API egress' },
+      { label: 'LLM',      value: 'Ollama llama3.2 (local, no API egress)' },
       { label: 'FAIRNESS', value: 'fairlearn MetricFrame (gender, age, marital)' },
     ],
     github: 'https://github.com/sourikduttanyu/retainiq',
@@ -113,7 +113,7 @@ const projects = [
     id: 'PRJ-05',
     title: 'GO_PUBSUB_BROKER',
     subtitle: 'Lightweight In-Memory Pub/Sub Engine',
-    description: 'Built a Go pub/sub broker from scratch mirroring Google Cloud Pub/Sub semantics — at-least-once delivery, per-subscription goroutine fan-out, configurable retry budget, dead-letter queue, and graceful shutdown. Designed so handler panics can\'t crash the delivery loop.',
+    description: 'Built a Go pub/sub broker from scratch mirroring Google Cloud Pub/Sub semantics: at-least-once delivery, per-subscription goroutine fan-out, configurable retry budget, dead-letter queue, and graceful shutdown. Designed so handler panics can\'t crash the delivery loop.',
     accent: '#569e71',
     accentRgb: '86,158,113',
     stats: [
@@ -142,7 +142,7 @@ const projects = [
     id: 'PRJ-04',
     title: 'JOB_TRACKER',
     subtitle: 'Gmail Job Classification & Analytics Pipeline',
-    description: 'Auto-scans Gmail inbox, classifies job application emails into Applied / Interview / Offer / Rejected / Unknown via regex with an optional local LLM fallback (Ollama), deduplicates on Message ID, exports colour-coded jobs.xlsx, and serves an interactive Streamlit dashboard — zero manual entry.',
+    description: 'Auto-scans Gmail inbox, classifies job application emails into Applied / Interview / Offer / Rejected / Unknown via regex with an optional local LLM fallback (Ollama), deduplicates on Message ID, exports colour-coded jobs.xlsx, and serves an interactive Streamlit dashboard; zero manual entry.',
     accent: '#bd5869',
     accentRgb: '189,88,105',
     stats: [
@@ -163,7 +163,7 @@ const projects = [
       { label: 'INGEST',    value: 'Gmail API (OAuth 2.0)' },
       { label: 'CLASSIFY',  value: 'Regex-first + Ollama LLM fallback' },
       { label: 'OUTPUT',    value: 'pandas + openpyxl (jobs.xlsx)' },
-      { label: 'DASHBOARD', value: 'Streamlit — filters, charts, editable' },
+      { label: 'DASHBOARD', value: 'Streamlit: filters, charts, editable' },
     ],
     github: 'https://github.com/sourikduttanyu/gmail-job-tracker-ollama',
   },
@@ -171,7 +171,7 @@ const projects = [
     id: 'PRJ-08',
     title: 'LUMISYNTH',
     subtitle: 'Browser-Based Real-Time Video Instrument',
-    description: 'Real-time browser video instrument with vanilla JS, raw WebGL2, Canvas 2D, Vite, Playwright, and Cloudflare Pages Functions. Input sources: local video, image, webcam, and four raymarched GLSL generative shaders (Dive Clouds, Phantom Star, Star Nest, Hyperkart). A STRUCTURE → COLOR → GRADE → FX RACK pipeline runs fully on GPU — STRUCTURE covers ASCII, Erode, Watershed, Pixel Sort, Melt, FreqMod; FX RACK chains up to three feedback passes (Flow Field, Drag, Burn-In, Wobble Tape) or stateless passes (CRT, Scanlines, Degrade). Seven blob-detection modes plus MediaPipe EfficientDet object tracking bundled offline — no install, works in air-gap. BigBrain mode wires new GLSL shaders from TouchDesigner source through dispatcher, schema, UI, and verification in a single Cursor prompt.',
+    description: 'Real-time browser video instrument with vanilla JS, raw WebGL2, Canvas 2D, Vite, Playwright, and Cloudflare Pages Functions. Input sources: local video, image, webcam, and four raymarched GLSL generative shaders (Dive Clouds, Phantom Star, Star Nest, Hyperkart). A STRUCTURE → COLOR → GRADE → FX RACK pipeline runs fully on GPU: STRUCTURE covers ASCII, Erode, Watershed, Pixel Sort, Melt, FreqMod; FX RACK chains up to three feedback passes (Flow Field, Drag, Burn-In, Wobble Tape) or stateless passes (CRT, Scanlines, Degrade). Seven blob-detection modes plus MediaPipe EfficientDet object tracking bundled offline; no install, works in air-gap. BigBrain mode wires new GLSL shaders from TouchDesigner source through dispatcher, schema, UI, and verification in a single Cursor prompt.',
     accent: '#509ba8',
     accentRgb: '80,155,168',
     stats: [
@@ -200,7 +200,7 @@ const projects = [
     id: 'PRJ-09',
     title: 'VEIL',
     subtitle: 'Differential Privacy Ad Frequency Capper',
-    description: 'Chrome MV3 extension + Go backend enforcing ad frequency caps with Local Differential Privacy — no user IDs, no cookies, no tracking pixels. A Geometric mechanism (ε=1.0) scrambles true impression counts in pure JS inside the service worker before any fetch() call; the server only sees noisy cohort aggregates. No user_id column exists in any table — the absence is architectural, enforced by the migration comment. Fail-closed epsilon budget uses SELECT FOR UPDATE in Postgres: when the budget is exhausted the ad is not served, privacy over availability. Two-tier suppression: DOM hide then declarativeNetRequest session rule blocks the ad iframe at the network layer — ad server never receives the request, no tracking pixel fires. Works on YouTube, Facebook, and first-party domains where filter-list blockers fail. Python simulator with pluggable NoiseMechanism ABC; React dashboard with budget gauge and per-cohort charts.',
+    description: 'Chrome MV3 extension + Go backend enforcing ad frequency caps with Local Differential Privacy: no user IDs, no cookies, no tracking pixels. A Geometric mechanism (ε=1.0) scrambles true impression counts in pure JS inside the service worker before any fetch() call; the server only sees noisy cohort aggregates. No user_id column exists in any table; the absence is architectural, enforced by the migration comment. Fail-closed epsilon budget uses SELECT FOR UPDATE in Postgres: when the budget is exhausted the ad is not served, privacy over availability. Two-tier suppression: DOM hide then declarativeNetRequest session rule blocks the ad iframe at the network layer; ad server never receives the request, no tracking pixel fires. Works on YouTube, Facebook, and first-party domains where filter-list blockers fail. Python simulator with pluggable NoiseMechanism ABC; React dashboard with budget gauge and per-cohort charts.',
     accent: '#569e71',
     accentRgb: '86,158,113',
     stats: [
@@ -218,8 +218,8 @@ const projects = [
       { name: 'Docker',     category: 'infra' },
     ],
     metadata: [
-      { label: 'PRIVACY',  value: 'Geometric LDP — noise applied in-browser before fetch()' },
-      { label: 'SCHEMA',   value: 'No user_id column — PII storage structurally impossible' },
+      { label: 'PRIVACY',  value: 'Geometric LDP: noise applied in-browser before fetch()' },
+      { label: 'SCHEMA',   value: 'No user_id column: PII storage structurally impossible' },
       { label: 'ENFORCE',  value: 'Redis counters + SELECT FOR UPDATE epsilon budget (Postgres)' },
       { label: 'SUPPRESS', value: 'DOM hide → declarativeNetRequest block (ad server never called)' },
     ],
@@ -229,7 +229,7 @@ const projects = [
     id: 'PRJ-10',
     title: 'ASTRAL',
     subtitle: 'Context-Budget Manager for Claude Code',
-    description: 'Claude Code plugin that warns before auto-compact silently rewrites your session. A Python hook reads real context usage from the transcript on every prompt and fires at 40/55/70% of the window — thresholds derived from long-context accuracy degradation research, not arbitrary. A checkpoint command lets you multi-select which completed work to shed and generates a steered /compact line that drops the done work but keeps the live thread, instead of flattening everything. A Read-gate intercepts unbounded large-file reads and delegates them to a subagent so a 10K-token dump never lands in your main context. A PreCompact hook snapshots about-to-be-evicted turns to a SQLite FTS5 store; an MCP server exposes a recall(query) tool so Claude can re-fetch what compaction dropped. Ships with a statusline badge tracking live context percent, a one-line installer for macOS/Linux/Windows, and an audit command that finds never-used or stale agents loaded into every session.',
+    description: 'Claude Code plugin that warns before auto-compact silently rewrites your session. A Python hook reads real context usage from the transcript on every prompt and fires at 40/55/70% of the window; thresholds derived from long-context accuracy degradation research, not arbitrary. A checkpoint command lets you multi-select which completed work to shed and generates a steered /compact line that drops the done work but keeps the live thread, instead of flattening everything. A Read-gate intercepts unbounded large-file reads and delegates them to a subagent so a 10K-token dump never lands in your main context. A PreCompact hook snapshots about-to-be-evicted turns to a SQLite FTS5 store; an MCP server exposes a recall(query) tool so Claude can re-fetch what compaction dropped. Ships with a statusline badge tracking live context percent, a one-line installer for macOS/Linux/Windows, and an audit command that finds never-used or stale agents loaded into every session.',
     accent: '#a85d95',
     accentRgb: '168,93,149',
     stats: [
@@ -250,7 +250,7 @@ const projects = [
       { label: 'HOOKS',   value: 'UserPromptSubmit + PreToolUse:Read + PreCompact' },
       { label: 'RECALL',  value: 'SQLite FTS5 snapshot store + MCP recall(query) tool' },
       { label: 'WINDOW',  value: 'Occupancy-floor heuristic + /astral:window per-project override' },
-      { label: 'INSTALL', value: 'curl one-liner — idempotent, chains existing statusline' },
+      { label: 'INSTALL', value: 'curl one-liner: idempotent, chains existing statusline' },
     ],
     github: 'https://github.com/sourikduttanyu/astral',
   },
@@ -366,7 +366,7 @@ function ProjectDetail({ project }) {
               className="font-mono text-[10px] font-bold tracking-[0.18em] uppercase"
               style={{ color: accent }}
             >
-              {project.id} — {project.subtitle}
+              {project.id} · {project.subtitle}
             </div>
             {project.github && (
               <a
