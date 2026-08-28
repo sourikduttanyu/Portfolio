@@ -1,24 +1,9 @@
 import { motion } from 'framer-motion'
 import { Sparkles, Code2, Cloud, Server, Database, Monitor, Shield, Activity } from 'lucide-react'
 
-// `core` = signal skills for Full-Stack + Agentic AI Engineer roles. Rendered
+// `core` = signal skills for Backend / Distributed Systems + Cloud Engineer roles. Rendered
 // emphasized; everything else is supporting depth, rendered dimmed.
 const skillCategories = [
-  {
-    category: "AGENTIC AI & LLM",
-    icon: Sparkles,
-    accent: '#a85d95',
-    accentRgb: '168,93,149',
-    skills: [
-      "LangChain", "LangGraph", "RAG Pipelines", "LLM-as-a-Service", "Azure OpenAI",
-      "OpenAI API", "Claude API", "MCP Servers", "Ollama", "Amazon SageMaker",
-      "Prompt Engineering", "AIOps", "Z-Score / EWMA Anomaly Detection", "NLP",
-    ],
-    core: [
-      "LangChain", "LangGraph", "RAG Pipelines", "LLM-as-a-Service",
-      "OpenAI API", "Claude API", "MCP Servers", "Prompt Engineering",
-    ],
-  },
   {
     category: "LANGUAGES",
     icon: Code2,
@@ -26,21 +11,9 @@ const skillCategories = [
     accentRgb: '204,161,82',
     skills: [
       "TypeScript", "Python", "JavaScript", "Java", "Go", "SQL", "C++", "C#", "Bash", "C",
+      "Protobuf", "gRPC",
     ],
-    core: ["TypeScript", "Python", "JavaScript", "Java", "Go", "SQL"],
-  },
-  {
-    category: "CLOUD & PLATFORM",
-    icon: Cloud,
-    accent: '#6fa0cc',
-    accentRgb: '111,160,204',
-    skills: [
-      "Docker", "Kubernetes", "Azure AKS", "AWS Lambda", "Terraform",
-      "Azure API Management", "Azure Event Hubs", "Azure CosmosDB",
-      "Azure SignalR", "Azure OpenAI Service", "Azure Chaos Studio", "Azure App Configuration",
-      "AWS DynamoDB", "AWS S3", "GCP", "Helm",
-    ],
-    core: ["Docker", "Kubernetes", "Azure AKS", "AWS Lambda", "Terraform"],
+    core: ["TypeScript", "Python", "JavaScript", "Java", "Go", "SQL", "Protobuf", "gRPC"],
   },
   {
     category: "BACKEND & DISTRIBUTED",
@@ -51,8 +24,23 @@ const skillCategories = [
       "Java Spring Boot 3", ".NET 7", "FastAPI", "REST APIs", "GraphQL",
       "Apache Kafka", "Redis", "Flask", "PySpark", "OAuth 2.0 / PKCE",
       "Polly", "Resilience4j", "Circuit Breaking", "Exponential Backoff",
+      "asyncpg", "TimescaleDB", "JWT RS256", "WebSocket / SSE", "Goroutines / RWMutex",
     ],
     core: ["Java Spring Boot 3", ".NET 7", "FastAPI", "REST APIs", "GraphQL", "Apache Kafka", "Redis"],
+  },
+  {
+    category: "CLOUD & PLATFORM",
+    icon: Cloud,
+    accent: '#6fa0cc',
+    accentRgb: '111,160,204',
+    skills: [
+      "Docker", "Kubernetes", "Azure AKS", "AWS Lambda", "Terraform",
+      "Azure API Management", "Azure Event Hubs", "Azure CosmosDB",
+      "Azure SignalR", "Azure OpenAI Service", "Azure Chaos Studio", "Azure App Configuration",
+      "AWS DynamoDB", "AWS S3", "AWS EKS", "AWS SageMaker",
+      "GCP Cloud Run", "GCP Cloud Build", "Vertex AI", "Helm",
+    ],
+    core: ["Docker", "Kubernetes", "Azure AKS", "AWS Lambda", "Terraform", "GCP Cloud Run", "GCP Cloud Build", "Vertex AI"],
   },
   {
     category: "SRE & OBSERVABILITY",
@@ -105,6 +93,19 @@ const skillCategories = [
     ],
     core: ["GitHub Actions", "CI/CD Pipeline Design"],
   },
+  {
+    category: "AGENTIC AI & LLM",
+    icon: Sparkles,
+    accent: '#a85d95',
+    accentRgb: '168,93,149',
+    skills: [
+      "Multi-Agent Orchestration", "MCP Server", "LLM-as-a-Service", "Ragas",
+      "Vector Search", "Claude Code", "Cursor", "FinOps",
+    ],
+    core: [
+      "Multi-Agent Orchestration", "MCP Server", "LLM-as-a-Service", "Claude Code",
+    ],
+  },
 ]
 
 const containerVariants = {
@@ -130,6 +131,7 @@ function SkillPill({ skill, accent, accentRgb, index, isCore }) {
         border: `1px solid rgba(${accentRgb},${isCore ? 0.5 : 0.14})`,
         color: isCore ? `rgba(${accentRgb},1)` : `rgba(${accentRgb},0.55)`,
         '--glow-color': `rgba(${accentRgb},0.35)`,
+        '--i': index,
       }}
     >
       <span
@@ -167,13 +169,13 @@ export default function System({ id }) {
               <span className="text-brand-white">SYSTEM</span>
             </h2>
             <p className="font-mono text-alabaster/70 mt-4 text-sm max-w-xl leading-relaxed">
-              Production-proven skills across distributed systems, agentic AI, and cloud infrastructure.
+              Production-proven skills across distributed systems, cloud infrastructure, and agentic AI.
             </p>
             {/* Legend: brighter pills = core role signal, dim = supporting depth */}
             <div className="flex items-center gap-4 mt-4 font-mono text-[10px] tracking-wider">
               <span className="inline-flex items-center gap-1.5 text-alabaster/80">
                 <span className="w-1.5 h-1.5 rounded-full bg-alabaster/80" />
-                CORE (FULL-STACK + AGENTIC AI)
+                CORE (BACKEND + DISTRIBUTED SYSTEMS)
               </span>
               <span className="inline-flex items-center gap-1.5 text-alabaster/35">
                 <span className="w-1.5 h-1.5 rounded-full border border-alabaster/40" />
@@ -203,7 +205,7 @@ export default function System({ id }) {
             <motion.div
               key={group.category}
               variants={rowVariants}
-              className="group relative border-b border-yale-blue last:border-b-0 py-6"
+              className="cap-row group relative border-b border-yale-blue last:border-b-0 py-6"
             >
               {/* Ghost watermark */}
               <div

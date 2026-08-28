@@ -83,7 +83,9 @@ export default function ServiceLogs({ id }) {
       </div>
 
       {/* Experience Timeline */}
-      <div className="space-y-10 sm:space-y-14 pl-4 sm:pl-8 border-l border-yale-blue relative">
+      <div className="ol-timeline space-y-10 sm:space-y-14 pl-4 sm:pl-8 border-l border-yale-blue relative">
+        {/* Teal spine draws over the base border as the section scrolls through */}
+        <span className="ol-spine absolute -left-px top-0 bottom-0 w-px bg-stormy-teal-light pointer-events-none" aria-hidden="true" />
         {experienceLog.map((exp, idx) => (
           <motion.div
             key={exp.id}
@@ -94,7 +96,7 @@ export default function ServiceLogs({ id }) {
             className="group relative"
           >
             {/* Timeline Node */}
-            <div className="absolute -left-4 sm:-left-8 top-5 w-2.5 h-2.5 bg-yale-blue group-hover:bg-stormy-teal-light transition-all duration-200 group-hover:shadow-[0_0_12px_rgba(80,155,168,0.5)] -translate-x-1/2 group-hover:scale-125" />
+            <div className="ol-node absolute -left-4 sm:-left-8 top-5 w-2.5 h-2.5 bg-yale-blue group-hover:bg-stormy-teal-light transition-all duration-200 group-hover:shadow-[0_0_12px_rgba(80,155,168,0.5)] -translate-x-1/2 group-hover:scale-125" />
             <div className="absolute -left-4 sm:-left-8 top-6 w-8 h-px bg-yale-blue group-hover:bg-stormy-teal-light/60 transition-colors duration-200" />
 
             <div className="pl-5 sm:pl-8">

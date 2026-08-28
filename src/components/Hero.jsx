@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useMotionValue, useSpring, useReducedMotion } from 'framer-motion'
 import { Terminal } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
@@ -46,6 +46,22 @@ function ScrollColumn({ terms, duration, dimmer }) {
 
 export default function Hero({ id }) {
   const [scrolled, setScrolled] = useState(false)
+  const prefersReduced = useReducedMotion()
+
+  // Magnetic primary CTA — leans toward the cursor, springs back on leave.
+  const mx = useMotionValue(0)
+  const my = useMotionValue(0)
+  const springCfg = { stiffness: 260, damping: 18, mass: 0.5 }
+  const sx = useSpring(mx, springCfg)
+  const sy = useSpring(my, springCfg)
+
+  const handleMagnet = (e) => {
+    if (prefersReduced) return
+    const r = e.currentTarget.getBoundingClientRect()
+    mx.set((e.clientX - (r.left + r.width / 2)) * 0.3)
+    my.set((e.clientY - (r.top + r.height / 2)) * 0.4)
+  }
+  const resetMagnet = () => { mx.set(0); my.set(0) }
 
   useEffect(() => {
     const onScroll = () => { if (window.scrollY > 40) setScrolled(true) }
@@ -117,7 +133,7 @@ export default function Hero({ id }) {
             </span>
           </div>
           <span className="font-mono text-[11px] text-alabaster/40 tracking-wider hidden sm:inline">
-              SWE · SRE · Agentic AI · Large-scale distributed systems
+              Large-scale distributed systems · SWE · SRE · Agentic AI
             </span>
         </motion.div>
 
@@ -130,9 +146,11 @@ export default function Hero({ id }) {
         >
           <div className="absolute -left-4 sm:-left-8 top-0 bottom-0 w-px bg-stormy-teal-light" />
           <p className="font-mono text-alabaster/90 text-base leading-relaxed pl-4 sm:pl-0">
-            Software Engineer with 2+ years shipping distributed backend systems at production scale:
-            LLM-as-a-service platforms, AIOps telemetry pipelines, and agentic RAG architectures on
-            Azure and AWS. Focused on reliability, observability, and AI-native system design.
+            Systems &amp; Backend Software Engineer with 2+ years engineering high-throughput
+            distributed backend systems, real-time telemetry pipelines, and resilient cloud
+            infrastructure: sustained 99.86% SLO at 3,400+ req/sec in production, built a Go
+            pub/sub server pushing 1.54M msg/sec via goroutine-based concurrency, and shipped
+            LLM-as-a-service platforms and AIOps telemetry pipelines on Azure and AWS.
             MS Computer Science, New York University.
           </p>
         </motion.div>
@@ -144,9 +162,12 @@ export default function Hero({ id }) {
           transition={{ ease, duration: 1.1, delay: 1.05 }}
           className="mt-12 flex flex-col sm:flex-row items-start sm:items-center gap-4"
         >
-          <a
+          <motion.a
             href="#blueprints"
             aria-label="View my projects"
+            style={{ x: sx, y: sy }}
+            onMouseMove={handleMagnet}
+            onMouseLeave={resetMagnet}
             className="group inline-flex items-center justify-center px-7 py-3.5 bg-stormy-teal-light border border-stormy-teal-light text-graphite-100 hover:bg-stormy-teal-light/85 transition-colors duration-200 ease-out w-full sm:w-auto"
           >
             <span className="font-mono text-sm tracking-wider font-semibold">
@@ -160,7 +181,7 @@ export default function Hero({ id }) {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
             </svg>
-          </a>
+          </motion.a>
           <div className="flex gap-3 w-full sm:w-auto">
             <a
               href="https://github.com/sourikduttanyu"

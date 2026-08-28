@@ -191,6 +191,53 @@ body::after {
   100% { transform: translateY(-68vh);  opacity: 0; }
 }
 
+/* ── Instrument the UI (overdrive C) ─────────────────────── */
+
+/* System matrix — ripple wave across pills on category hover.
+   Keyframes end at identity so resting/framer transform is preserved;
+   backwards fill (no forwards) leaves :hover lift intact after the wave. */
+@keyframes pill-ripple {
+  0%   { transform: translateY(0)    scale(1); }
+  45%  { transform: translateY(-4px) scale(1.05); }
+  100% { transform: translateY(0)    scale(1); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cap-row:hover .skill-pill {
+    animation: pill-ripple 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 28ms);
+    will-change: transform;
+  }
+}
+
+/* Service Logs — timeline spine draws top→down, nodes charge as they scroll in.
+   Base yale-blue border + resting node stay as the static fallback. */
+@keyframes spine-draw {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+@keyframes node-charge {
+  from { background-color: var(--color-yale-blue);        box-shadow: 0 0 0 rgba(80,155,168,0); }
+  to   { background-color: var(--color-stormy-teal-light); box-shadow: 0 0 12px rgba(80,155,168,0.5); }
+}
+.ol-spine { display: none; }
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ol-timeline { view-timeline-name: --ol-track; view-timeline-axis: block; }
+    .ol-spine {
+      display: block;
+      transform-origin: top;
+      animation: spine-draw linear both;
+      animation-timeline: --ol-track;
+      animation-range: entry 0% cover 55%;
+    }
+    .ol-node {
+      animation: node-charge linear both;
+      animation-timeline: view();
+      animation-range: entry 35% cover 30%;
+    }
+  }
+}
+
 /* Aurora blob drift animations */
 @keyframes aurora-a {
   0%, 100% { transform: translateY(0px)    scale(1.00); }
