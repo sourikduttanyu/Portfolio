@@ -1,9 +1,56 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { mountWorld } from '../pixel/world'
 import { projects } from '../data/projects'
 import { experience } from '../data/experience'
 
 const ext = { target: '_blank', rel: 'noopener noreferrer' }
+
+// Level-select scene buttons. Icons are 9x9 pixel bitmaps.
+const ICONS = {
+  intro: ['....X....', '...XXX...', '..XXXXX..', '.XXXXXXX.', 'XXXXXXXXX', '.X.....X.', '.X.XXX.X.', '.X.X.X.X.', '.XXX.XXX.'],
+  projects: ['..X...X..', '...X.X...', 'XXXXXXXXX', 'X.....XX.', 'X.....X.X', 'X.....XX.', 'X.....X.X', 'XXXXXXXXX', '.X.....X.'],
+  work: ['...XXX...', '.XX...XX.', 'X..XXX..X', 'XXXXXXXXX', 'X.XXXXX.X', 'XXXXXXXXX', 'X..XXX..X', '.XX...XX.', '...XXX...'],
+}
+const SCENES = [
+  { id: 'intro', label: 'Intro' },
+  { id: 'projects', label: 'Projects' },
+  { id: 'work', label: 'Work' },
+]
+const sceneTop = id => {
+  if (id === 'intro') return 0
+  const el = document.getElementById(id === 'projects' ? 'stage' : 'scene')
+  return el.getBoundingClientRect().top + window.scrollY - (id === 'projects' ? 16 : 0)
+}
+function PixelIcon({ rows }) {
+  return (
+    <svg viewBox="0 0 9 9" aria-hidden="true">
+      {rows.flatMap((r, y) => [...r].map((c, x) => (c === 'X' ? <rect key={`${x}-${y}`} x={x} y={y} width="1" height="1" fill="currentColor" /> : null)))}
+    </svg>
+  )
+}
+function SceneNav() {
+  const [current, setCurrent] = useState('intro')
+  useEffect(() => {
+    const onScroll = () => {
+      const probe = window.scrollY + window.innerHeight * .35
+      setCurrent(SCENES.reduce((best, s) => (sceneTop(s.id) <= probe ? s.id : best), 'intro'))
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return (
+    <nav className="scene-nav" aria-label="Scenes">
+      {SCENES.map(s => (
+        <button key={s.id} type="button" className="btn" aria-label={s.label} aria-current={current === s.id}
+          onClick={() => window.scrollTo({ top: sceneTop(s.id), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}>
+          <PixelIcon rows={ICONS[s.id]} />
+          <span className="nav-tip">{s.label}</span>
+        </button>
+      ))}
+    </nav>
+  )
+}
 
 export default function PixelWorld() {
   const root = useRef(null)
@@ -12,6 +59,7 @@ export default function PixelWorld() {
   return (
     <div ref={root}>
       <a href="#now" className="skip-link">Skip to projects</a>
+      <SceneNav />
 
       <section className="hero" aria-labelledby="name">
         <canvas id="sky" aria-hidden="true" />

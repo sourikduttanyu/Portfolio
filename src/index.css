@@ -124,6 +124,7 @@
   /* ---------- Work: LCD layer ---------- */
   .work { background: #05070f; padding: 0; }
   .work-scene { position: relative; overflow: hidden; padding: 150px 0 210px; }
+  .work-scene.fit { height: 100svh; min-height: 560px; padding: var(--wtop, 60px) 0 0; }
   #space { position: absolute; inset: 0; width: 100%; height: 100%; }
   .work-scene .work-inner { position: relative; z-index: 1; }
   .scope { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); opacity: 0; transition: opacity .2s; pointer-events: none; }
@@ -131,8 +132,6 @@
   /* work CRTs: same sets as the hero, floating over the campfire in career order, Insight raised */
   .lcds { display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 24px 5%; margin: 0; }
   .tv.wtv { position: relative; }
-  .wtv:nth-child(1) { margin-top: 90px; } .wtv:nth-child(3) { margin-top: 110px; }
-  @media (max-width: 860px) { .wtv:nth-child(n) { margin-top: 0; } }
   /* hover: the set glows with the colour of its own screen (fits night, sunrise and the campfire) */
   .tv canvas { transition: filter .25s; }
   .tv:hover canvas, .tv:focus-visible canvas { filter: drop-shadow(0 0 12px rgb(var(--glow, 255 214 170) / .55)) drop-shadow(0 0 3px rgb(var(--glow, 255 214 170) / .6)); }
@@ -177,3 +176,21 @@
   .site-footer .links { margin-top: 0; }
   .music { position: absolute; left: 16px; bottom: 14px; z-index: 2; font-size: 12px; min-height: 40px; padding: 8px 12px; }
   .music[aria-pressed="true"] { color: #e8a33d; }
+
+  /* scene selector: level-select style buttons on the left */
+  .scene-nav { position: fixed; left: 12px; top: 50%; transform: translateY(-50%); z-index: 30; display: flex; flex-direction: column; gap: 12px; }
+  .scene-nav .btn { position: relative; width: 48px; height: 48px; min-height: 48px; padding: 0; }
+  .scene-nav .btn svg { width: 24px; height: 24px; shape-rendering: crispEdges; }
+  .scene-nav .btn[aria-current="true"] { background: var(--pink); box-shadow: inset 0 2px 0 0 oklch(80% 0.15 355), 0 4px 0 0 oklch(45% 0.18 355), 0 5px 0 1px var(--ui-edge); }
+  .scene-nav .btn[aria-current="true"]::before { content: "▶"; position: absolute; left: -14px; font-size: 10px; color: var(--pink); animation: nav-blink 1s steps(1) infinite; }
+  @keyframes nav-blink { 50% { opacity: 0; } }
+  .scene-nav .nav-tip { position: absolute; left: 58px; top: 50%; transform: translateY(-50%); white-space: nowrap; pointer-events: none;
+    padding: 6px 10px; font-size: 12px; color: var(--ink); background: var(--plate); border: 2px solid var(--ui-border); border-radius: 7px; opacity: 0; transition: opacity .15s; }
+  .scene-nav .btn:hover .nav-tip, .scene-nav .btn:focus-visible .nav-tip { opacity: 1; }
+  @media (max-width: 1340px) and (min-width: 701px) { .hero-inner, .now, .work-inner { padding-left: 56px; } }
+  @media (max-width: 700px) {
+    .scene-nav { top: auto; bottom: 12px; left: 50%; transform: translateX(-50%); flex-direction: row; }
+    .scene-nav .btn[aria-current="true"]::before { display: none; }
+    .scene-nav .nav-tip { display: none; }
+  }
+  .plate-role { display: block; margin-top: 3px; font-size: 11px; color: var(--ink-2); letter-spacing: .01em; }

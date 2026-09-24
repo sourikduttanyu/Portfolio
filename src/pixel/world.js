@@ -388,10 +388,26 @@ function layoutStage() {
   });
   stage.style.height = drop + full + 'px';
 }
+// Work scene = one screen: size the three sets so they, their plates and the raised middle one
+// fit between the top edge and the ground. Narrow screens stack instead (scene grows taller).
+function layoutWork() {
+  const sceneEl = $id('scene'), vw = sceneEl.clientWidth, vh = window.innerHeight;
+  const narrow = vw < 860;
+  sceneEl.classList.toggle('fit', !narrow);
+  let s = pixelScale();
+  if (!narrow) {
+    const top = Math.max(40, vh * .07), ground = Math.max(150, vh * .2), plate = 64;
+    const byH = (vh - top - ground - plate) / (TV_H * 1.3), byW = vw * .8 / (TV_W * 3.3);
+    s = Math.max(1.5, Math.min(4, Math.floor(Math.min(byH, byW) * 4) / 4));
+    sceneEl.style.setProperty('--wtop', top + 'px');
+    const raise = Math.round(TV_H * s * .3) + 'px';
+    lcds.forEach(l => { l.d.style.marginTop = l.n === 1 ? '0px' : raise; });
+  } else lcds.forEach(l => { l.d.style.marginTop = '0px'; });
+  lcds.forEach(l => { l.cv.style.width = TV_W * s + 'px'; l.cv.style.height = TV_H * s + 'px'; });
+}
 function sizeTVs() {
   layoutStage(); bk = null;
-  const ws = pixelScale();
-  lcds.forEach(l => { l.cv.style.width = TV_W * ws + 'px'; l.cv.style.height = TV_H * ws + 'px'; });
+  layoutWork();
   drawBeam(); drawSign();
 }
 
@@ -1504,7 +1520,7 @@ function setWorkChannel(l, idx, t) {
   ch.from = knobAngle(ch, t); ch.to = ch.from + Math.PI / 3 + l.n * .3; ch.t0 = t; ch.dur = dur;
   fine.from = knobAngle(fine, t); fine.to = fine.from - (.3 + hash(l.n, idx) * .6); fine.t0 = t + .06; fine.dur = dur;
   const name = l.j.work[idx][0];
-  l.cap.innerHTML = `<small>${esc(name)}</small>${esc(l.j.co)}`;
+  l.cap.innerHTML = `<small>${esc(name)}</small>${esc(l.j.co)}<span class="plate-role">${esc(l.j.role)} · <span class="nowrap">${esc(l.j.when)}</span></span>`;
   l.d.setAttribute('aria-label', `${esc(l.j.co)}, now showing ${esc(name)}. Open job details`);
   root.querySelectorAll(`#log-${l.j.id} li`).forEach((li, i) => li.classList.toggle('on', i === idx));
 }
