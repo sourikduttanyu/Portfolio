@@ -429,7 +429,10 @@ function renderNow() {
     tv.label.innerHTML = p ? `<small>${esc(p.tag)}</small>${esc(p.name)}` : `<small>CH 0${channel + 1}</small>Open slot`;
     tv.btn.setAttribute('aria-label', p ? `${esc(p.name)}: ${esc(p.line)} Show details` : 'Open slot, no project on this channel yet');
   });
-  $id('chLabel').textContent = 'CH 0' + (channel + 1);
+  const ch = $id('chLabel'), pad = n => String(n).padStart(2, '0');
+  ch.innerHTML = `<span class="ch-num">CH ${pad(channel + 1)}<small> /${pad(NCH)}</small></span>`
+    + `<span class="ch-pips" aria-hidden="true">${Array.from({ length: NCH }, (_, i) => `<i class="${i === channel ? 'on' : ''}"></i>`).join('')}</span>`;
+  ch.setAttribute('aria-label', `Channel ${channel + 1} of ${NCH}`);
 }
 function flip(dir) {
   channel = (channel + dir + NCH) % NCH;
