@@ -183,12 +183,14 @@
   .scene-nav .btn { position: relative; min-width: 48px; height: 48px; min-height: 48px; padding: 0 12px; justify-content: flex-start;
     transition: background .25s ease-out, transform 70ms, box-shadow 70ms; }
   .scene-nav .btn svg { width: 24px; height: 24px; flex: none; shape-rendering: crispEdges; }
-  .scene-nav .btn[aria-current="true"] { background: var(--pink); color: oklch(12% 0.04 290); box-shadow: inset 0 2px 0 0 oklch(80% 0.15 355), 0 4px 0 0 oklch(45% 0.18 355), 0 5px 0 1px var(--ui-edge); }
+  /* selected + hover = lit neon: dark button, pink glyph and label, pink rim and glow (solid pink is kept for the Résumé CTA) */
+  .scene-nav .btn[aria-current="true"], .scene-nav .btn:hover, .scene-nav .btn:focus-visible { color: var(--pink); border-color: var(--pink);
+    box-shadow: inset 0 2px 0 0 var(--ui-bg-hi), 0 4px 0 0 var(--ui-ledge), 0 5px 0 1px var(--ui-edge), 0 0 14px oklch(70% 0.21 355 / .45); }
+  .scene-nav .btn[aria-current="true"] svg, .scene-nav .btn:hover svg { filter: drop-shadow(0 0 4px oklch(70% 0.21 355 / .8)); }
   .scene-nav .btn[aria-current="true"]::before { content: "▶"; position: absolute; left: -14px; font-size: 10px; color: var(--pink); animation: nav-blink 1s steps(1) infinite; }
   @keyframes nav-blink { 50% { opacity: 0; } }
   .scene-nav .nav-tip { display: inline-block; overflow: hidden; white-space: nowrap; max-width: 0; opacity: 0; margin-left: 0; font-size: 12px;
     transition: max-width .32s cubic-bezier(.2, .9, .2, 1), opacity .2s ease-out, margin-left .32s cubic-bezier(.2, .9, .2, 1); }
-  .scene-nav .btn:hover, .scene-nav .btn:focus-visible { background: var(--pink); color: oklch(12% 0.04 290); }
   .scene-nav .btn:hover .nav-tip, .scene-nav .btn:focus-visible .nav-tip { max-width: 140px; opacity: 1; margin-left: 10px; }
   @media (max-width: 1340px) and (min-width: 701px) { .hero-inner, .now, .work-inner { padding-left: 56px; } }
   @media (max-width: 700px) {
@@ -207,7 +209,8 @@
   .ch-pips { display: flex; gap: 5px; }
   .ch-pips i { width: 10px; height: 4px; background: #3a2a0c; box-shadow: 0 0 0 1px #070402; }
   .ch-pips i.on { background: var(--gold); box-shadow: 0 0 6px oklch(85% 0.13 82 / .7); }
-  .btn.chan:hover, .btn.chan.pressed { background: var(--pink); color: oklch(12% 0.04 290); }
+  .btn.chan:hover, .btn.chan.pressed { color: var(--pink); border-color: var(--pink); box-shadow: inset 0 2px 0 0 var(--ui-bg-hi), 0 4px 0 0 var(--ui-ledge), 0 5px 0 1px var(--ui-edge), 0 0 14px oklch(70% 0.21 355 / .45); }
+  .btn.chan:hover svg { filter: drop-shadow(0 0 4px oklch(70% 0.21 355 / .8)); }
   .btn.chan:hover, .btn.chan.pressed { background: var(--pink); color: oklch(12% 0.04 290); }
 
   /* day/night switch with identity: a starry window at night (sun hint at the empty end), a warm sky at sunrise */
@@ -250,7 +253,7 @@
   .scroll-cue svg { width: 18px; height: 18px; shape-rendering: crispEdges; color: var(--gold); animation: cue-bob 1.4s ease-in-out infinite; }
   @keyframes cue-bob { 50% { transform: translateY(3px); } }
   .scene-nav.hint .btn { animation: nav-shimmer .9s ease-out 1 both; animation-delay: calc(var(--i) * .16s); }
-  @keyframes nav-shimmer { 30% { background: var(--pink); color: oklch(12% 0.04 290); } }
+  @keyframes nav-shimmer { 30% { color: var(--pink); border-color: var(--pink); box-shadow: 0 0 14px oklch(70% 0.21 355 / .5); } }
   .scene-nav.hint .btn:nth-child(2) .nav-tip { animation: tip-peek 2.8s ease-out .8s 1 both; }
   @keyframes tip-peek { 0%, 100% { max-width: 0; opacity: 0; margin-left: 0; } 15%, 80% { max-width: 140px; opacity: 1; margin-left: 10px; } }
   @media (max-width: 700px) { .scroll-cue { padding-bottom: 76px; } }

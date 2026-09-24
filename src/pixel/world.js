@@ -802,8 +802,10 @@ function buildCity(P, W, H) {
   }
   box(og, wx, wy - 3, 40, 3, P.parapet);
   for (let y = wy + 5; y < H - 4; y += 9) for (let x = wx + 6; x < W - 3; x += 9) {
-    const lit = hash(x, y) < .35;
-    box(og, x, y + 1, 5, 6, lit ? P.foreWin : P.winDark); box(og, x + 1, y, 3, 1, lit ? P.foreWin : P.winDark);
+    const lit = hash(x, y) < (P.day ? .05 : .35);                             // at sunrise most panes are dark glass
+    const pane = lit ? P.foreWin : P.day ? '#6e6290' : P.winDark;
+    box(og, x, y + 1, 5, 6, pane); box(og, x + 1, y, 3, 1, pane);
+    if (P.day && !lit) { box(og, x + 1, y + 1, 3, 1, '#b8a8d0'); dot(og, x + 1, y + 2, '#9a8cc0'); }   // dawn sky caught in the glass
     box(og, x - 1, y + 7, 7, 1, P.parapet); if (lit) box(og, x + 2, y + 1, 1, 6, P.winDark);   // sill + mullion
   }
   for (let y = wy + 12; y < PY + 4; y += 9) {                                // fire escape on the near face
@@ -1376,10 +1378,19 @@ function drawSign() {
 // Wordless, vivid screens (54x42), in the order of each job's work items in src/data/experience.js.
 const P2 = (g, x, y, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), 1, 1); };
 const glowDot = (g, x, y, c, halo) => { P2(g, x, y, c); if (halo) { g.fillStyle = halo; g.fillRect(Math.round(x) - 1, Math.round(y), 1, 1); g.fillRect(Math.round(x) + 1, Math.round(y), 1, 1); g.fillRect(Math.round(x), Math.round(y) - 1, 1, 1); g.fillRect(Math.round(x), Math.round(y) + 1, 1, 1); } };
+// JellySynth-style living background for the work screens: a slow, dark, dithered plasma
+// whose hue drifts around the wheel from each project's base colour. Foreground stays crisp on top.
+function flowBg(g, t, hue) {
+  const h = (hue + (reduce ? 0 : t * 9)) % 360, cols = [0, 1, 2, 3].map(k => `hsl(${(h + k * 18) % 360}, ${45 + k * 6}%, ${5 + k * 4}%)`);
+  for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) {
+    const v = (Math.sin(x * .13 + t * .7) + Math.sin(y * .17 - t * .5) + Math.sin((x + y) * .09 + t * .35) + Math.sin(Math.hypot(x - 27, y - 21) * .22 - t * .9)) / 4;
+    g.fillStyle = cols[Math.max(0, Math.min(3, Math.floor((v + 1) / 2 * 3.99 + (bayer(x, y) - .5) * .9)))]; g.fillRect(x, y, 1, 1);
+  }
+}
 const JOB_SCENES = {
   insight: [
     function llmCore(g, t) {                                   // requests pour into a glowing core; a few bounce off the rate-limit ring
-      rect(g, 0, 0, SW, SH, '#0a0718');
+      flowBg(g, t, 275);
       const cx = 27, cy = 21, pulse = 4.5 + Math.sin(t * 3) * .8;
       for (let y = -9; y <= 9; y++) for (let x = -9; x <= 9; x++) {
         const d = Math.hypot(x, y);
@@ -1398,7 +1409,7 @@ const JOB_SCENES = {
       for (let i = 0; i < 8; i++) { const ang = hash(i, 7) * 6.28, r = ((t * .7 + i / 8) % 1) * 26; P2(g, cx + Math.cos(ang) * r, cy + Math.sin(ang) * r * .85, '#57f287'); }
     },
     function heartbeat(g, t) {                                 // live signal; the anomaly spike sets off alarm rings
-      rect(g, 0, 0, SW, SH, '#050d16');
+      flowBg(g, t, 195);
       for (let x = 0; x < SW; x += 6) for (let y = 3; y < SH; y += 6) P2(g, x, y, '#0f2233');
       let prev = null; const beat = (t % 3) / 3;
       for (let x = 0; x < SW; x++) {
@@ -1411,7 +1422,7 @@ const JOB_SCENES = {
       rect(g, 42, 6, 5, 5, '#ffd66b'); rect(g, 41, 11, 7, 1, '#ffd66b');
     },
     function drain(g, t) {                                     // sockets pile up red, then one pooled pipe drains to green
-      rect(g, 0, 0, SW, SH, '#080a12');
+      flowBg(g, t, 150);
       const k = (t % 10) / 10, fixed = k > .5, level = fixed ? 30 - (k - .5) / .5 * 22 : 8 + k / .5 * 22;
       rect(g, 8, 4, 2, 34, '#3a4060'); rect(g, 44, 4, 2, 34, '#3a4060'); rect(g, 8, 37, 38, 2, '#3a4060');
       for (let y = 37 - Math.round(level); y < 37; y++) for (let x = 10; x < 44; x++) P2(g, x, y, bayer(x, y + Math.floor(t * 8)) < .5 ? (fixed ? '#1f8a5a' : '#8a1f3a') : (fixed ? '#2fbf7a' : '#c02a50'));
@@ -1419,7 +1430,7 @@ const JOB_SCENES = {
       if (fixed) { rect(g, 44, 34, 8, 2, '#57f287'); for (let x = 46; x < 54; x += 2) P2(g, x + Math.floor(t * 10) % 2, 35, '#bfffe0'); }
     },
     function spectrum(g, t) {                                  // real-time dashboard: a neon spectrum at 60fps
-      rect(g, 0, 0, SW, SH, '#07060f');
+      flowBg(g, t, 300);
       for (let b = 0; b < 12; b++) {
         const h = Math.round(6 + (Math.sin(t * 5 + b * .9) * .5 + .5) * 26 * (.6 + .4 * vnoise(b, t * 3)));
         for (let y = 0; y < h; y++) { const f = y / 32; rect(g, 3 + b * 4, 39 - y, 3, 1, f < .4 ? '#3de0ff' : f < .7 ? '#b48cff' : '#ff3d9f'); }
@@ -1427,7 +1438,7 @@ const JOB_SCENES = {
       }
     },
     function portal(g, t) {                                    // care calendar lighting up around a beating heart
-      rect(g, 0, 0, SW, SH, '#0c0a14');
+      flowBg(g, t, 335);
       const lit = Math.floor(t * 3) % 24;
       for (let i = 0; i < 24; i++) { const x = 3 + (i % 6) * 5, y = 6 + Math.floor(i / 6) * 8; rect(g, x, y, 4, 6, i === lit ? '#57f2c8' : hash(i, 2) < .4 ? '#1f5a5a' : '#1a1a2e'); }
       const big = Math.sin(t * 5) > .3, hx = 40, hy = 18;
@@ -1435,7 +1446,7 @@ const JOB_SCENES = {
       HEART.forEach((row, r) => [...row].forEach((c, q) => { if (c === 'X') P2(g, hx + q - (big ? 3 : 2), hy + r - 3, r === 0 || q === 1 ? '#ff9ac0' : '#ff3d7f'); }));
     },
     function scanner(g, t) {                                   // a laser tags bottles on the line
-      rect(g, 0, 0, SW, SH, '#0b0a0e');
+      flowBg(g, t, 20);
       rect(g, 0, 32, SW, 3, '#2a2530'); for (let x = -(t * 20 % 4); x < SW; x += 4) P2(g, x, 33, '#4a4252');
       const lx = 30;
       for (let y = 4; y < 32; y++) if ((y + Math.floor(t * 20)) % 3) P2(g, lx, y, '#ff3d5a');
@@ -1447,7 +1458,7 @@ const JOB_SCENES = {
       }
     },
     function pairTree(g, t) {                                  // two cursors growing one tree together
-      rect(g, 0, 0, SW, SH, '#080c14');
+      flowBg(g, t, 215);
       const k = (t % 8) / 8, depth = Math.floor(k * 6) + 1;
       const branch = (x, y, len, ang, d, who) => {
         if (d > depth) return;
@@ -1461,7 +1472,7 @@ const JOB_SCENES = {
   ],
   hanu: [
     function lap(g, t) {                                       // fast laps, needle held in the green
-      rect(g, 0, 0, SW, SH, '#070b12');
+      flowBg(g, t, 200);
       for (let a = 0; a < 60; a++) { const an = a / 60 * 6.28; P2(g, 27 + Math.cos(an) * 22, 17 + Math.sin(an) * 11, '#1f2a44'); }
       for (let i = 0; i < 12; i++) { const an = t * 4 - i * .07; P2(g, 27 + Math.cos(an) * 22, 17 + Math.sin(an) * 11, i ? (i < 4 ? '#bff4ff' : '#3de0ff') : '#ffffff'); }
       const cx = 44, cy = 38;
@@ -1470,7 +1481,7 @@ const JOB_SCENES = {
       for (let r = 0; r < 7; r++) P2(g, cx + Math.cos(nd) * r, cy + Math.sin(nd) * r, '#ffffff');
     },
     function shield(g, t) {                                    // bugs zapped at the shield
-      rect(g, 0, 0, SW, SH, '#070a14');
+      flowBg(g, t, 180);
       const S = ['..XXXXX..', '.XXXXXXX.', 'XXXXXXXXX', 'XXXXXXXXX', 'XXXXXXXXX', '.XXXXXXX.', '.XXXXXXX.', '..XXXXX..', '...XXX...', '....X....'];
       S.forEach((row, r) => [...row].forEach((c, q) => { if (c === 'X') P2(g, 23 + q, 15 + r, q < 4 ? '#6ff0ff' : '#2ab0d0'); }));
       for (let a = 0; a < 30; a++) { const an = a / 30 * 6.28; if (bayer(a, Math.floor(t * 4)) < .5) P2(g, 27 + Math.cos(an) * 10, 20 + Math.sin(an) * 10, '#1f6a8a'); }
@@ -1482,7 +1493,7 @@ const JOB_SCENES = {
       }
     },
     function coins(g, t) {                                     // spend shrinks while instances breathe with load
-      rect(g, 0, 0, SW, SH, '#0c0a08');
+      flowBg(g, t, 45);
       const k = Math.min(1, (t % 8) / 6), n = Math.round(10 - 4 * k);
       for (let i = 0; i < n; i++) { rect(g, 8, 34 - i * 3, 12, 2, '#ffc83d'); rect(g, 8, 35 - i * 3, 12, 1, '#b8861a'); P2(g, 9, 34 - i * 3, '#fff0b0'); }
       for (let y = 0; y < 6; y++) rect(g, 24 - y + 2, 12 + y, 1 + y * 0 + 1, 1, '#57f287');
@@ -1491,7 +1502,7 @@ const JOB_SCENES = {
       for (let v = 0; v < 6; v++) rect(g, 34 + (v % 3) * 6, 12 + Math.floor(v / 3) * 8, 5, 6, v < up ? '#3de0ff' : '#18202e');
     },
     function donut(g, t) {                                     // live FinOps: flowing area + turning donut
-      rect(g, 0, 0, SW, SH, '#08081a');
+      flowBg(g, t, 255);
       for (let x = 0; x < 30; x++) { const y = Math.round(28 - (Math.sin((x + t * 12) * .2) * .5 + .5) * 16); for (let yy = y; yy < 38; yy++) P2(g, x + 2, yy, yy === y ? '#3de0ff' : yy % 2 ? '#1a3a6a' : '#12284a'); }
       const cx = 43, cy = 20;
       for (let y = -9; y <= 9; y++) for (let x = -9; x <= 9; x++) { const d = Math.hypot(x, y); if (d < 9 && d > 5) { const a = (Math.atan2(y, x) - t * .8 + 20 * Math.PI) % (2 * Math.PI); P2(g, cx + x, cy + y, a < 2.2 ? '#b48cff' : a < 4 ? '#ffd66b' : '#57f287'); } }
@@ -1499,7 +1510,7 @@ const JOB_SCENES = {
   ],
   ey: [
     function lanes(g, t) {                                     // sensor data streaming down three Kafka lanes
-      rect(g, 0, 0, SW, SH, '#0c0a06');
+      flowBg(g, t, 30);
       [9, 20, 31].forEach((ly, i) => {
         for (let x = 6; x < SW - 6; x += 2) P2(g, x, ly, '#241e10');
         for (let p = 0; p < 4; p++) {
@@ -1511,7 +1522,7 @@ const JOB_SCENES = {
       });
     },
     function race(g, t) {                                      // slow query drip vs. an instant cache bolt
-      rect(g, 0, 0, SW, SH, '#0a0810');
+      flowBg(g, t, 315);
       rect(g, 4, 6, 8, 10, '#6a5a8a'); rect(g, 4, 5, 8, 2, '#9a8ab8'); rect(g, 4, 15, 8, 2, '#4a3a6a');           // database
       rect(g, 4, 26, 8, 8, '#c02a3a'); rect(g, 5, 27, 6, 6, '#ff5c5c');                                        // cache chip
       rect(g, 44, 14, 8, 12, '#1a2a3a'); const k = (t % 3) / 3;
@@ -1620,6 +1631,7 @@ $id('jobs').innerHTML = JOBS.map(j => `
 
 /* ================= work scene: tiny planet under open space (Outer Wilds-inspired) ================= */
 const scene = $id('scene'), space = $id('space'), xg = space.getContext('2d');
+let oceanSprite = null, twinA = null, twinB = null, redSprite = null;
 let SPW = 0, SPH = 0, SPS = 3, spaceStatic = null, spaceBand = null, spaceGround = null, twinkles = [], gasSprite = null, moonSprite = null;
 const FIRE = { x: 0, y: 0, level: 1 };
 const AMBER = '#e8a33d';
@@ -1725,8 +1737,14 @@ function buildSpace() {
   for (let y = 0; y < 20; y++) px(g, rx + 9, lg - 7 - y, W3[2]);                 // gantry
   for (let y = 0; y < 20; y += 4) { px(g, rx + 7, lg - 7 - y, W3[3]); px(g, rx + 8, lg - 7 - y, W3[3]); }
   spaceStatic = c;
-  gasSprite = buildPlanet(22, (x, y) => ['#c9824a', '#e0a86a', '#9c5a36', '#d9b58a', '#b0703f', '#e8c9a0'][((Math.floor((y + 22) / 5 + Math.sin(x * .25) * .5) % 6) + 6) % 6]
-    .replace(/.*/, m => (Math.hypot(x - 6, (y - 4) * 1.8) < 4 ? '#7a3322' : m)));
+  gasSprite = buildPlanet(28, (x, y) => ['#c9824a', '#e0a86a', '#9c5a36', '#d9b58a', '#b0703f', '#e8c9a0'][((Math.floor((y + 28) / 6 + Math.sin(x * .2) * .6) % 6) + 6) % 6]
+    .replace(/.*/, m => (Math.hypot(x - 8, (y - 5) * 1.8) < 5 ? '#7a3322' : m)));
+  // ringed ocean world: deep teal with drifting cloud swirls; the ring is drawn live (behind + in front)
+  oceanSprite = buildPlanet(16, (x, y) => (vnoise(x / 4 + 20, y / 2.5) > .62 ? '#d8f4f0' : vnoise(x / 6, y / 5 + 9) > .5 ? '#2f8f96' : '#1d6a78'));
+  // twin sand worlds and a small rusty one
+  twinA = buildPlanet(6, (x, y) => (hash(x + 40, y) < .15 ? '#b8864a' : '#e0b070'));
+  twinB = buildPlanet(5, (x, y) => (hash(x + 70, y) < .15 ? '#a8703a' : '#d49a58'));
+  redSprite = buildPlanet(7, (x, y) => (Math.hypot(x + 2, y - 1) < 2 ? '#7a2e1c' : hash(x, y + 5) < .12 ? '#a8442a' : '#c65a36'));
   moonSprite = buildPlanet(8, (x, y) => (Math.hypot(x + 3, y - 2) < 2 || Math.hypot(x - 3, y + 3) < 1.5 || Math.hypot(x - 1, y - 5) < 1.2 ? '#5c5d6a' : '#9a9bab'));
 }
 
@@ -1785,7 +1803,7 @@ function drawFire(g, t) {
 /* ship-log trail between monitors, in career order: EY -> Hanu -> Insight */
 function monitorPoint(id) {
   const l = lcds.find(q => q.j.id === id), r = l.cv.getBoundingClientRect(), s = scene.getBoundingClientRect();
-  return [Math.round((r.left + r.width / 2 - s.left) / SPS), Math.round((r.top + r.height * .4 - s.top) / SPS)];
+  return [Math.round((r.left + r.width / 2 - s.left) / SPS), Math.round((r.top - s.top) / SPS) - 10];
 }
 function drawTrail(g, t) {
   const pts = ['ey', 'hanu', 'insight'].map(monitorPoint), years = ['2022', '2023'];
@@ -1892,8 +1910,27 @@ function drawSpace(t) {
   });
   // bodies ride the same sky
   const body = (sprite, bx, y) => { const x = toView(bx); if (x < SPW + sprite.width) g.drawImage(sprite, Math.round(x - sprite.width / 2), y + drop(x)); };
-  body(gasSprite, BW * .18, Math.round(SPH * .42));
-  body(moonSprite, BW * .62, Math.round(SPH * .05 + Math.sin(t * .05) * 3));
+  body(gasSprite, BW * .18, Math.round(SPH * .8));                           // huge, rising over the horizon
+  // ringed ocean world: back half of the ring, planet, front half
+  {
+    const x = toView(BW * .4), cx = Math.round(x), cy = Math.round(SPH * .07) + drop(x);
+    if (x < SPW + 40) {
+      const ring = front => { for (let a = 0; a < 120; a++) { const an = a / 120 * Math.PI * 2, rx = Math.cos(an) * 28, ry = Math.sin(an) * 7, tilt = rx * .22;
+        if ((ry > 0) === front) px(g, cx + Math.round(rx), cy + Math.round(ry + tilt), a % 3 ? '#c9b8e8' : '#8a7ab8'); } };
+      ring(false); g.drawImage(oceanSprite, cx - 16, cy - 16); ring(true);
+    }
+  }
+  // twin worlds circling each other
+  {
+    const x = toView(BW * .74), ang = t * .6, cy = Math.round(SPH * .74) + drop(x);
+    if (x < SPW + 30) {
+      const ax = Math.round(x + Math.cos(ang) * 9), ay = Math.round(cy + Math.sin(ang) * 3), bx = Math.round(x - Math.cos(ang) * 9), by = Math.round(cy - Math.sin(ang) * 3);
+      const order = Math.sin(ang) > 0 ? [[twinB, bx, by, 5], [twinA, ax, ay, 6]] : [[twinA, ax, ay, 6], [twinB, bx, by, 5]];
+      order.forEach(([spr, px2, py2, r]) => g.drawImage(spr, px2 - r, py2 - r));
+    }
+  }
+  body(redSprite, BW * .93, Math.round(SPH * .05));
+  body(moonSprite, BW * .6, Math.round(SPH * .04 + Math.sin(t * .05) * 3));
   const sunX = Math.round(toView(BW * .9)), sunY = Math.floor(SPH * .05 + 10) + drop(sunX);
   drawSun(g, sunX, sunY, reduce ? sunState(0) : sunState(e), t);
   // comet: its own slow pass every 80s
