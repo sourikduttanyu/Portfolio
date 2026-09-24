@@ -11,16 +11,19 @@ const ICONS = {
   projects: ['..X...X..', '...X.X...', 'XXXXXXXXX', 'X.....XX.', 'X.....X.X', 'X.....XX.', 'X.....X.X', 'XXXXXXXXX', '.X.....X.'],
   left: ['.........', '.....X...', '....XX...', '...XXX...', '..XXXX...', '...XXX...', '....XX...', '.....X...', '.........'],
   right: ['.........', '...X.....', '...XX....', '...XXX...', '...XXXX..', '...XXX...', '...XX....', '...X.....', '.........'],
+  details: ['.XXXXXXX.', 'X.......X', '.XXXXXXX.', '.X.....X.', '.X.XXX.X.', '.X.....X.', '.X.XX..X.', '.XXXXXXX.', 'X.......X'],
   work: ['...XXX...', '.XX...XX.', 'X..XXX..X', 'XXXXXXXXX', 'X.XXXXX.X', 'XXXXXXXXX', 'X..XXX..X', '.XX...XX.', '...XXX...'],
 }
 const SCENES = [
   { id: 'intro', label: 'Intro' },
   { id: 'projects', label: 'Projects' },
   { id: 'work', label: 'Work' },
+  { id: 'details', label: 'Experience' },
 ]
 const sceneTop = id => {
   if (id === 'intro') return 0
   if (id === 'work') return document.getElementById('scene').getBoundingClientRect().top + window.scrollY
+  if (id === 'details') return document.querySelector('.log-panel').getBoundingClientRect().top + window.scrollY - 8
   // Projects: land so the descriptions are fully on screen, with as much of the TV row above as fits.
   const y = window.scrollY, stage = document.getElementById('stage').getBoundingClientRect().top + y - 16
   const nowBottom = document.getElementById('now').getBoundingClientRect().bottom + y
@@ -93,7 +96,8 @@ export default function PixelWorld() {
           <div className="remote">
             <div className="ch" id="chLabel" aria-live="polite">CH 01</div>
           </div>
-          <p className="hint" id="hint">← → keys flip the channel · click a screen for details</p>
+          <div className="tabs" id="tabs" role="group" aria-label="Projects by channel" />
+          <p className="hint" id="hint">← → or swipe to flip · click a screen for details</p>
         </div>
       </section>
 

@@ -22,7 +22,7 @@ const PROJECTS = projects.map(p => {
 });
 const JOBS = jobs.map(j => ({ id: j.slug, co: j.company, role: j.role, when: j.period,
   mono: j.company.split(' ').filter(w => /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 2),
-  work: j.work.map(w => [w.name, w.text]) }));
+  sticker: j.sticker, work: j.work.map(w => [w.name, w.text]) }));
 
 /* ---------------- pixel helpers ---------------- */
 const C = {
@@ -354,7 +354,7 @@ const tvs = [0, 1, 2].map(i => {
   const g = cv.getContext('2d');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
   const sg = screen.getContext('2d', { willReadFrequently: true });
-  btn.addEventListener('click', () => { const p = current()[i]; if (p) $id('p-' + p.id)?.scrollIntoView({ block: 'start' }); });
+  btn.addEventListener('click', () => { takeControl(); const p = current()[i]; if (p) $id('p-' + p.id)?.scrollIntoView({ block: 'start' }); });
   const up = -Math.PI / 2;
   const knobs = [{ from: up, to: up, t0: 0, dur: 0 }, { from: up + .6 * (i - 1), to: up + .6 * (i - 1), t0: 0, dur: 0 }];
   return { btn, cv, g, sg, screen, label, knobs };
@@ -364,12 +364,13 @@ const NCH = Math.ceil(PROJECTS.length / 3);
 function current() { return [0, 1, 2].map(i => PROJECTS[channel * 3 + i] ?? null); }
 // Triangle: TV 1 bottom-left, TV 2 bottom-right, TV 3 centred and raised.
 // Picks the largest scale at which all three screens + captions fit above the fold.
-const LABEL_H = 50, GAP = 20;
+const GAP = 20;
 function layoutStage() {
+  const LABEL_H = Math.max(50, ...tvs.map(tv => tv.label.offsetHeight + 22));   // real caption height (wraps on phones)
   const G = window.innerWidth >= 860 ? 68 : 0;                 // room for the side arrows
   const W = stage.clientWidth - 2 * G;
   const top = stage.getBoundingClientRect().top + scrollY;
-  const below = root.querySelector('.remote').offsetHeight + $id('hint').offsetHeight + 36;
+  const below = root.querySelector('.remote').offsetHeight + $id('tabs').offsetHeight + $id('hint').offsetHeight + 44;
   const availH = Math.max(260, innerHeight - top - below);
   let fit = null;
   for (let s = 4; s >= 1; s -= .25) {
@@ -444,15 +445,35 @@ function flip(dir) {
     ch.from = knobAngle(ch, switchAt); ch.to = ch.from + dir * (Math.PI / 3 + i * .45); ch.t0 = t0; ch.dur = dur;
     fine.from = knobAngle(fine, switchAt); fine.to = fine.from - dir * (.35 + hash(i, channel) * .9); fine.t0 = t0 + .08; fine.dur = dur;
   });
-  renderNow(); playOnly([...current().filter(Boolean).map(p => p.id), ...JOBS.map(j => j.id)]);
+  renderNow(); syncTabs(); attractAt = switchAt; playOnly([...current().filter(Boolean).map(p => p.id), ...JOBS.map(j => j.id)]);
   if (reduce) (raf = requestAnimationFrame(frame));
 }
-$id('prev').onclick = () => flip(-1);
-$id('next').onclick = () => flip(1);
-on(window, 'keydown', e => { if (e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.key === 'ArrowRight') { flip(1); press('next'); } if (e.key === 'ArrowLeft') { flip(-1); press('prev'); } });
+// Attract mode: until someone interacts, the sets flip themselves every ATTRACT seconds so a
+// recruiter who never clicks still sees every project. Any interaction hands over control.
+const ATTRACT = 10;
+let attract = !reduce, attractAt = 0;
+function takeControl() { attract = false; root.classList.add('ch-manual'); }
+function goToChannel(target) { if (target === channel) return; const dir = target > channel ? 1 : -1; channel = target - dir; flip(dir); }
+$id('prev').onclick = () => { takeControl(); flip(-1); };
+$id('next').onclick = () => { takeControl(); flip(1); };
+// Project tabs: every project named, the current channel's lit, click to jump there.
+const tabsEl = $id('tabs');
+tabsEl.innerHTML = PROJECTS.map((p, i) => `<button type="button" class="tab" data-i="${i}">${esc(p.name)}</button>`).join('');
+tabsEl.addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; takeControl(); goToChannel(Math.floor(+b.dataset.i / 3)); });
+function syncTabs() { tabsEl.querySelectorAll('.tab').forEach((b, i) => { const on = Math.floor(i / 3) === channel; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }
+// Swipe across the TVs on touch screens.
+let touchX = null;
+on(stage, 'touchstart', e => { touchX = e.touches[0].clientX; });
+on(stage, 'touchend', e => { if (touchX === null) return; const dx = e.changedTouches[0].clientX - touchX; touchX = null; if (Math.abs(dx) > 40) { takeControl(); flip(dx < 0 ? 1 : -1); } });
+on(window, 'keydown', e => { if (e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.key === 'ArrowRight') { takeControl(); flip(1); press('next'); } if (e.key === 'ArrowLeft') { takeControl(); flip(-1); press('prev'); } });
 function press(id) { const b = $id(id); b.classList.add('pressed'); setTimeout(() => b.classList.remove('pressed'), 130); }
 
 function drawTVs(t) {
+  if (attract) {                                                        // attract-mode countdown + flip
+    const k = Math.min(1, (t - attractAt) / ATTRACT);
+    root.style.setProperty('--attract', k.toFixed(3));
+    if (k >= 1 && vis.hero) flip(1);
+  }
   const staticFor = reduce ? 0 : .38;
   tvs.forEach((tv, i) => {
     tv.g.clearRect(0, 0, TV_W, TV_H); tv.g.drawImage(TV_FRAME, 0, 0);
@@ -1519,6 +1540,27 @@ const lcds = WORK_ORDER.map((id, n) => {
   ['mouseleave', 'blur'].forEach(ev => d.addEventListener(ev, () => { entry.tuned = false; }));
   return entry;
 });
+// Company sticker slapped on the casing's top-left corner, tilted a pixel per few columns,
+// initials in a 3x5 pixel font. Drawn under the campfire light pass so it's lit like the set.
+const GLYPH = { E: ['111', '100', '110', '100', '111'], Y: ['101', '101', '010', '010', '010'], N: ['101', '111', '111', '111', '101'],
+  S: ['111', '100', '111', '001', '111'], I: ['111', '010', '010', '010', '111'], T: ['111', '010', '010', '010', '010'],
+  H: ['101', '101', '111', '101', '101'], A: ['010', '101', '111', '101', '101'], U: ['101', '101', '101', '101', '111'] };
+function drawSticker(g, st) {
+  if (!st) return;
+  const w = st.text.length * 4 + 3, h = 9, x0 = 5, y0 = 23;
+  const tilt = x => Math.floor(x / 5);                                      // one pixel down every five columns
+  for (let x = -1; x <= w; x++) for (let y = -1; y <= h; y++) {
+    const edge = x < 0 || y < 0 || x === w || y === h;
+    g.fillStyle = edge ? 'rgba(20,16,30,.55)' : (x === 0 || y === 0) ? 'rgba(255,255,255,.35)' : st.bg;
+    if (!edge && !(x === 0 || y === 0)) g.fillStyle = st.bg;
+    g.fillRect(x0 + x, y0 + y + tilt(x + 1), 1, 1);
+  }
+  g.fillStyle = 'rgba(255,255,255,.3)'; for (let x = 1; x < w - 1; x++) g.fillRect(x0 + x, y0 + 1 + tilt(x + 1), 1, 1);   // glossy top edge
+  [...st.text].forEach((ch, i) => (GLYPH[ch] || []).forEach((row, ry) => [...row].forEach((b, rx) => {
+    if (b === '1') { const x = 2 + i * 4 + rx; g.fillStyle = st.fg; g.fillRect(x0 + x, y0 + 2 + ry + tilt(3 + i * 4), 1, 1); }
+  })));
+  g.fillStyle = 'rgba(20,16,30,.35)'; g.fillRect(x0 + w - 2, y0 + tilt(w - 1) - 1, 2, 1);          // a corner peeling up
+}
 function setWorkChannel(l, idx, t) {
   l.idx = idx; l.switchAt = t;
   const [ch, fine] = l.knobs, dur = reduce ? 0 : .32;
@@ -1537,6 +1579,7 @@ function drawLCDs(t) {
     const g = l.g;
     g.clearRect(0, 0, TV_W, TV_H); g.drawImage(TV_FRAME, 0, 0);
     l.knobs.forEach((k, i) => drawKnob(g, KNOBS[i][0], KNOBS[i][1], knobAngle(k, t)));
+    drawSticker(g, l.j.sticker);
     g.save(); g.globalCompositeOperation = 'source-atop';               // campfire underlight
     const wl = g.createLinearGradient(0, TV_H * .55, 0, TV_H);
     wl.addColorStop(0, 'rgba(255,140,60,0)'); wl.addColorStop(1, `rgba(255,140,60,${(.3 * FIRE.level).toFixed(3)})`);
@@ -1901,7 +1944,7 @@ function frame(ms) {
 }
 document.fonts.ready.then(() => {
   if (stopped) return;
-  renderNow(); sizeTVs(); on(window, 'resize', sizeTVs);
+  renderNow(); syncTabs(); attractAt = performance.now() / 1000; sizeTVs(); on(window, 'resize', sizeTVs);
   buildSpace(); ro = new ResizeObserver(() => buildSpace()); ro.observe(scene);
   (raf = requestAnimationFrame(frame));
   if (reduce) setTimeout(() => (raf = requestAnimationFrame(frame)), 50);
