@@ -25,7 +25,7 @@ const SCENES = [
 ]
 const sceneTop = id => {
   if (id === 'intro') return 0
-  if (id === 'work') return document.getElementById('scene').getBoundingClientRect().top + window.scrollY
+  if (id === 'work') return document.querySelector('.beam-wrap').getBoundingClientRect().bottom + window.scrollY - 140   // sign's lower planks in view
   if (id === 'details') return document.querySelector('.log-panel').getBoundingClientRect().top + window.scrollY - 8
   // Projects: land so the descriptions are fully on screen, with as much of the TV row above as fits.
   const y = window.scrollY, stage = document.getElementById('stage').getBoundingClientRect().top + y - 16

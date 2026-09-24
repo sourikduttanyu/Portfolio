@@ -121,29 +121,34 @@
   .hint svg { width: 14px; height: 14px; flex: none; shape-rendering: crispEdges; animation: cue-bob 1.4s ease-in-out infinite; }
   .hero-inner > .hint svg { animation-name: point-up; }
   @keyframes point-up { 50% { transform: translateY(-3px); } }
-  .work-hint { position: absolute; top: 20px; left: 24px; z-index: 2; margin: 0; }
-  /* hover: a dialog box pops out of the screen and types the stack line by line, then shrinks back into the glass */
-  .tv .say { position: absolute; left: 37%; top: 0; z-index: 6; min-width: 150px; padding: 8px 12px 9px; pointer-events: none; text-align: left;
-    background: oklch(11% 0.04 290 / .98); border: 2px solid var(--gold); border-radius: 6px;
-    box-shadow: 0 3px 0 0 var(--ui-edge), 0 0 18px oklch(85% 0.13 82 / .25);
-    transform-origin: 50% 100%; transform: translate(-50%, calc(var(--cvh, 270px) * .6 - 50%)) scale(.06); opacity: 0;
+  .work-hint { position: absolute; top: calc(20px + var(--sign-overlap)); left: 24px; z-index: 2; margin: 0; }
+  /* hover: a dialog box pops out of the screen beside the set, types the stack line by line, then shrinks back
+     into the glass. It opens toward the outside (.left / .right, chosen in JS) so it never covers the intro. */
+  .tv .say { position: absolute; top: calc(var(--cvh, 270px) * .58); z-index: 6; min-width: 150px; padding: 8px 12px 9px; pointer-events: none;
+    text-align: left; background: oklch(11% 0.04 290 / .98); border: 2px solid var(--gold); border-radius: 6px;
+    box-shadow: 0 3px 0 0 var(--ui-edge), 0 0 18px oklch(85% 0.13 82 / .25); opacity: 0;
     transition: transform .2s cubic-bezier(.5, 0, .75, 0), opacity .18s ease-in .04s; }
+  .tv .say, .tv .say.right { left: calc(100% + 16px); right: auto; transform-origin: 0 50%;
+    transform: translate(calc(var(--cvw, 300px) * -.63 - 16px), -50%) scale(.06); }
+  .tv .say.left { left: auto; right: calc(100% + 16px); transform-origin: 100% 50%;
+    transform: translate(calc(var(--cvw, 300px) * .37 + 16px), -50%) scale(.06); }
   .tv .say:empty { display: none; }
-  .stage .tv:hover, .stage .tv:focus-visible { z-index: 5; }
-  .tv .say::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 12px; height: 8px; transform: translateX(-50%);
-    background: var(--gold); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+  .stage .tv:hover, .stage .tv:focus-visible, .wtv:hover, .wtv:focus-visible { z-index: 5; }
+  .tv .say::after { content: ""; position: absolute; top: 50%; width: 8px; height: 12px; background: var(--gold); transform: translateY(-50%); }
+  .tv .say::after, .tv .say.right::after { left: -9px; right: auto; clip-path: polygon(100% 0, 100% 100%, 0 50%); }
+  .tv .say.left::after { left: auto; right: -9px; clip-path: polygon(0 0, 0 100%, 100% 50%); }
   .tv .say b { display: block; margin-bottom: 4px; font: 400 10px "Silkscreen", monospace; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; }
   .tv .say ul { margin: 0; padding: 0; list-style: none; }
   .tv .say li { font-size: 13px; line-height: 1.5; color: var(--ink); white-space: nowrap; opacity: 0; transform: translateY(3px);
     transition: opacity .1s, transform .1s; }
   .tv .say li::before { content: "▸ "; color: var(--gold); }
-  .tv:hover .say, .tv:focus-visible .say { opacity: 1; transform: translate(-50%, calc(-100% - 6px)) scale(1);
+  .tv:hover .say, .tv:focus-visible .say { opacity: 1; transform: translate(0, -50%) scale(1);
     transition: transform .34s cubic-bezier(.16, 1, .3, 1), opacity .12s ease-out; }
   .tv:hover .say li, .tv:focus-visible .say li { opacity: 1; transform: none;
     transition: opacity .16s ease-out, transform .16s ease-out; transition-delay: calc(.16s + var(--k) * 70ms); }
   @media (hover: none) { .tv .say { display: none; } }
   @media (prefers-reduced-motion: reduce) {
-    .tv .say, .tv:hover .say, .tv:focus-visible .say { transform: translate(-50%, calc(-100% - 6px)); transition: opacity .15s; }
+    .tv .say, .tv .say.left, .tv .say.right, .tv:hover .say, .tv:focus-visible .say { transform: translate(0, -50%); transition: opacity .15s; }
     .tv .say li { opacity: 1; transform: none; transition: none; }
   }
   /* until the first screen is opened, the name plates breathe gold so the sets read as clickable */
@@ -151,7 +156,7 @@
   @keyframes plate-call { 50% { border-color: var(--gold); box-shadow: 0 3px 0 0 var(--ui-edge), 0 0 12px oklch(85% 0.13 82 / .45); } }
   @media (prefers-reduced-motion: reduce) { .nudge .tv-label, .hint svg { animation: none; } }
   /* readable strip: what the three screens are showing */
-  .now { width: min(1200px, 100% - 32px); margin: 0 auto; padding: 40px 0 72px;
+  .now { width: min(1200px, 100% - 32px); margin: 0 auto; padding: 40px 0 36px;
     display: grid; gap: 32px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .now article { scroll-margin-top: 24px; }
   .now .tag { font-family: "Silkscreen", monospace; font-size: 12px; color: var(--gold); text-transform: uppercase; letter-spacing: .1em; }
@@ -163,18 +168,20 @@
   @media (max-width: 860px) { .now { grid-template-columns: 1fr; } }
 
   /* ---------- Wooden beam divider ---------- */
-  .beam-wrap { position: relative; }
+  /* the whole board hangs in open space: the work scene starts behind the beam (set from JS) */
+  .beam-wrap { position: relative; z-index: 2; margin-bottom: calc(-1 * var(--sign-overlap)); }
+  :root { --sign-overlap: 240px; }
   #beam { width: 100%; height: auto; }
   #sign { margin: -34px auto 0; position: relative; }
 
   /* ---------- Work: LCD layer ---------- */
   .work { background: #05070f; padding: 0; }
-  .work-scene { position: relative; overflow: hidden; padding: 150px 0 210px; }
-  .work-scene.fit { height: 100svh; min-height: 560px; padding: var(--wtop, 60px) 0 0; }
+  .work-scene { position: relative; overflow: hidden; padding: calc(150px + var(--sign-overlap)) 0 210px; }
+  .work-scene.fit { height: calc(100svh + var(--sign-overlap) - 140px); min-height: 560px; padding: var(--wtop, 60px) 0 0; }
   #space { position: absolute; inset: 0; width: 100%; height: 100%; }
   .work-scene .work-inner { position: relative; z-index: 1; }
   /* no hard edge under the sign: the page's night fades into open space */
-  .work-scene::before { content: ""; position: absolute; inset: 0 0 auto; height: 140px; z-index: 0; pointer-events: none;
+  .work-scene::before { content: ""; position: absolute; inset: 0 0 auto; height: 110px; z-index: 0; pointer-events: none;
     background: linear-gradient(var(--night-deep), transparent); }
   .scope { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); opacity: 0; transition: opacity .2s; pointer-events: none; }
   .wtv:hover .scope, .wtv:focus-visible .scope { opacity: 1; }
@@ -224,7 +231,7 @@
   .site-footer .links { margin-top: 0; }
   .music { position: absolute; left: 16px; bottom: 14px; z-index: 2; font-size: 12px; min-height: 40px; padding: 8px 12px; }
   .music[aria-pressed="true"] { color: #e8a33d; }
-  .warp { position: absolute; right: 16px; top: 16px; z-index: 2; display: flex; gap: 8px; }
+  .warp { position: absolute; right: 16px; top: calc(20px + var(--sign-overlap)); z-index: 2; display: flex; gap: 8px; }
   .warp .btn { font-size: 12px; min-height: 40px; min-width: 44px; padding: 8px 10px; }
   .warp .btn[aria-pressed="true"] { color: #e8a33d; border-color: #e8a33d; }
   @media (prefers-reduced-motion: reduce) { .warp { display: none; } }
@@ -257,7 +264,7 @@
     .stage .tv-label small { display: none; }          /* captions carry the name; the strip below carries the rest */
     .scroll-cue { display: none; }
     .work-hint { left: 16px; }
-    .warp { top: 78px; }
+    .warp { top: calc(78px + var(--sign-overlap)); }
     .scene-nav .btn[aria-current="true"]::before { display: none; }
     .scene-nav .btn { width: 76px; }
   }

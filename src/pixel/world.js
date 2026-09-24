@@ -20,7 +20,7 @@ const PROJECTS = projects.map(p => {
     stack: p.libraries.join(' · '), src: p.source === 'open' ? 'Open source' : 'Closed source',
     href, linkText: href.replace(/^https:\/\/(github\.com\/)?/, ''), scene: SCENES[p.slug] ?? 'plasma' };
 });
-const JOBS = jobs.map(j => ({ id: j.slug, co: j.company, role: j.role, when: j.period,
+const JOBS = jobs.map(j => ({ id: j.slug, co: j.company, role: j.role, when: j.period, stack: j.stack ?? [],
   mono: j.company.split(' ').filter(w => /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 2),
   work: j.work.map(w => [w.name, w.text, w.skill]) }));
 
@@ -341,6 +341,15 @@ function playOnly(slugs) {
   slugs.forEach(k => { const c = clipFor(k); if (c.ready && !reduce && c.video.paused) c.video.play().catch(() => {}); });
 }
 
+/* Hover box beside a set: opens toward the outside (preferred side), or the other side if it would
+   run off screen or under the scene nav. */
+function placeSay(tv, box, prefer) {
+  const r = tv.getBoundingClientRect(), w = box.offsetWidth + 20, navW = innerWidth > 700 ? 104 : 0;
+  let side = prefer;
+  if (side === 'left' && r.left - w < navW) side = 'right';
+  else if (side === 'right' && r.right + w > innerWidth - 8) side = 'left';
+  box.classList.toggle('left', side === 'left'); box.classList.toggle('right', side === 'right');
+}
 /* ---------------- build TVs ---------------- */
 const stage = $id('stage');
 let channel = 0, switchAt = -10, osdUntil = 0;
@@ -350,6 +359,7 @@ const tvs = [0, 1, 2].map(i => {
   const label = document.createElement('div'); label.className = 'tv-label';
   const shadow = document.createElement('div'); shadow.className = 'tv-shadow';
   const say = document.createElement('div'); say.className = 'say'; say.setAttribute('aria-hidden', 'true');   // hover: the set "speaks" its stack
+  btn.addEventListener('mouseenter', () => placeSay(btn, say, i === 0 ? 'left' : 'right'));
   btn.append(cv, say, shadow, label); stage.append(btn);
   const g = cv.getContext('2d');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
@@ -390,7 +400,7 @@ function layoutStage(extra = 0) {
   tvs.forEach((tv, i) => {
     tv.cv.style.width = w + 'px'; tv.cv.style.height = TV_H * s + 'px';
     tv.btn.style.width = w + 'px'; tv.btn.style.left = pos[i][0] + 'px'; tv.btn.style.top = pos[i][1] + 'px';
-    tv.btn.style.setProperty('--px', s + 'px'); tv.btn.style.setProperty('--cvh', TV_H * s + 'px');                              // one art pixel, for the cast shadow
+    tv.btn.style.setProperty('--px', s + 'px'); tv.btn.style.setProperty('--cvh', TV_H * s + 'px'); tv.btn.style.setProperty('--cvw', w + 'px');                              // one art pixel, for the cast shadow
   });
   stage.style.height = drop + full + 'px';
   // the remote rises into the empty space under the raised middle TV, between the lower two
@@ -406,19 +416,26 @@ function layoutStage(extra = 0) {
 // Work scene = one screen: size the three sets so they, their plates and the raised middle one
 // fit between the top edge and the ground. Narrow screens stack instead (scene grows taller).
 function layoutWork() {
-  const sceneEl = $id('scene'), vw = sceneEl.clientWidth, vh = window.innerHeight;
+  // The space scene starts behind the beam + sign (stars run behind the board). Landing on Work shows the
+  // sign's lower 140px, so the part below the sign is one screen minus that.
+  const O = root.querySelector('.beam-wrap').offsetHeight;
+  document.documentElement.style.setProperty('--sign-overlap', O + 'px');
+  const sceneEl = $id('scene'), vw = sceneEl.clientWidth, vh = window.innerHeight - 140;
   const narrow = vw < 860;
   sceneEl.classList.toggle('fit', !narrow);
   let s = pixelScale();
   if (!narrow) {
-    const top = Math.max(40, vh * .07), ground = Math.max(150, vh * .2), plate = 64;
-    const byH = (vh - top - ground - plate) / (TV_H * 1.3), byW = vw * .8 / (TV_W * 3.3);
-    s = Math.max(1.5, Math.min(4, Math.floor(Math.min(byH, byW) * 4) / 4));
-    sceneEl.style.setProperty('--wtop', top + 'px');
+    const top = Math.max(40, vh * .07) + O, ground = Math.max(150, vh * .2), plate = 64;
+    const byH = (vh - (top - O) - ground - plate) / (TV_H * 1.3), byW = vw * .8 / (TV_W * 3.3);
+    s = Math.max(1.5, Math.min(vw >= 1800 ? 5 : 4, Math.floor(Math.min(byH, byW) * 4) / 4));
+    // big screens: centre the sets between the sign and the ground instead of leaving a dead band above the grass
+    const spare = vh - (top - O) - ground - plate - TV_H * s * 1.3;
+    sceneEl.style.setProperty('--wtop', top + Math.max(0, spare * .45) + 'px');
     const raise = Math.round(TV_H * s * .3) + 'px';
     lcds.forEach(l => { l.d.style.marginTop = l.n === 1 ? '0px' : raise; });
   } else lcds.forEach(l => { l.d.style.marginTop = '0px'; });
-  lcds.forEach(l => { l.cv.style.width = TV_W * s + 'px'; l.cv.style.height = TV_H * s + 'px'; l.d.style.width = Math.max(TV_W * s, 200) + 'px'; });
+  lcds.forEach(l => { l.cv.style.width = TV_W * s + 'px'; l.cv.style.height = TV_H * s + 'px'; l.d.style.width = Math.max(TV_W * s, 200) + 'px';
+    l.d.style.setProperty('--cvh', TV_H * s + 'px'); l.d.style.setProperty('--cvw', TV_W * s + 'px'); });
   lcds.forEach(l => {                                              // tape sits over the front face's lower-right corner
     l.tape.style.fontSize = Math.max(9, Math.round(3.4 * s)) + 'px';
     l.tape.style.left = l.cv.offsetLeft + 90 * s - l.tape.offsetWidth + 'px'; l.tape.style.top = l.cv.offsetTop + 74 * s + 'px';
@@ -426,8 +443,8 @@ function layoutWork() {
 }
 function sizeTVs() {
   layoutStage(); bk = null;
-  layoutWork();
   drawBeam(); drawSign();
+  layoutWork();                                                   // after the board is drawn: it measures its height
 }
 
 function renderNow() {
@@ -1727,7 +1744,10 @@ const lcds = WORK_ORDER.map((id, n) => {
   const tape = document.createElement('div'); tape.className = 'tape'; tape.setAttribute('aria-hidden', 'true');
   tape.textContent = j.when.split(/\s+[–-]\s+/).map(d => d.replace(/(\w{3})\w*\s+\d{2}(\d{2})/, '$1 $2').toUpperCase()).join(' → ');
   const scope = document.createElement('canvas'); scope.width = 84; scope.height = 14; scope.className = 'scope'; scope.setAttribute('aria-hidden', 'true'); scope.style.width = '252px'; scope.style.height = '42px';
-  d.append(scope, cv, tape, shadow, cap); lcdWrap.append(d);
+  const say = document.createElement('div'); say.className = 'say'; say.setAttribute('aria-hidden', 'true');
+  say.innerHTML = `<b>Stack</b><ul>${j.stack.map((l, k) => `<li style="--k:${k}">${esc(l)}</li>`).join('')}</ul>`;
+  d.append(scope, cv, tape, say, shadow, cap); lcdWrap.append(d);
+  d.addEventListener('mouseenter', () => placeSay(d, say, n === 0 ? 'left' : 'right'));
   d.tabIndex = 0; d.setAttribute('role', 'button');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
   const up = -Math.PI / 2;
@@ -1826,7 +1846,10 @@ let SPW = 0, SPH = 0, SPS = 3, spaceStatic = null, spaceBand = null, spaceGround
 const FIRE = { x: 0, y: 0, level: 1 };
 const AMBER = '#e8a33d';
 const px = (g, x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
-const groundTop = x => Math.round(SPH - 36 + 16 * ((x - SPW / 2) / (SPW / 2)) ** 2);   // convex: edges fall away
+// a small round world: the ground is a circle arc whose edges fall GROUND_DROP px below the crest
+const GROUND_DROP = 40;
+const planetR = () => ((SPW / 2) ** 2 + GROUND_DROP ** 2) / (2 * GROUND_DROP);
+const groundTop = x => { const R = planetR(), dx = x - SPW / 2; return Math.round(SPH - 44 + R - Math.sqrt(Math.max(0, R * R - dx * dx))); };
 
 function buildPlanet(r, fn) {
   const c = document.createElement('canvas'); c.width = c.height = r * 2 + 1; const g = c.getContext('2d');
@@ -1843,8 +1866,12 @@ function buildPlanet(r, fn) {
 }
 function mixHex(a, b, t) { const [r1, g1, b1] = hex(a), [r2, g2, b2] = hex(b); return `rgb(${r1 + (r2 - r1) * t | 0},${g1 + (g2 - g1) * t | 0},${b1 + (b2 - b1) * t | 0})`; }
 
+// Sky objects sit in the open sky below the board, not behind it: fractions of the visible height.
+let SKY0 = 0;
+const skyY = f => SKY0 + (SPH - SKY0) * f;
 function buildSpace() {
   SPS = pixelScale(); SPW = Math.ceil(scene.clientWidth / SPS); SPH = Math.ceil(scene.clientHeight / SPS);
+  SKY0 = Math.round(root.querySelector('.beam-wrap').offsetHeight * .75 / SPS);
   space.width = SPW; space.height = SPH;
   const c = document.createElement('canvas'); c.width = SPW; c.height = SPH; let g = c.getContext('2d');
   // sky: dithered bands from deep space down to a teal horizon
@@ -1857,8 +1884,8 @@ function buildSpace() {
   const bg = band.getContext('2d');
   const wrapNoise = (x, y, sx, sy) => { const k = x / BW; return vnoise(x / sx, y / sy) * (1 - k) + vnoise((x - BW) / sx, y / sy) * k; };
   for (let y = 0; y < SPH * .8; y++) for (let x = 0; x < BW; x++) {
-    const bandY = SPH * .3 + Math.sin(x / BW * Math.PI * 2) * SPH * .08;
-    const v = (wrapNoise(x, y, 38, 16) * .6 + wrapNoise(x, y, 11, 7) * .4) * Math.exp(-(((y - bandY) / (SPH * .16)) ** 2));
+    const bandY = skyY(.3) + Math.sin(x / BW * Math.PI * 2) * (SPH - SKY0) * .08;
+    const v = (wrapNoise(x, y, 38, 16) * .6 + wrapNoise(x, y, 11, 7) * .4) * Math.exp(-(((y - bandY) / ((SPH - SKY0) * .16)) ** 2));
     if (v > .38 && bayer(x, y) < (v - .38) * 2.6) px(bg, x, y, wrapNoise(x + 900, y, 30, 30) > .5 ? '#15404f' : '#2b2152');
   }
   twinkles = [];
@@ -1885,40 +1912,53 @@ function buildSpace() {
       px(g, x, y, col);
     }
   }
-  // pines: back row darker, front row with a warm rim toward the fire
+  // pines stand on the curve: each leans out along the surface normal and shrinks toward the horizon,
+  // so the ground reads as a small round world. Back row darker; front row warm-rimmed toward the fire.
   const pine = (bx, h, dark) => {
-    const gy = groundTop(bx);
-    for (let y = 0; y < 4; y++) { px(g, bx, gy - 1 - y, '#2a1a10'); px(g, bx + 1, gy - 1 - y, '#1a100a'); }
-    const tiers = Math.floor(h / 7);
+    const gy = groundTop(bx), off = (bx - SPW / 2) / (SPW / 2), lean = (bx - SPW / 2) / planetR();
+    h = Math.round(h * (1 - Math.abs(off) * .3));
+    const P = (x, up, col) => px(g, bx + x + Math.round(up * lean), gy - up, col);   // up = height above ground
+    for (let y = 1; y <= 4; y++) { P(0, y, '#2a1a10'); P(1, y, '#1a100a'); }
+    const tiers = Math.max(2, Math.floor(h / 7));
     for (let k = 0; k < tiers; k++) {
-      const ty = gy - 4 - k * 6, w = Math.max(2, Math.floor((tiers - k) * 2.2 + 2));
+      const w = Math.max(2, Math.floor((tiers - k) * 2.2 + 2));
       for (let r = 0; r < 8; r++) {
-        const half = Math.floor(w * (r / 8)), yy = ty - 8 + r;
+        const half = Math.floor(w * (r / 8)), up = 4 + k * 6 + 8 - r;
         for (let x = -half; x <= half + 1; x++) {
           let col = dark ? '#0a1d1b' : '#0e2a26';
+          if (hash(bx * 3 + x, up) < .16) col = dark ? '#0d2522' : '#153a33';                // needle texture
+          if (r === 7 && hash(bx + x, up) < .5) col = dark ? '#081614' : '#0a211d';        // tier shadow
           if (x === -half) col = dark ? '#0f2a26' : '#1a4a40';
-          if (!dark && x === half + 1 && bx < SPW / 2) col = '#4a2a18';           // warm rim, fire side
+          if (!dark && x === half + 1 && bx < SPW / 2) col = '#4a2a18';                    // warm rim, fire side
           if (!dark && x === -half && bx > SPW / 2) col = '#4a2a18';
-          px(g, bx + x, yy, col);
+          P(x, up, col);
         }
       }
     }
-    for (let y = 0; y < 3; y++) px(g, bx, gy - 4 - tiers * 6 - 8 - y, dark ? '#0f2a26' : '#1a4a40');
+    for (let y = 1; y <= 3; y++) P(0, 4 + tiers * 6 + 8 + y - 1, dark ? '#0f2a26' : '#1a4a40');
   };
-  [[.03, 40, 1], [.1, 34, 1], [.9, 38, 1], [.97, 30, 1]].forEach(([p, h, d]) => pine(Math.floor(SPW * p), h, d));
-  [[.06, 30, 0], [.15, 44, 0], [.85, 42, 0], [.94, 28, 0]].forEach(([p, h, d]) => pine(Math.floor(SPW * p), h, d));
+  // back row runs the whole horizon (clear of the fire); front row frames the sides
+  for (let k = 0; k < 26; k++) {
+    const p = .01 + k / 25 * .98;
+    if (p > .4 && p < .6) continue;
+    pine(Math.floor(SPW * (p + (hash(k, 9) - .5) * .02)), 20 + hash(k, 8) * 18, 1);
+  }
+  [[.03, 38], [.17, 44], [.24, 30], [.76, 32], [.83, 42], [.97, 36]].forEach(([p, h]) => pine(Math.floor(SPW * p), h, 0));
   // wooden observation tower (left)
-  const tx = Math.floor(SPW * .24), tg = groundTop(tx), th = 56;
+  const tx = Math.floor(SPW * .1), tg = Math.min(groundTop(tx), groundTop(tx + 13)), th = 56;
   const W3 = WOOD.map(c => `rgb(${c.join(',')})`);
-  for (let y = 0; y < th; y++) { px(g, tx, tg - 1 - y, W3[3]); px(g, tx + 1, tg - 1 - y, W3[1]); px(g, tx + 12, tg - 1 - y, W3[3]); px(g, tx + 13, tg - 1 - y, W3[1]); }
+  for (let y = -12; y < th; y++) {                                           // legs run down to their own ground
+    if (tg - 1 - y < groundTop(tx)) { px(g, tx, tg - 1 - y, W3[3]); px(g, tx + 1, tg - 1 - y, W3[1]); }
+    if (tg - 1 - y < groundTop(tx + 13)) { px(g, tx + 12, tg - 1 - y, W3[3]); px(g, tx + 13, tg - 1 - y, W3[1]); }
+  }
   for (let k = 0; k < 4; k++) for (let i = 0; i < 11; i++) { const y0 = tg - 6 - k * 12; px(g, tx + 2 + i, y0 - i, W3[4]); px(g, tx + 2 + i, y0 - 10 + i, W3[2]); }
   for (let x = -2; x < 16; x++) { px(g, tx + x, tg - th - 1, W3[6]); px(g, tx + x, tg - th, W3[3]); px(g, tx + x, tg - th + 1, W3[1]); }
   for (let r = 0; r < 7; r++) for (let x = -2 + r; x < 16 - r; x++) px(g, tx + x, tg - th - 8 + r, r === 6 ? W3[2] : r % 2 ? W3[4] : W3[5]);
   for (let y = 0; y < th; y += 3) { px(g, tx + 16, tg - th + y, '#a08a5a'); px(g, tx + 18, tg - th + y, '#a08a5a'); if (y % 6 === 0) { px(g, tx + 17, tg - th + y, '#7a6440'); } }
   // launch pad + small rocket (right)
-  const lx = Math.floor(SPW * .74), lg = groundTop(lx);
+  const lx = Math.floor(SPW * .885), lg = Math.min(groundTop(lx - 4), groundTop(lx + 21));
   for (let x = -4; x < 22; x++) { px(g, lx + x, lg - 6, W3[5]); px(g, lx + x, lg - 5, W3[2]); }
-  for (const lxx of [-3, 8, 20]) for (let y = 0; y < 5; y++) px(g, lx + lxx, lg - 1 - y, W3[3]);
+  for (const lxx of [-3, 8, 20]) for (let y = lg - 5; y < groundTop(lx + lxx); y++) px(g, lx + lxx, y, W3[3]);
   const rx = lx + 6;
   for (let y = 0; y < 18; y++) for (let x = 0; x < 5; x++) px(g, rx + x, lg - 7 - y, x === 0 ? '#e9e3d2' : x === 4 ? '#8a8272' : '#c9c2b0');
   for (let r = 0; r < 4; r++) for (let x = r; x < 5 - r; x++) px(g, rx + x, lg - 25 - r, r === 3 ? '#e8a33d' : '#d15a3a');
@@ -1962,6 +2002,7 @@ function drawSun(g, cx, cy, s, t) {
 const embers = Array.from({ length: 16 }, (_, i) => ({ x: 0, y: -99, vy: 0, life: 0, seed: i }));
 function drawFire(g, t) {
   const fx = FIRE.x, fy = FIRE.y;
+  t *= .55;                                                                     // a slow, lazy burn
   FIRE.pulse = (FIRE.pulse || 0) * .9;
   FIRE.level = reduce ? .9 : .85 + .15 * vnoise(t * 3, 0) + FIRE.pulse * .25;
   for (let y = -26; y <= 8; y++) for (let x = -40; x <= 40; x++) {             // warm pool of light
@@ -1984,7 +2025,7 @@ function drawFire(g, t) {
   for (let i = 0; i < 11; i++) px(g, fx - 13 + i, fy - 2 - Math.floor(i * .7), '#6e4829');
   px(g, fx - 2, fy - 10, '#f4efe6'); px(g, fx - 1, fy - 10, '#f4efe6'); px(g, fx - 2, fy - 9, '#c98a4a'); px(g, fx - 1, fy - 9, '#e6d3b0');
   if (!reduce) embers.forEach(e => {
-    if (e.life <= 0) { e.x = fx + (hash(e.seed, t) - .5) * 6; e.y = fy - 6; e.vy = .25 + hash(e.seed, t + 1) * .35; e.life = 40 + hash(e.seed, t + 2) * 50; }
+    if (e.life <= 0) { e.x = fx + (hash(e.seed, t) - .5) * 6; e.y = fy - 6; e.vy = .14 + hash(e.seed, t + 1) * .2; e.life = 70 + hash(e.seed, t + 2) * 80; }
     e.y -= e.vy; e.x += Math.sin((e.y + e.seed * 10) * .15) * .25; e.life--;
     px(g, Math.round(e.x), Math.round(e.y), e.life > 30 ? '#ffb238' : '#e2552a99');
   });
@@ -2017,7 +2058,7 @@ const meteors = [];
 let nextMeteor = 4;
 function spawnMeteor(t) {
   if (reduce || meteors.length >= 2) return;
-  const x = SPW * (.1 + Math.random() * .8), y = SPH * (.03 + Math.random() * .12), dir = Math.random() < .5 ? -1 : 1;
+  const x = SPW * (.1 + Math.random() * .8), y = skyY(.03 + Math.random() * .12), dir = Math.random() < .5 ? -1 : 1;
   meteors.push({ x, y, vx: dir * (70 + Math.random() * 50), vy: 25 + Math.random() * 20, t0: t, life: .7 + Math.random() * .4 });
 }
 function drawMeteors(g, t) {
@@ -2099,7 +2140,7 @@ function drawSpace(t) {
   g.drawImage(spaceStatic, 0, 0);
   // The planet turns: we stay put, the sky slides past and bends with the horizon's curve.
   const BW = spaceBand.width, off = reduce ? 0 : (st * 3.5) % BW;
-  const drop = x => Math.round(16 * ((x - SPW / 2) / (SPW / 2)) ** 2);
+  const drop = x => Math.round(26 * ((x - SPW / 2) / (SPW / 2)) ** 2);
   const toView = bx => { let x = bx - off; x = ((x % BW) + BW) % BW; return x; };
   for (let x = 0; x < SPW; x++) g.drawImage(spaceBand, Math.floor((x + off) % BW), 0, 1, SPH, x, drop(x), 1, SPH);
   const beat = FIRE.pulse || 0;
@@ -2109,10 +2150,10 @@ function drawSpace(t) {
   });
   // bodies ride the same sky
   const body = (sprite, bx, y) => { const x = toView(bx); if (x < SPW + sprite.width) g.drawImage(sprite, Math.round(x - sprite.width / 2), y + drop(x)); };
-  body(gasSprite, BW * .18, Math.round(SPH * .8));                           // huge, rising over the horizon
+  body(gasSprite, BW * .18, Math.round(skyY(.8)));                           // huge, rising over the horizon
   // ringed ocean world: back half of the ring, planet, front half
   {
-    const x = toView(BW * .4), cx = Math.round(x), cy = Math.round(SPH * .07) + drop(x);
+    const x = toView(BW * .4), cx = Math.round(x), cy = Math.round(skyY(.07)) + drop(x);
     if (x < SPW + 40) {
       const ring = front => { for (let a = 0; a < 120; a++) { const an = a / 120 * Math.PI * 2, rx = Math.cos(an) * 28, ry = Math.sin(an) * 7, tilt = rx * .22;
         if ((ry > 0) === front) px(g, cx + Math.round(rx), cy + Math.round(ry + tilt), a % 3 ? '#c9b8e8' : '#8a7ab8'); } };
@@ -2121,19 +2162,19 @@ function drawSpace(t) {
   }
   // twin worlds circling each other
   {
-    const x = toView(BW * .74), ang = st * .6, cy = Math.round(SPH * .74) + drop(x);
+    const x = toView(BW * .74), ang = st * .6, cy = Math.round(skyY(.74)) + drop(x);
     if (x < SPW + 30) {
       const ax = Math.round(x + Math.cos(ang) * 9), ay = Math.round(cy + Math.sin(ang) * 3), bx = Math.round(x - Math.cos(ang) * 9), by = Math.round(cy - Math.sin(ang) * 3);
       const order = Math.sin(ang) > 0 ? [[twinB, bx, by, 5], [twinA, ax, ay, 6]] : [[twinA, ax, ay, 6], [twinB, bx, by, 5]];
       order.forEach(([spr, px2, py2, r]) => g.drawImage(spr, px2 - r, py2 - r));
     }
   }
-  body(redSprite, BW * .93, Math.round(SPH * .05));
-  body(moonSprite, BW * .6, Math.round(SPH * .04 + Math.sin(st * .05) * 3));
-  const sunX = Math.round(toView(BW * .9)), sunY = Math.floor(SPH * .05 + 10) + drop(sunX);
+  body(redSprite, BW * .93, Math.round(skyY(.05)));
+  body(moonSprite, BW * .6, Math.round(skyY(.04) + Math.sin(st * .05) * 3));
+  const sunX = Math.round(toView(BW * .9)), sunY = Math.floor(skyY(.05) + 10) + drop(sunX);
   drawSun(g, sunX, sunY, reduce ? sunState(0) : sunState(e), t);
   // comet: its own slow pass every 80s
-  const ck = reduce ? .35 : (st % 80) / 80, cx = Math.round(-30 + (SPW + 60) * ck), cy = Math.round(SPH * .34 - ck * SPH * .18);
+  const ck = reduce ? .35 : (st % 80) / 80, cx = Math.round(-30 + (SPW + 60) * ck), cy = Math.round(skyY(.34 - ck * .18));
   for (let i = 1; i < 24; i++) if (bayer(cx - i, cy + i * .3) < (1 - i / 24) * .9) px(g, cx - i, Math.round(cy + i * .35), i < 6 ? '#e8fbff' : '#7fd8e8');
   px(g, cx, cy, '#ffffff'); px(g, cx + 1, cy, '#ffffff'); px(g, cx, cy - 1, '#cfefff');
   drawMeteors(g, t);
