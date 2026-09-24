@@ -240,3 +240,18 @@
   .ch-pips i { width: 14px; height: 5px; }
   .remote .btn.chan { width: 56px; height: 56px; min-height: 56px; }
   .remote .btn.chan svg { width: 28px; height: 28px; }
+  /* landing invitation: appears after a few idle seconds, points at the scene buttons */
+  .scroll-cue { display: inline-flex; align-items: center; gap: 8px; margin-top: 6px; padding: 8px 12px 8px 10px; cursor: pointer;
+    font-family: "Silkscreen", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; white-space: nowrap;
+    color: var(--ink); background: var(--plate); border: 2px solid var(--ui-border); border-radius: 8px; box-shadow: 0 3px 0 0 var(--ui-edge);
+    opacity: 0; transform: translateY(6px); pointer-events: none; transition: opacity .5s ease-out, transform .5s ease-out; }
+  .scroll-cue.show { opacity: 1; transform: none; pointer-events: auto; }
+  .scroll-cue:hover { border-color: var(--pink); color: var(--pink); }
+  .scroll-cue svg { width: 16px; height: 16px; shape-rendering: crispEdges; color: var(--gold); animation: cue-bob 1.4s ease-in-out infinite; }
+  @keyframes cue-bob { 50% { transform: translateY(3px); } }
+  .scene-nav.hint .btn { animation: nav-shimmer .9s ease-out 1 both; animation-delay: calc(var(--i) * .16s); }
+  @keyframes nav-shimmer { 30% { background: var(--pink); color: oklch(12% 0.04 290); } }
+  .scene-nav.hint .btn:nth-child(2) .nav-tip { animation: tip-peek 2.8s ease-out .8s 1 both; }
+  @keyframes tip-peek { 0%, 100% { max-width: 0; opacity: 0; margin-left: 0; } 15%, 80% { max-width: 140px; opacity: 1; margin-left: 10px; } }
+  @media (max-width: 700px) { .scroll-cue { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .scroll-cue svg, .scene-nav.hint .btn, .scene-nav.hint .btn:nth-child(2) .nav-tip { animation: none; } }

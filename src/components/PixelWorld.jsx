@@ -9,6 +9,7 @@ const ext = { target: '_blank', rel: 'noopener noreferrer' }
 const ICONS = {
   intro: ['....X....', '...XXX...', '..XXXXX..', '.XXXXXXX.', 'XXXXXXXXX', '.X.....X.', '.X.XXX.X.', '.X.X.X.X.', '.XXX.XXX.'],
   projects: ['..X...X..', '...X.X...', 'XXXXXXXXX', 'X.....XX.', 'X.....X.X', 'X.....XX.', 'X.....X.X', 'XXXXXXXXX', '.X.....X.'],
+  down: ['.........', '.........', 'XXXXXXXXX', '.XXXXXXX.', '..XXXXX..', '...XXX...', '....X....', '.........', '.........'],
   left: ['.........', '.....X...', '....XX...', '...XXX...', '..XXXX...', '...XXX...', '....XX...', '.....X...', '.........'],
   right: ['.........', '...X.....', '...XX....', '...XXX...', '...XXXX..', '...XXX...', '...XX....', '...X.....', '.........'],
   details: ['.XXXXXXX.', 'X.......X', '.XXXXXXX.', '.X.....X.', '.X.XXX.X.', '.X.....X.', '.X.XX..X.', '.XXXXXXX.', 'X.......X'],
@@ -39,6 +40,22 @@ function PixelIcon({ rows }) {
 }
 function SceneNav() {
   const [current, setCurrent] = useState('intro')
+  const [hint, setHint] = useState(false)
+  // Invitation: a few seconds after landing, if nobody has scrolled or used the nav yet.
+  useEffect(() => {
+    let done = false
+    const dismiss = () => { done = true; setHint(false) }
+    const timer = setTimeout(() => { if (!done && window.scrollY < 40) setHint(true) }, 3000)
+    const onScroll = () => { if (window.scrollY > 40) dismiss() }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('wheel', dismiss, { passive: true })
+    window.addEventListener('keydown', dismiss)
+    return () => { clearTimeout(timer); window.removeEventListener('scroll', onScroll); window.removeEventListener('wheel', dismiss); window.removeEventListener('keydown', dismiss) }
+  }, [])
+  const go = id => {
+    setHint(false)
+    window.scrollTo({ top: sceneTop(id), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+  }
   useEffect(() => {
     const onScroll = () => {
       const probe = window.scrollY + window.innerHeight * .35
@@ -49,14 +66,17 @@ function SceneNav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
   return (
-    <nav className="scene-nav" aria-label="Scenes">
-      {SCENES.map(s => (
-        <button key={s.id} type="button" className="btn" aria-label={s.label} aria-current={current === s.id}
-          onClick={() => window.scrollTo({ top: sceneTop(s.id), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })}>
+    <nav className={`scene-nav${hint ? ' hint' : ''}`} aria-label="Scenes">
+      {SCENES.map((s, i) => (
+        <button key={s.id} type="button" className="btn" aria-label={s.label} aria-current={current === s.id} style={{ '--i': i }}
+          onClick={() => go(s.id)}>
           <PixelIcon rows={ICONS[s.id]} />
           <span className="nav-tip">{s.label}</span>
         </button>
       ))}
+      <button type="button" className={`scroll-cue${hint ? ' show' : ''}`} tabIndex={hint ? 0 : -1} aria-hidden={!hint} onClick={() => go('projects')}>
+        <PixelIcon rows={ICONS.down} /> <span>Scroll · or pick a scene</span>
+      </button>
     </nav>
   )
 }
