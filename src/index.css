@@ -116,21 +116,16 @@
   .remote { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 8px; }
   .hero-inner > .hint { display: block; width: fit-content; margin-left: auto; margin-right: auto; }
   /* call to action under the remote: gold, with a pointer bobbing up at the screens */
-  .hero-inner > .hint { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--gold); padding: 7px 14px;
+  .hero-inner > .hint, .work-hint { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--gold); padding: 7px 14px;
     border: 2px solid oklch(85% 0.13 82 / .45); background: oklch(11% 0.04 290 / .92); }
-  .hint svg, .kicker svg { width: 14px; height: 14px; flex: none; shape-rendering: crispEdges; animation: cue-bob 1.4s ease-in-out infinite; }
+  .hint svg { width: 14px; height: 14px; flex: none; shape-rendering: crispEdges; animation: cue-bob 1.4s ease-in-out infinite; }
   .hero-inner > .hint svg { animation-name: point-up; }
   @keyframes point-up { 50% { transform: translateY(-3px); } }
-  /* scene labels: say what the screens are before anyone has to guess */
-  .kicker { margin: 26px 0 0; font-family: "Silkscreen", monospace; font-size: 15px; color: var(--gold); text-transform: uppercase; letter-spacing: .12em;
-    text-shadow: 0 2px 0 oklch(8% 0.03 290), 0 0 10px oklch(8% 0.03 290); }
-  .kicker span { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-family: "Space Grotesk", sans-serif; font-size: 14px; color: var(--ink-2); text-transform: none; letter-spacing: 0; }
-  .work-kicker { position: absolute; top: 20px; left: 24px; z-index: 2; margin: 0; padding: 10px 16px 12px; text-shadow: none;
-    background: var(--plate); border: 2px solid var(--ui-border); border-radius: 8px; box-shadow: 0 4px 0 0 var(--ui-edge); }
+  .work-hint { position: absolute; top: 20px; left: 24px; z-index: 2; margin: 0; }
   /* until the first screen is opened, the name plates breathe gold so the sets read as clickable */
   .nudge .tv-label { animation: plate-call 2.4s ease-in-out infinite; }
   @keyframes plate-call { 50% { border-color: var(--gold); box-shadow: 0 3px 0 0 var(--ui-edge), 0 0 12px oklch(85% 0.13 82 / .45); } }
-  @media (prefers-reduced-motion: reduce) { .nudge .tv-label, .hint svg, .kicker svg { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .nudge .tv-label, .hint svg { animation: none; } }
   /* readable strip: what the three screens are showing */
   .now { width: min(1200px, 100% - 32px); margin: 0 auto; padding: 40px 0 72px;
     display: grid; gap: 32px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -144,7 +139,7 @@
   @media (max-width: 860px) { .now { grid-template-columns: 1fr; } }
 
   /* ---------- Wooden beam divider ---------- */
-  .beam-wrap { position: relative; padding-bottom: 12px; }
+  .beam-wrap { position: relative; }
   #beam { width: 100%; height: auto; }
   #sign { margin: -34px auto 0; position: relative; }
 
@@ -154,6 +149,9 @@
   .work-scene.fit { height: 100svh; min-height: 560px; padding: var(--wtop, 60px) 0 0; }
   #space { position: absolute; inset: 0; width: 100%; height: 100%; }
   .work-scene .work-inner { position: relative; z-index: 1; }
+  /* no hard edge under the sign: the page's night fades into open space */
+  .work-scene::before { content: ""; position: absolute; inset: 0 0 auto; height: 140px; z-index: 0; pointer-events: none;
+    background: linear-gradient(var(--night-deep), transparent); }
   .scope { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); opacity: 0; transition: opacity .2s; pointer-events: none; }
   .wtv:hover .scope, .wtv:focus-visible .scope { opacity: 1; }
   /* work CRTs: same sets as the hero, floating over the campfire in career order, Insight raised */
@@ -220,7 +218,7 @@
   .scene-nav .btn[aria-current="true"]::before { content: "▶"; position: absolute; left: -14px; font-size: 10px; color: var(--pink); animation: nav-blink 1s steps(1) infinite; }
   @keyframes nav-blink { 50% { opacity: 0; } }
   .scene-nav .nav-tip { font-size: 9px; letter-spacing: .08em; white-space: nowrap; line-height: 1; }
-  @media (max-width: 1440px) and (min-width: 701px) { .hero-inner, .now, .work-inner { padding-left: 96px; } .work-kicker { left: 112px; } }
+  @media (max-width: 1440px) and (min-width: 701px) { .hero-inner, .now, .work-inner { padding-left: 96px; } .work-hint { left: 112px; } }
   @media (max-width: 700px) {
     /* phones: the scene nav is a solid bottom bar, so reading text never shows through between the buttons */
     .scene-nav { top: auto; bottom: 0; left: 0; right: 0; transform: none; flex-direction: row; justify-content: center;
@@ -234,6 +232,8 @@
     .hero .links { display: grid; grid-template-columns: 1fr 1fr; }
     .stage .tv-label small { display: none; }          /* captions carry the name; the strip below carries the rest */
     .scroll-cue { display: none; }
+    .work-hint { left: 16px; }
+    .warp { top: 78px; }
     .scene-nav .btn[aria-current="true"]::before { display: none; }
     .scene-nav .btn { width: 76px; }
   }

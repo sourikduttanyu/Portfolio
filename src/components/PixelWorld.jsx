@@ -158,7 +158,7 @@ export default function PixelWorld() {
       <section className="work" aria-labelledby="work-h">
         <div className="work-scene" id="scene">
           <canvas id="space" aria-hidden="true" />
-          <div className="kicker work-kicker">Work experience <span><PixelIcon rows={ICONS.down} />Click a screen for details</span></div>
+          <p className="hint work-hint"><PixelIcon rows={ICONS.down} />Click a screen for details</p>
           <div className="work-inner">
             <h2 id="work-h" className="sr-only">Work experience</h2>
             <div className="lcds" id="lcds" />
