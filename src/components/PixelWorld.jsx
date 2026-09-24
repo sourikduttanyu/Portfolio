@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
+import Lenis from 'lenis'
+import 'lenis/dist/lenis.css'
 import { mountWorld } from '../pixel/world'
 import { projects } from '../data/projects'
 import { experience } from '../data/experience'
@@ -33,25 +35,36 @@ const sceneTop = id => {
   const nowTop = document.getElementById('now').getBoundingClientRect().top + y
   return Math.min(Math.max(stage, nowBottom - window.innerHeight + 24), nowTop - 8)   // too tall to fit: start at its top
 }
+// Lenis eases wheel/trackpad scrolling (touch stays native); null under reduced motion.
+let lenis = null
 // Camera-like glide between scenes: duration grows with distance so the journey (beam, vine,
 // planets) is actually seen; eased in and out; any wheel/touch/key hands control back.
-let glideRaf = 0
 function glide(top) {
-  cancelAnimationFrame(glideRaf)
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, top); return }
+  if (!lenis) { window.scrollTo(0, top); return }
   // Peak speed of the cubic ease is 1.5x the average; keep it near 700px/s (~12px per 60Hz frame) so text stays legible in passing.
-  const from = window.scrollY, dist = top - from, dur = Math.min(4500, Math.max(1000, 1.5 * Math.abs(dist) / .7)), t0 = performance.now()
+  const dur = Math.min(4500, Math.max(1000, 1.5 * Math.abs(top - window.scrollY) / .7))
   const ease = k => (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
-  const stop = () => { cancelAnimationFrame(glideRaf); off() }
+  const stop = () => { lenis.scrollTo(window.scrollY, { immediate: true }); off() }
   const off = () => ['wheel', 'touchstart', 'keydown'].forEach(e => window.removeEventListener(e, stop))
   ;['wheel', 'touchstart', 'keydown'].forEach(e => window.addEventListener(e, stop, { passive: true }))
-  const step = now => {
-    const k = Math.min(1, (now - t0) / dur)
-    window.scrollTo(0, from + dist * ease(k))
-    if (k < 1) glideRaf = requestAnimationFrame(step); else off()
-  }
-  document.documentElement.style.scrollBehavior = 'auto'                  // our own easing, not the browser's
-  glideRaf = requestAnimationFrame(step)
+  lenis.scrollTo(top, { duration: dur / 1000, easing: ease, force: true, onComplete: off })
+}
+// Gentle snap (mouse/trackpad only): when scrolling comes to rest with a scene's top just
+// off the viewport, settle onto it. Never mid-scene; snapping under a thumb feels like a fight.
+function snapToScenes() {
+  if (!matchMedia('(pointer: fine)').matches) return
+  let timer = 0, snapping = false
+  lenis.on('scroll', () => {
+    clearTimeout(timer)
+    if (snapping) return
+    timer = setTimeout(() => {
+      const y = window.scrollY, zone = window.innerHeight * .18
+      const top = SCENES.map(s => sceneTop(s.id)).find(t => Math.abs(t - y) > 6 && Math.abs(t - y) < zone)
+      if (top === undefined) return
+      snapping = true
+      lenis.scrollTo(top, { duration: .7, onComplete: () => { snapping = false } })
+    }, 220)
+  })
 }
 function PixelIcon({ rows }) {
   return (
@@ -109,7 +122,18 @@ function SceneNav() {
 
 export default function PixelWorld() {
   const root = useRef(null)
-  useEffect(() => mountWorld(root.current, { projects, jobs: experience }), [])
+  useEffect(() => {
+    let raf = 0
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      lenis = new Lenis({ lerp: .1, anchors: true })
+      const loop = t => { lenis.raf(t); raf = requestAnimationFrame(loop) }
+      raf = requestAnimationFrame(loop)
+      snapToScenes()
+    }
+    // the world reads scroll speed to streak the rain while you move
+    const unmount = mountWorld(root.current, { projects, jobs: experience, scroll: { get velocity() { return lenis?.velocity ?? 0 } } })
+    return () => { unmount(); cancelAnimationFrame(raf); lenis?.destroy(); lenis = null }
+  }, [])
 
   return (
     <div ref={root}>
@@ -176,7 +200,7 @@ export default function PixelWorld() {
         </div>
       </section>
 
-      <dialog className="closeup" id="closeup" aria-labelledby="cuName">
+      <dialog className="closeup" id="closeup" aria-labelledby="cuName" data-lenis-prevent>
         <div className="cu-wrap">
           <div className="cu-set">
             <canvas id="cuTV" aria-hidden="true" />

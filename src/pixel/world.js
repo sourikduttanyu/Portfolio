@@ -3,7 +3,7 @@
 // with nearest-neighbour, so all art (and any real clip) is genuinely pixelated.
 // mountWorld() returns a cleanup that stops the loop and removes listeners and nodes.
 
-export function mountWorld(root, { projects, jobs }) {
+export function mountWorld(root, { projects, jobs, scroll = { velocity: 0 } }) {
 const $id = id => root.querySelector('#' + id);
 const esc = v => String(v).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const offs = [];
@@ -1489,10 +1489,12 @@ function drawSky(t) {
   if (day < 1) {
     kg.fillStyle = f > .3 ? '#b8aef088' : '#6b5fa844';                   // rain thins out as the sun comes up
     const n = Math.round(drops.length * (1 - day));
+    const sv = Math.min(1, Math.abs(scroll.velocity) / 40);                 // scrolling streaks the rain: longer, faster, more slanted
+    const len = 3 + Math.round(sv * 5), lean = .25 + sv * .35;
     for (let k = 0; k < drops.length; k++) {
       const d = drops[k];
-      if (k < n) kg.fillRect(Math.round(d.x), Math.round(d.y), 1, 3);
-      if (!reduce) { d.y += d.v; d.x -= d.v * .25; if (d.y > SKY_H) { d.y = -3; d.x = Math.random() * (SKY_W + 30); } }
+      if (k < n) for (let j = 0; j < len; j++) kg.fillRect(Math.round(d.x + (len - 1 - j) * lean), Math.round(d.y - len + j), 1, 1);
+      if (!reduce) { const v = d.v * (1 + sv * 1.5); d.y += v; d.x -= v * lean; if (d.y > SKY_H + len) { d.y = -3; d.x = Math.random() * (SKY_W + 30); } }
     }
   }
 }
