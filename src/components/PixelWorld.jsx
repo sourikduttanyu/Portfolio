@@ -67,6 +67,11 @@ function SceneNav() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
   return (
+    <>
+    <button type="button" className={`scroll-cue${hint ? ' show' : ''}`} tabIndex={hint ? 0 : -1} aria-hidden={!hint}
+      onClick={() => { setHint(false); const now = document.getElementById('now'); window.scrollTo({ top: now.getBoundingClientRect().top + window.scrollY - 16, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }) }}>
+      <PixelIcon rows={ICONS.down} /><span>Scroll for projects</span>
+    </button>
     <nav className={`scene-nav${hint ? ' hint' : ''}`} aria-label="Scenes">
       {SCENES.map((s, i) => (
         <button key={s.id} type="button" className="btn" aria-label={s.label} aria-current={current === s.id} style={{ '--i': i }}
@@ -75,10 +80,8 @@ function SceneNav() {
           <span className="nav-tip">{s.label}</span>
         </button>
       ))}
-      <button type="button" className={`scroll-cue${hint ? ' show' : ''}`} tabIndex={hint ? 0 : -1} aria-hidden={!hint} onClick={() => go('projects')}>
-        <PixelIcon rows={ICONS.down} /> <span>Scroll · or pick a scene</span>
-      </button>
     </nav>
+    </>
   )
 }
 
