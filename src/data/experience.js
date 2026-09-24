@@ -7,7 +7,6 @@ export const experience = [
   {
     slug: 'insight',
     company: 'Insight Enterprises',
-    sticker: { text: 'IN', bg: '#d40e8c', fg: '#ffffff' },    // Insight red-violet
     role: 'Software Engineer, Cloud & AI Platform',
     period: 'Jan 2023 – Nov 2023',
     work: [
@@ -51,7 +50,6 @@ export const experience = [
   {
     slug: 'hanu',
     company: 'Hanu Software',
-    sticker: { text: 'HANU', bg: '#f7941d', fg: '#1a1a1a' },  // Hanu orange (exact hex unpublished)
     role: 'Software Engineer, API & Cloud Security',
     period: 'Jan 2022 – Jan 2023',
     work: [
@@ -80,7 +78,6 @@ export const experience = [
   {
     slug: 'ey',
     company: 'Ernst & Young',
-    sticker: { text: 'EY', bg: '#ffe600', fg: '#2e2e38' },
     role: 'Software Engineer Intern',
     period: 'May 2021 – Jul 2021',
     work: [

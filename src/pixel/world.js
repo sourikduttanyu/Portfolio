@@ -22,7 +22,7 @@ const PROJECTS = projects.map(p => {
 });
 const JOBS = jobs.map(j => ({ id: j.slug, co: j.company, role: j.role, when: j.period,
   mono: j.company.split(' ').filter(w => /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 2),
-  sticker: j.sticker, work: j.work.map(w => [w.name, w.text]) }));
+  work: j.work.map(w => [w.name, w.text]) }));
 
 /* ---------------- pixel helpers ---------------- */
 const C = {
@@ -1558,26 +1558,33 @@ const lcds = WORK_ORDER.map((id, n) => {
   ['mouseleave', 'blur'].forEach(ev => d.addEventListener(ev, () => { entry.tuned = false; }));
   return entry;
 });
-// Company sticker slapped on the casing's top-left corner, tilted a pixel per few columns,
-// initials in a 3x5 pixel font. Drawn under the campfire light pass so it's lit like the set.
+// Company emblem mounted on the casing's top-left corner, like a maker's badge: pixel versions
+// of each brand's mark (Insight wordmark on red-violet, HANU on orange, EY's yellow beam over EY).
 const GLYPH = { E: ['111', '100', '110', '100', '111'], Y: ['101', '101', '010', '010', '010'], N: ['101', '111', '111', '111', '101'],
   S: ['111', '100', '111', '001', '111'], I: ['111', '010', '010', '010', '111'], T: ['111', '010', '010', '010', '010'],
-  H: ['101', '101', '111', '101', '101'], A: ['010', '101', '111', '101', '101'], U: ['101', '101', '101', '101', '111'] };
-function drawSticker(g, st) {
-  if (!st) return;
-  const w = st.text.length * 4 + 3, h = 9, x0 = 5, y0 = 23;
-  const tilt = x => Math.floor(x / 5);                                      // one pixel down every five columns
-  for (let x = -1; x <= w; x++) for (let y = -1; y <= h; y++) {
-    const edge = x < 0 || y < 0 || x === w || y === h;
-    g.fillStyle = edge ? 'rgba(20,16,30,.55)' : (x === 0 || y === 0) ? 'rgba(255,255,255,.35)' : st.bg;
-    if (!edge && !(x === 0 || y === 0)) g.fillStyle = st.bg;
-    g.fillRect(x0 + x, y0 + y + tilt(x + 1), 1, 1);
-  }
-  g.fillStyle = 'rgba(255,255,255,.3)'; for (let x = 1; x < w - 1; x++) g.fillRect(x0 + x, y0 + 1 + tilt(x + 1), 1, 1);   // glossy top edge
-  [...st.text].forEach((ch, i) => (GLYPH[ch] || []).forEach((row, ry) => [...row].forEach((b, rx) => {
-    if (b === '1') { const x = 2 + i * 4 + rx; g.fillStyle = st.fg; g.fillRect(x0 + x, y0 + 2 + ry + tilt(3 + i * 4), 1, 1); }
+  H: ['101', '101', '111', '101', '101'], A: ['010', '101', '111', '101', '101'], U: ['101', '101', '101', '101', '111'],
+  G: ['111', '100', '101', '101', '111'] };
+function drawWord(g, word, x0, y0, col) {
+  [...word].forEach((ch, i) => (GLYPH[ch] || []).forEach((row, ry) => [...row].forEach((b, rx) => {
+    if (b === '1') { g.fillStyle = col; g.fillRect(x0 + i * 4 + rx, y0 + ry, 1, 1); }
   })));
-  g.fillStyle = 'rgba(20,16,30,.35)'; g.fillRect(x0 + w - 2, y0 + tilt(w - 1) - 1, 2, 1);          // a corner peeling up
+}
+function badge(g, x0, y0, w, h, bg, hi) {                               // outlined plate with a lit top edge
+  g.fillStyle = 'rgba(20,16,30,.85)'; g.fillRect(x0 - 1, y0, w + 2, h); g.fillRect(x0, y0 - 1, w, h + 2);
+  g.fillStyle = bg; g.fillRect(x0, y0, w, h);
+  g.fillStyle = hi; g.fillRect(x0 + 1, y0, w - 2, 1);
+  g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(x0 + 1, y0 + h - 1, w - 2, 1);
+}
+function drawEmblem(g, id) {
+  if (id === 'insight') { badge(g, 5, 20, 31, 9, '#d40e8c', '#f25ab4'); drawWord(g, 'INSIGHT', 7, 22, '#ffffff'); }
+  else if (id === 'hanu') { badge(g, 5, 20, 19, 9, '#f7941d', '#ffc070'); drawWord(g, 'HANU', 7, 22, '#1a1a1a'); }
+  else if (id === 'ey') {
+    // EY on dark: white EY on charcoal, the yellow beam rising off the top-right corner
+    badge(g, 5, 21, 11, 8, '#2e2e38', '#4a4a58');
+    for (let r = 0; r < 4; r++) for (let x = 0; x < 13; x++) { g.fillStyle = r === 0 ? '#fff6a0' : '#ffe600'; g.fillRect(9 + x + (3 - r) * 2, 15 + r, 1, 1); }
+    g.fillStyle = 'rgba(20,16,30,.85)'; for (let x = -1; x < 14; x++) { g.fillRect(9 + x + 6, 14, 1, 1); g.fillRect(9 + x, 19, 1, 1); }
+    drawWord(g, 'EY', 7, 23, '#ffffff');
+  }
 }
 function setWorkChannel(l, idx, t) {
   l.idx = idx; l.switchAt = t;
@@ -1585,7 +1592,8 @@ function setWorkChannel(l, idx, t) {
   ch.from = knobAngle(ch, t); ch.to = ch.from + Math.PI / 3 + l.n * .3; ch.t0 = t; ch.dur = dur;
   fine.from = knobAngle(fine, t); fine.to = fine.from - (.3 + hash(l.n, idx) * .6); fine.t0 = t + .06; fine.dur = dur;
   const name = l.j.work[idx][0];
-  l.cap.innerHTML = `<small>${esc(name)}</small>${esc(l.j.co)}<span class="plate-role">${esc(l.j.role)} · <span class="nowrap">${esc(l.j.when)}</span></span>`;
+  l.cap.innerHTML = `<span class="plate-co">${esc(l.j.co)}</span><span class="plate-role">${esc(l.j.role)}</span>`
+    + `<span class="plate-when">${esc(l.j.when)}</span><small class="plate-now">▸ ${esc(name)}</small>`;
   l.d.setAttribute('aria-label', `${esc(l.j.co)}, now showing ${esc(name)}. Open job details`);
   root.querySelectorAll(`#log-${l.j.id} li`).forEach((li, i) => li.classList.toggle('on', i === idx));
 }
@@ -1597,7 +1605,7 @@ function drawLCDs(t) {
     const g = l.g;
     g.clearRect(0, 0, TV_W, TV_H); g.drawImage(TV_FRAME, 0, 0);
     l.knobs.forEach((k, i) => drawKnob(g, KNOBS[i][0], KNOBS[i][1], knobAngle(k, t)));
-    drawSticker(g, l.j.sticker);
+    drawEmblem(g, l.j.id);
     g.save(); g.globalCompositeOperation = 'source-atop';               // campfire underlight
     const wl = g.createLinearGradient(0, TV_H * .55, 0, TV_H);
     wl.addColorStop(0, 'rgba(255,140,60,0)'); wl.addColorStop(1, `rgba(255,140,60,${(.3 * FIRE.level).toFixed(3)})`);
