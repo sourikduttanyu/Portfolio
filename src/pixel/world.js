@@ -386,7 +386,8 @@ function flip(dir) {
 }
 $id('prev').onclick = () => flip(-1);
 $id('next').onclick = () => flip(1);
-on(window, 'keydown', e => { if (e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.key === 'ArrowRight') flip(1); if (e.key === 'ArrowLeft') flip(-1); });
+on(window, 'keydown', e => { if (e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.key === 'ArrowRight') { flip(1); press('next'); } if (e.key === 'ArrowLeft') { flip(-1); press('prev'); } });
+function press(id) { const b = $id(id); b.classList.add('pressed'); setTimeout(() => b.classList.remove('pressed'), 130); }
 
 function drawTVs(t) {
   const staticFor = reduce ? 0 : .38;
@@ -414,7 +415,7 @@ function drawTVs(t) {
 // the river with rain-broken reflections, a Brooklyn Bridge tower with its cable web, and
 // DUMBO rooftops with wooden water towers, a fire escape and Jane's Carousel on the water.
 const sky = $id('sky'), kg = sky.getContext('2d');
-let SKY_W = 320, SKY_H = 180, HY = 136, bk = null, drops = [];
+let SKY_W = 320, SKY_H = 180, HY = 136, PY = 150, bk = null, drops = [];
 // Two palettes over the same hand-placed city. Night: neon rain, warm windows, violet haze.
 // Dawn: sun low in the east-southeast, Manhattan's faces catch it; glass throws the sky back.
 const NIGHT = {
@@ -472,10 +473,12 @@ function buildCity(P, W, H) {
   const layer = () => { const c = document.createElement('canvas'); c.width = W; c.height = H; return [c, c.getContext('2d')]; };
   const [skyC, sg] = layer(), [far, fg] = layer(), [mid, mg] = layer(), [br, bg2] = layer(), [fore, og] = layer();
   const K = H / 180;                                                  // scale heights with the canvas
+  const rods = {};
   const dot = (g, x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
   const box = (g, x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
   const dither = (x, y, t) => bayer(x, y) < t;
-  const tint = (c, rgb, k) => { const [r, g, b] = hex(c.slice(0, 7)); return `rgb(${r + (rgb[0] - r) * k | 0},${g + (rgb[1] - g) * k | 0},${b + (rgb[2] - b) * k | 0})`; };
+  const rgbOf = c => c.startsWith('rgb') ? c.match(/\d+/g).slice(0, 3).map(Number) : hex(c.slice(0, 7));
+  const tint = (c, rgb, k) => { const [r, g, b] = rgbOf(c); return `rgb(${r + (rgb[0] - r) * k | 0},${g + (rgb[1] - g) * k | 0},${b + (rgb[2] - b) * k | 0})`; };
 
   // sky: dithered bands, plus a glow pooled on the horizon
   for (let y = 0; y < HY + 20; y++) for (let x = 0; x < W; x++) {
@@ -538,7 +541,7 @@ function buildCity(P, W, H) {
         dot(g, xx, yy, col(xx > x + (w >> 1) - 2 ? P.side : yy === y ? P.rim : P.face));
       if (i < 2) for (let yy = y + 2; yy < y + h - 1; yy += 2) { dot(g, x - 1, yy, col(P.win[0])); dot(g, x + 1, yy, col(P.win[0])); }
     });
-    box(g, x, y - 12, 1, 12, col(P.side)); dot(g, x, y - 13, P.day ? col(P.side) : '#ff5c7a');
+    box(g, x, y - 12, 1, 12, col(P.side)); dot(g, x, y - 13, P.day ? col(P.side) : '#ff5c7a'); rods.esb = [x, y - 13];
   }
   function chrysler(g, xf, dk) {
     const col = c => tint(c, P.haze, dk), x = Math.round(xf * W), h = Math.round(40 * K), top = HY - h;
@@ -562,7 +565,7 @@ function buildCity(P, W, H) {
         dot(g, xx, y, c);
       }
     }
-    box(g, x, top - 18, 1, 18, P.rim); dot(g, x, top - 19, P.day ? '#ffffff' : '#ff5c7a');
+    box(g, x, top - 18, 1, 18, P.rim); dot(g, x, top - 19, P.day ? '#ffffff' : '#ff5c7a'); rods.wtc = [x, top - 19];
   }
   function spruce(g, xf) {                                                  // 8 Spruce: rippled stainless skin
     const x0 = Math.round(xf * W), w = 12, h = Math.round(74 * K), top = HY - h;
@@ -649,46 +652,63 @@ function buildCity(P, W, H) {
     for (let i = 0; i <= n; i++) { const x = top[0] + i, y = Math.round(top[1] + (deck - top[1]) * i / n); if (y > cableY(x) + 1) dot(bg2, x, y, P.stay); }
   }
 
-  // --- DUMBO: brick warehouses, parapets, arched windows, shadow sides, water towers ---
-  const blocks = [[0, 34, 12], [34, 30, 20], [64, 40, 8], [104, 26, 16], [130, 44, 10], [174, 30, 22], [204, 22, 6, 'carousel'], [226, 38, 14], [264, 30, 24], [294, 26, 11]];
-  const tanks = [];
-  blocks.forEach(([x0, w, dy, kind], i) => {
-    if (kind === 'carousel') {                                             // Jane's Carousel: glass pavilion on the water
-      const cy = HY + 2, C = P.carousel;
-      box(og, x0, cy - 1, w, 12, P.brickSide); box(og, x0 + 1, cy, w - 2, 9, C.glass);
-      for (let k = 0; k < 6; k++) dot(og, x0 + 3 + k * 3, cy + 5 + (k % 2), C.horse);
-      box(og, x0 + 1, cy, w - 2, 1, C.top); box(og, x0, cy + 10, w, H - cy - 10, P.brickLo);
-      return;
-    }
-    const roofY = HY + dy, side = 4;
-    for (let y = roofY; y < H; y++) for (let x = x0; x < x0 + w; x++) {
-      const onSide = x >= x0 + w - side;
-      let c = onSide ? P.brickSide : (y - roofY) % 3 === 0 ? P.brickLo : ((x + (Math.floor((y - roofY) / 3) % 2) * 2) % 5 === 0 ? P.brickLo : P.brick);
-      if (!onSide && x < x0 + 2) c = P.brickHi;
+  // --- Brooklyn Bridge Park promenade: bulkhead, iron railing, wet boardwalk, lamps, benches,
+  //     Jane's Carousel by the bridge, and a DUMBO warehouse framing the right edge ---
+  const Q = P.day
+    ? { cap: '#d8c4b0', face: '#8a7478', rail: '#2a2438', railHi: '#8a7a9a', plank: '#8a6a58', plankLo: '#6e5244', plankHi: '#a88470', seam: '#54403a', pole: '#2a2438', poleHi: '#6a5a78', lantern: '#e8d8c0', bench: '#5a4038', brickRim: '#ffd9a0' }
+    : { cap: '#3a3054', face: '#1a1430', rail: '#0c0918', railHi: '#3a3060', plank: '#231824', plankLo: '#1a1120', plankHi: '#33243a', seam: '#120b16', pole: '#0c0918', poleHi: '#3a3060', lantern: '#ffe2a8', bench: '#140d18', brickRim: '#ff6fa0' };
+  box(og, 0, PY, W, 2, Q.cap); box(og, 0, PY + 2, W, 3, Q.face);             // bulkhead
+  for (let y = PY + 5; y < H; y++) {                                       // boardwalk: planks widen toward the viewer
+    const depth = (y - PY - 5) / (H - PY - 5), rowH = 2 + Math.floor(depth * 4);
+    const seamRow = Math.floor(Math.pow(depth, .7) * 14) !== Math.floor(Math.pow((y + 1 - PY - 5) / (H - PY - 5), .7) * 14);
+    for (let x = 0; x < W; x++) {
+      let c = seamRow ? Q.seam : (x + Math.floor(y / rowH) * 7) % 23 === 0 ? Q.seam : hash(x, y) < .12 ? Q.plankLo : depth < .15 ? Q.plankHi : Q.plank;
       dot(og, x, y, c);
     }
-    box(og, x0, roofY - 2, w, 2, P.parapet); box(og, x0 + w - side, roofY - 2, side, 2, P.brickSide);
-    for (let y = roofY + 4; y < H - 3; y += 7) for (let x = x0 + 3; x < x0 + w - side - 3; x += 5) {   // arched windows
-      const lit = hash(x, y + i) < P.foreWinP;
-      box(og, x, y + 1, 3, 4, lit ? P.foreWin : P.winDark); dot(og, x + 1, y, lit ? P.foreWin : P.winDark);
-      box(og, x, y + 5, 3, 1, P.parapet);
-    }
-    if (i % 3 !== 1) tanks.push([x0 + 5 + (i * 7) % Math.max(1, w - 16), roofY - 2]);
-    if (i === 3) for (let y = roofY + 3; y < H - 2; y += 6) {              // fire escape
-      box(og, x0 + w - side - 10, y, 9, 1, P.fire);
-      for (let k = 0; k < 5; k++) dot(og, x0 + w - side - 9 + (Math.floor(y / 6) % 2 ? k : 4 - k), y + 1 + k, P.fire);
-    }
+  }
+  for (let x = 0; x < W; x++) {                                            // railing along the water
+    dot(og, x, PY - 6, Q.railHi); dot(og, x, PY - 5, Q.rail); dot(og, x, PY - 2, Q.rail);
+    if (x % 3 === 0) box(og, x, PY - 4, 1, 4, Q.rail);
+  }
+  const lamps = [.3, .52, .74].map(f => Math.round(f * W));
+  lamps.forEach(lx => {                                                    // NYC park lamp: fluted pole, crook, lantern
+    const base = PY + 10, top = PY - 26;
+    box(og, lx - 1, base - 2, 3, 3, Q.pole);
+    for (let y = top; y < base - 2; y++) { dot(og, lx, y, Q.pole); if (y % 5 === 0) dot(og, lx - 1, y, Q.poleHi); }
+    box(og, lx - 2, top - 1, 5, 1, Q.pole); box(og, lx - 1, top - 5, 3, 4, Q.lantern); box(og, lx - 1, top - 6, 3, 1, Q.pole); dot(og, lx, top - 7, Q.pole);
   });
-  tanks.forEach(([cx, ry]) => {                                           // water towers: cylinder shading, hoops, cone
-    const T = P.tank;
-    for (let y = 1; y <= 6; y++) { dot(og, cx + 1, ry - y, T[3]); dot(og, cx + 7, ry - y, T[3]); if (y === 3) box(og, cx + 1, ry - y, 7, 1, T[3]); dot(og, cx + 1 + (y % 6), ry - y, T[3]); }
-    for (let y = 0; y < 9; y++) for (let x = 0; x < 9; x++) {
-      const shade = x < 2 ? T[0] : x < 5 ? T[1] : x < 7 ? T[2] : T[3];
-      dot(og, cx + x, ry - 7 - y, (y === 2 || y === 6) ? T[3] : shade);
-    }
-    for (let r = 0; r < 4; r++) for (let x = r; x < 9 - r; x++) dot(og, cx + x, ry - 17 - r, x < 4 ? T[1] : T[2]);
-    dot(og, cx + 4, ry - 21, T[0]);
+  [.41, .63].forEach(f => {                                                // benches
+    const bx = Math.round(f * W), by = PY + 8;
+    box(og, bx, by - 3, 9, 1, Q.bench); box(og, bx, by - 1, 9, 1, Q.bench); dot(og, bx + 1, by, Q.bench); dot(og, bx + 7, by, Q.bench);
   });
+  // Jane's Carousel: glass pavilion on the pier beside the bridge
+  const cx0 = Math.round(W * .15), cw = 30, cy0 = PY - 16, C = P.carousel;
+  box(og, cx0 - 1, cy0 - 3, cw + 2, 3, Q.rail); box(og, cx0, cy0 - 4, cw, 1, Q.railHi);
+  box(og, cx0, cy0, cw, 16, C.glass);
+  for (let x = cx0; x < cx0 + cw; x += 5) box(og, x, cy0, 1, 16, Q.rail);
+  box(og, cx0 + 4, cy0 + 12, cw - 8, 2, C.top);                             // carousel platform (horses animate on top)
+  // DUMBO warehouse, close to camera, framing the right edge
+  const wx = W - 40, wy = HY - 46;
+  for (let y = wy; y < H; y++) for (let x = wx; x < W; x++) {
+    let c = (y - wy) % 3 === 0 ? P.brickLo : (x + (Math.floor((y - wy) / 3) % 2) * 2) % 5 === 0 ? P.brickLo : P.brick;
+    if (x === wx) c = Q.brickRim; else if (x === wx + 1 && y % 2) c = Q.brickRim;  // neon / sunrise rim light
+    dot(og, x, y, c);
+  }
+  box(og, wx, wy - 3, 40, 3, P.parapet);
+  for (let y = wy + 5; y < H - 4; y += 9) for (let x = wx + 6; x < W - 3; x += 9) {
+    const lit = hash(x, y) < .35;
+    box(og, x, y + 1, 5, 6, lit ? P.foreWin : P.winDark); box(og, x + 1, y, 3, 1, lit ? P.foreWin : P.winDark);
+    box(og, x - 1, y + 7, 7, 1, P.parapet); if (lit) box(og, x + 2, y + 1, 1, 6, P.winDark);   // sill + mullion
+  }
+  for (let y = wy + 12; y < PY + 4; y += 9) {                                // fire escape on the near face
+    box(og, wx + 3, y, 14, 1, Q.rail); box(og, wx + 3, y - 3, 1, 3, Q.rail); box(og, wx + 16, y - 3, 1, 3, Q.rail);
+    for (let k = 0; k < 7; k++) dot(og, wx + 4 + (Math.floor(y / 9) % 2 ? k * 2 : 12 - k * 2), y + 1 + k, Q.rail);
+  }
+  const T = P.tank, tcx = W - 26, try_ = wy - 3;                            // water tower on the roof
+  for (let y = 1; y <= 7; y++) { dot(og, tcx + 1, try_ - y, T[3]); dot(og, tcx + 9, try_ - y, T[3]); if (y === 4) box(og, tcx + 1, try_ - y, 9, 1, T[3]); }
+  for (let y = 0; y < 11; y++) for (let x = 0; x < 11; x++) dot(og, tcx + x, try_ - 8 - y, (y === 3 || y === 7) ? T[3] : x < 2 ? T[0] : x < 6 ? T[1] : x < 9 ? T[2] : T[3]);
+  for (let r = 0; r < 5; r++) for (let x = r; x < 11 - r; x++) dot(og, tcx + x, try_ - 20 - r, x < 5 ? T[1] : T[2]);
+  const promenade = { lamps, carousel: [cx0, cy0, cw], Q };
 
   // rim map for lightning: every silhouette pixel with open sky above it
   const [edge, eg] = layer();
@@ -699,12 +719,12 @@ function buildCity(P, W, H) {
   // what the river mirrors: sky + skyline + bridge
   const [mirror, mig] = layer();
   [skyC, far, mid, br].forEach(c => mig.drawImage(c, 0, 0));
-  return { skyC, far, mid, br, fore, edge, mirror, P };
+  return { skyC, far, mid, br, fore, edge, mirror, P, rods, promenade };
 }
 function buildDawnExtras(W) {
   const c = document.createElement('canvas'); c.width = W; c.height = HY + 10; const g = c.getContext('2d');
   // cumulus: overlapping puffs, lit from below by the low sun, dithered edges
-  [[.22, .2, 30], [.47, .12, 22], [.74, .26, 36], [.93, .1, 18], [.08, .34, 20]].forEach(([fx, fy, r]) => {
+  [[.64, .08, 22], [.82, .22, 32], [.97, .1, 16], [.7, .38, 18], [.1, .5, 20]].forEach(([fx, fy, r]) => {
     const cx = Math.round(fx * W), cy = Math.round(fy * HY) + 8;
     for (let y = -r; y <= r / 2; y++) for (let x = -r * 2; x <= r * 2; x++) {
       const v = Math.max(...[[0, 0, 1], [-r * .9, 3, .75], [r * .9, 2, .8], [-r * 1.6, 5, .5], [r * 1.5, 5, .55]].map(([ox, oy, s]) => 1 - Math.hypot((x - ox) / (r * s), (y - oy) / (r * s * .5))));
@@ -726,7 +746,7 @@ const DITHER = Array.from({ length: 17 }, (_, k) => {
 function buildBrooklyn() {
   const hero = sky.parentElement;
   SKY_W = 320; SKY_H = Math.max(160, Math.round(SKY_W * hero.clientHeight / Math.max(1, hero.clientWidth)));
-  sky.width = SKY_W; sky.height = SKY_H; HY = SKY_H - Math.round(SKY_H * .24);
+  sky.width = SKY_W; sky.height = SKY_H; HY = SKY_H - Math.round(SKY_H * .26); PY = HY + Math.round((SKY_H - HY) * .38);
   const mk = () => { const c = document.createElement('canvas'); c.width = SKY_W; c.height = SKY_H; return [c, c.getContext('2d')]; };
   const [dayCv, dg] = mk(), [nightCv, ng] = mk();
   bk = { night: buildCity(NIGHT, SKY_W, SKY_H), dawn: buildCity(DAWN, SKY_W, SKY_H), clouds: buildDawnExtras(SKY_W), dayCv, dg, nightCv, ng };
@@ -736,18 +756,23 @@ function buildBrooklyn() {
    kept low-intensity and under 3 flashes/s (WCAG 2.3.1); off entirely for reduced motion. */
 const storm = { next: 3 + Math.random() * 6, at: -10, bolt: null };
 function makeBolt() {
-  const pts = [[Math.round(SKY_W * (.58 + Math.random() * .36)), 0]], branches = [];   // right of the name/role text
-  const end = HY - 30 + Math.random() * 20;
+  const rods = bk?.night.rods, hitRod = rods && (storm.forceRod || Math.random() < .25);
+  const target = hitRod ? (storm.forceRod === 'esb' ? rods.esb : storm.forceRod === 'wtc' ? rods.wtc : Math.random() < .5 ? rods.wtc : rods.esb) : null;
+  storm.forceRod = null;
+  const pts = [[target ? target[0] + Math.round((Math.random() - .3) * 30) : Math.round(SKY_W * (.58 + Math.random() * .36)), 0]], branches = [];
+  const end = target ? target[1] : HY - 30 + Math.random() * 20;
   while (pts[pts.length - 1][1] < end) {
     const [x, y] = pts[pts.length - 1];
-    pts.push([x + Math.round((Math.random() - .5) * 7), y + 2 + Math.round(Math.random() * 3)]);
+    const pull = target ? (target[0] - x) / Math.max(4, (target[1] - y) / 3) : 0;   // steer toward the rod
+    pts.push([x + Math.round((Math.random() - .5) * 7 + pull), Math.min(end, y + 2 + Math.round(Math.random() * 3))]);
     if (Math.random() < .12 && branches.length < 3) {                      // forks
       const b = [[x, y]], dir = Math.random() < .5 ? -1 : 1;
       for (let k = 0; k < 4 + Math.random() * 6; k++) { const [bx, by] = b[b.length - 1]; b.push([bx + dir * (1 + Math.round(Math.random() * 3)), by + 2 + Math.round(Math.random() * 2)]); }
       branches.push(b);
     }
   }
-  return { pts, branches };
+  if (target) pts.push([target[0], target[1]]);
+  return { pts, branches, target };
 }
 function flashLevel(dt) {
   if (dt < 0) return 0;
@@ -766,6 +791,56 @@ function drawBolt(g, path) {
   g.fillStyle = '#f4f0ff';
   for (let i = 1; i < path.length; i++) line(g, path[i - 1], path[i]);
 }
+// Living promenade: lamp halos, carousel, walkers, rain splashes. (Ferry is drawn on the river.)
+function drawFerry(g, L, t) {
+  const day = L.P.day, tt = reduce ? 0 : t;
+  // ferry: NYC-ferry white/blue, crosses right to left every 40s, wake behind
+  const fk = (tt % 40) / 40, fx = Math.round(SKY_W + 30 - fk * (SKY_W + 70)), fy = HY + 3;
+  for (let i = 0; i < 26; i++) if (hash(i, Math.floor(tt * 6)) < .6 - i / 50) { g.fillStyle = '#e8ecff88'; g.fillRect(fx + 24 + i, fy + 3 + (i % 2), 1, 1); }
+  g.fillStyle = day ? '#f4f4f8' : '#c8c8e0'; g.fillRect(fx, fy, 24, 3);
+  g.fillStyle = '#2a5aa8'; g.fillRect(fx, fy + 2, 24, 1);
+  g.fillStyle = day ? '#e8e8f0' : '#9a9ab8'; g.fillRect(fx + 4, fy - 3, 15, 3);
+  for (let k = 0; k < 5; k++) { g.fillStyle = day ? '#5a6a9a' : '#ffe2a8'; g.fillRect(fx + 5 + k * 3, fy - 2, 2, 1); }
+}
+const walkers = [
+  { speed: 6, dir: 1, y: 3, off: 0, coat: '#ff6fa0', umb: '#ff3d7f' },
+  { speed: 4.5, dir: -1, y: 6, off: 140, coat: '#6fd3ff', umb: '#3de0ff' },
+  { speed: 5.2, dir: 1, y: 9, off: 220, coat: '#ffd66b', umb: '#b48cff' },
+];
+function drawPromenade(g, L, t) {
+  const P = L.P, pm = L.promenade, day = P.day, tt = reduce ? 0 : t;
+  // carousel horses bob and circle under warm light
+  const [cx0, cy0, cw] = pm.carousel;
+  for (let k = 0; k < 6; k++) {
+    const ph = tt * 1.4 + k * (Math.PI / 3), hx = cx0 + 5 + Math.round((Math.sin(ph) * .5 + .5) * (cw - 12)), hy = cy0 + 8 + Math.round(Math.sin(ph * 2) * 1.5);
+    g.fillStyle = Math.cos(ph) > 0 ? '#fff1c4' : '#c8a070'; g.fillRect(hx, hy, 3, 2); g.fillRect(hx + 2, hy - 1, 1, 1); g.fillRect(hx + 1, hy + 2, 1, 2);
+  }
+  // lamp halos (night) with a faint flicker, and their smear on the wet boardwalk
+  if (!day) pm.lamps.forEach((lx, i) => {
+    const ly = PY - 29, k = .8 + .2 * vnoise(tt * 2 + i * 7, i);
+    for (let y = -12; y <= 12; y++) for (let x = -12; x <= 12; x++) {
+      const d = Math.hypot(x, y * 1.1);
+      if (d < 12 && bayer(lx + x, ly + y) < (1 - d / 12) * .5 * k) { g.fillStyle = 'rgba(255,210,140,.35)'; g.fillRect(lx + x, ly + y, 1, 1); }
+    }
+    for (let y = PY + 6; y < SKY_H; y += 2) if (hash(lx, y + Math.floor(tt * 4)) < .6) { g.fillStyle = 'rgba(255,200,130,.35)'; g.fillRect(lx + Math.round(Math.sin(y + tt) * 1), y, 1, 1); }
+  });
+  // walkers: umbrellas at night, joggers at sunrise; two-frame legs
+  walkers.forEach((w, i) => {
+    const span = SKY_W + 20, x = Math.round(((w.off + tt * w.speed * w.dir) % span + span) % span) - 10, y = PY + 4 + w.y;
+    const step = Math.floor(tt * (day ? 6 : 4) + i) % 2;
+    g.fillStyle = day ? '#3a2438' : '#07050c';
+    g.fillRect(x, y - 5, 2, 4); g.fillRect(x, y - 7, 2, 2);                         // body, head
+    g.fillRect(x + (step ? 0 : 1), y - 1, 1, 2); g.fillRect(x + (step ? 1 : 0), y - 1, 1, 2);
+    g.fillStyle = w.coat; g.fillRect(x, y - 4, 2, 1);
+    if (!day) { g.fillStyle = w.umb; g.fillRect(x - 2, y - 10, 6, 1); g.fillRect(x - 1, y - 11, 4, 1); g.fillStyle = '#07050c'; g.fillRect(x + 1, y - 9, 1, 2); }
+  });
+  // rain splashes on the boardwalk (night only)
+  if (!day && !reduce) for (let k = 0; k < 10; k++) {
+    const sx = Math.floor(hash(k, Math.floor(t * 8)) * SKY_W), sy = PY + 6 + Math.floor(hash(k + 20, Math.floor(t * 8)) * (SKY_H - PY - 6));
+    g.fillStyle = '#b8aef066'; g.fillRect(sx - 1, sy, 1, 1); g.fillRect(sx + 1, sy, 1, 1); g.fillRect(sx, sy - 1, 1, 1);
+  }
+}
+
 /* Day/night: `mode.day` is the target; the dissolve runs 1.6s in either direction. */
 const mode = { day: false, from: 0, at: -10 };
 const DISSOLVE = 1.6;
@@ -774,24 +849,32 @@ function dayAmount(t) {
   const e = 1 - Math.pow(1 - p, 3);
   return mode.from + ((mode.day ? 1 : 0) - mode.from) * e;
 }
-// The river: the city mirrored and squashed, each row nudged by a ripple, then tinted.
+// The river: a Manhattan shoreline, then the city mirrored below it as broken, fading ripple
+// streaks (alternate rows), so the skyline stands on land instead of sinking into the water.
 function drawRiver(g, L, t) {
-  const rows = SKY_H - HY;
-  for (let i = 0; i < rows; i++) {
-    const y = HY + i, src = Math.max(0, HY - 1 - Math.floor(i * 2.2));
-    const dx = reduce ? 0 : Math.round(Math.sin(i * .9 + t * 2.4) * (1 + i * .06));
+  const P = L.P, rows = PY - HY;
+  g.fillStyle = P.water[0]; g.fillRect(0, HY, SKY_W, rows);
+  g.fillStyle = P.day ? '#3a3558' : '#0a0716'; g.fillRect(0, HY, SKY_W, 2);                 // bulkhead / FDR edge
+  g.fillStyle = P.day ? '#6a6488' : '#1c1630'; g.fillRect(0, HY + 2, SKY_W, 1);
+  if (!P.day) for (let x = 1; x < SKY_W; x += 4) { g.fillStyle = hash(x, 77) < .6 ? '#ffcf7a' : '#ff8a5c'; g.fillRect(x, HY, 1, 1); }  // FDR lights
+  for (let i = 3; i < rows; i++) {
+    if (i % 2 === 0) continue;                                                           // water between streaks
+    const y = HY + i, src = Math.max(0, HY - 1 - Math.floor((i - 3) * 2.4));
+    const dx = reduce ? 0 : Math.round(Math.sin(i * 1.3 + t * 2.6) * (1.5 + i * .12));
+    g.globalAlpha = Math.max(0, .75 * (1 - (i - 3) / rows));
     g.drawImage(L.mirror, 0, src, SKY_W, 1, dx, y, SKY_W, 1);
     if (dx) g.drawImage(L.mirror, 0, src, SKY_W, 1, dx - Math.sign(dx) * SKY_W, y, SKY_W, 1);
   }
-  g.fillStyle = L.P.waterTint; g.fillRect(0, HY, SKY_W, rows);
+  g.globalAlpha = 1;
+  g.fillStyle = P.waterTint; g.fillRect(0, HY + 3, SKY_W, rows - 3);
   const tq = reduce ? 0 : Math.floor(t * 5);
-  g.fillStyle = L.P.water[1];
-  for (let y = HY + 1; y < SKY_H; y += 2) for (let x = (y * 3 + tq) % 7; x < SKY_W; x += 7) if (hash(x, y) < .5) g.fillRect(x, y, 2, 1);
+  g.fillStyle = P.water[1];
+  for (let y = HY + 4; y < PY; y += 2) for (let x = (y * 3 + tq) % 7; x < SKY_W; x += 7) if (hash(x, y) < .4) g.fillRect(x, y, 2, 1);
 }
 function drawCity(g, L, t, f) {
   g.drawImage(L.skyC, 0, 0);
   if (L.P.day) {
-    const sx = Math.round(SKY_W * .86), sunY = Math.round(HY - 6 - dayAmount(t) * 16);   // low sun, clear of the TVs
+    const sx = Math.round(SKY_W * .78), sunY = Math.round(HY - 6 - dayAmount(t) * 16);   // low sun, clear of the TVs
     for (let y = -14; y <= 14; y++) for (let x = -14; x <= 14; x++) {
       const d = Math.hypot(x, y);
       if (d <= 6) { g.fillStyle = d < 3 ? '#fffbe8' : '#ffe39a'; g.fillRect(sx + x, sunY + y, 1, 1); }
@@ -802,12 +885,14 @@ function drawCity(g, L, t, f) {
   g.drawImage(L.far, 0, 0);
   g.drawImage(L.mid, 0, 0);
   drawRiver(g, L, t);
+  drawFerry(g, L, t);
   if (L.P.day) {                                                            // sun glitter path toward the viewer
-    const sx = Math.round(SKY_W * .86), tq = reduce ? 0 : Math.floor(t * 6);
-    for (let y = HY + 1; y < SKY_H; y++) { const w = 2 + (y - HY) * .9; for (let x = -w; x <= w; x++) if (hash(x + y * 7, tq) < .3) { g.fillStyle = hash(x, y + tq) < .5 ? '#fff3d0' : '#ffc070'; g.fillRect(sx + Math.round(x), y, 1, 1); } }
+    const sx = Math.round(SKY_W * .78), tq = reduce ? 0 : Math.floor(t * 6);
+    for (let y = HY + 1; y < PY; y++) { const w = 2 + (y - HY) * 1.6; for (let x = -w; x <= w; x++) if (hash(x + y * 7, tq) < .3) { g.fillStyle = hash(x, y + tq) < .5 ? '#fff3d0' : '#ffc070'; g.fillRect(sx + Math.round(x), y, 1, 1); } }
   }
   g.drawImage(L.br, 0, 0);
   g.drawImage(L.fore, 0, 0);
+  drawPromenade(g, L, t);
   if (f > 0) { g.globalAlpha = .6 * f; g.drawImage(L.edge, 0, 0); g.globalAlpha = 1; }
 }
 function drawSky(t) {
@@ -821,6 +906,11 @@ function drawSky(t) {
     if (f > 0) {
       kg.fillStyle = `rgba(190,175,255,${(.18 * f).toFixed(3)})`; kg.fillRect(0, 0, SKY_W, HY);
       if (f > .3 && storm.bolt) { drawBolt(kg, storm.bolt.pts); storm.bolt.branches.forEach(b => drawBolt(kg, b)); }
+      if (storm.bolt?.target) {                                           // the rod takes the hit: spark burst at the tip
+        const [rx, ry] = storm.bolt.target;
+        for (let k = 0; k < 14; k++) { const a = hash(k, 3) * 6.28, r = 1 + hash(k, 4) * 6 * f; kg.fillStyle = k % 3 ? '#fff3d0' : '#b48cff'; kg.fillRect(Math.round(rx + Math.cos(a) * r), Math.round(ry + Math.sin(a) * r), 1, 1); }
+        kg.fillStyle = '#ffffff'; kg.fillRect(rx - 1, ry - 1, 3, 3);
+      }
     }
   }
   if (day > 0) {                                                            // dawn, dissolved in through a Bayer mask
@@ -878,7 +968,7 @@ $id('dayNight').addEventListener('click', () => setDay(!mode.day));
   btn.classList.toggle('is-day', mode.day); root.classList.toggle('is-day', mode.day);
   drawSwitchIcon(mode.day);
 }
-window.lightning = () => { storm.next = 0; };
+window.lightning = (rod) => { storm.next = 0; if (rod) storm.forceRod = rod; };
 
 /* ---------------- aged wood beam + Zelda vine + hanging sign ---------------- */
 const beam = $id('beam'), bg = beam.getContext('2d');
