@@ -57,6 +57,7 @@ export default function PixelWorld() {
             <div className="lcds" id="lcds" />
           </div>
           <div className="loop-clock" id="loopClock" aria-hidden="true" />
+          <button className="btn music" id="music" type="button" aria-pressed="false">♪ Campfire</button>
         </div>
         <div className="log-panel">
           <div className="work-inner"><div className="jobs" id="jobs" /></div>

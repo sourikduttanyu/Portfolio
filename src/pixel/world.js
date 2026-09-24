@@ -905,60 +905,50 @@ function drawPromenade(g, L, t) {
   }
 }
 
-/* Air traffic: jets at cruising altitude, fast but far away, so they drift across in about a
-   minute. Twin engine contrails merge, widen, drift with the wind and fade over ~45s.
-   Night: dark silhouettes with red/green wing lights and a white strobe. Dawn: silver, sunlit. */
+/* Air traffic, kept deliberately far away: tiny jets only in the top-right corner of the sky,
+   well above the tallest spire, always flying away from the city toward the corner and
+   shrinking as they recede. If there is no clear sky above the skyline, none spawn. */
 const planes = [];
-let nextPlane = 2;
-function headerBottomArt() {
-  const hero = sky.parentElement.getBoundingClientRect(), links = root.querySelector('.links').getBoundingClientRect();
-  return hero.height ? Math.ceil((links.bottom - hero.top) / hero.height * SKY_H) : 60;
+let nextPlane = 4;
+function airCeiling() {
+  const r = bk?.night.rods; if (!r) return 0;
+  return Math.min(r.wtc[1], r.esb[1]) - 30;                     // wide margin above the highest rod
 }
 function updatePlanes(t) {
   if (reduce) return;
-  if (t >= nextPlane && planes.filter(p => !p.gone).length < 2) {
-    const dir = Math.random() < .5 ? 1 : -1, laneTop = headerBottomArt() + 4, y = Math.round(laneTop + Math.random() * Math.max(4, (HY - 58) - laneTop));
-    const speed = 4.5 + Math.random() * 2.5;
-    planes.push({ x: dir > 0 ? -12 : SKY_W + 12, y, vx: dir * speed, vy: (Math.random() - .5) * .35, dir, trail: [], lastPuff: t, big: Math.random() < .25 });
-    nextPlane = t + 10 + Math.random() * 15;
+  const ceil = airCeiling();
+  if (t >= nextPlane && ceil > 12 && planes.length < 2) {
+    const x = SKY_W * (.62 + Math.random() * .22), y = Math.max(4, ceil * (.35 + Math.random() * .5));
+    const ang = -(.25 + Math.random() * .35);                     // up and to the right, away from the skyline
+    planes.push({ x, y, x0: x, y0: y, ang, born: t, life: 55 + Math.random() * 20, trail: [], lastPuff: t });
+    nextPlane = t + 14 + Math.random() * 16;
   }
   planes.forEach(p => {
-    const dt = Math.min(.1, t - (p.t ?? t)); p.t = t;
-    if (!p.gone) {
-      p.x += p.vx * dt; p.y += p.vy * dt;
-      if (t - p.lastPuff > .2) { p.trail.push({ x: p.x - p.dir * 4, y: p.y + 1, t }); p.lastPuff = t; }
-      if (p.x < -20 || p.x > SKY_W + 20) p.gone = true;
-    }
-    p.trail = p.trail.filter(q => t - q.t < 45);
+    const k = (t - p.born) / p.life, dt = Math.min(.1, t - (p.t ?? t)); p.t = t;
+    const v = 2.2 * (1 - k * .7);                                 // slows as it recedes
+    p.x += Math.cos(p.ang) * v * dt; p.y += Math.sin(p.ang) * v * dt;
+    if (k < .9 && t - p.lastPuff > .25) { p.trail.push({ x: p.x, y: p.y, t }); p.lastPuff = t; }
+    p.trail = p.trail.filter(q => t - q.t < 30);
+    p.done = k >= 1 || p.x > SKY_W + 4 || p.y < -4;
   });
-  for (let i = planes.length - 1; i >= 0; i--) if (planes[i].gone && !planes[i].trail.length) planes.splice(i, 1);
+  for (let i = planes.length - 1; i >= 0; i--) if (planes[i].done) planes.splice(i, 1);
 }
 function drawPlanes(g, day, t) {
   planes.forEach(p => {
-    p.trail.forEach((q, qi) => {                                    // contrail: twin lines -> one soft band
-      const a = t - q.t, fade = Math.max(0, 1 - a / 45);
-      const drift = a * .12, spread = a < 4 ? 1 : 0, w = 1 + Math.min(2, a / 12);
-      const prev = p.trail[qi - 1], y = Math.round(q.y + a * .04);
-      const x0 = Math.round(q.x + drift), x1 = prev ? Math.round(prev.x + (t - prev.t) * .12) : x0;
-      for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) {
-      const col = day ? `rgba(255,${226 - a * .6 | 0},${214 - a | 0},${(.55 * fade).toFixed(3)})` : `rgba(170,150,230,${(.28 * fade).toFixed(3)})`;
-      g.fillStyle = col;
-      if (spread) { g.fillRect(x, y - 1, 1, 1); g.fillRect(x, y + 1, 1, 1); }
-      else for (let k = 0; k < w; k++) if (bayer(x, y + k) < fade + .2) g.fillRect(x, y - Math.floor(w / 2) + k, 1, 1);
-      }
+    const k = (t - p.born) / p.life, fadeIn = Math.min(1, (t - p.born) / 3), far = 1 - k;
+    p.trail.forEach(q => {                                          // hairline contrail, thinning with distance
+      const a = Math.max(0, 1 - (t - q.t) / 30) * fadeIn * far;
+      g.fillStyle = day ? `rgba(255,236,220,${(.45 * a).toFixed(3)})` : `rgba(180,165,235,${(.22 * a).toFixed(3)})`;
+      g.fillRect(Math.round(q.x + (t - q.t) * .05), Math.round(q.y), 1, 1);
     });
-    if (p.gone) return;
-    const x = Math.round(p.x), y = Math.round(p.y), d = p.dir, body = day ? '#e6e8f2' : '#0b0916', shade = day ? '#9aa0b8' : '#191430';
-    const len = p.big ? 9 : 7;
-    for (let k = 0; k < len; k++) { g.fillStyle = k === len - 1 ? shade : body; g.fillRect(x - d * k, y, 1, 1); }   // fuselage
-    g.fillStyle = shade; g.fillRect(x - d * 3, y + 1, 1, 1); g.fillRect(x - d * 4, y + 1, 1, 1);                // wings (swept)
-    g.fillStyle = body; g.fillRect(x - d * 2, y + 1, 1, 1);
-    g.fillStyle = shade; g.fillRect(x - d * (len - 1), y - 1, 1, 1); g.fillRect(x - d * (len - 1), y - 2, 1, 1);   // tail fin
-    if (day) { g.fillStyle = '#ffffff'; g.fillRect(x - d, y, 1, 1); }                                             // sun glint
+    const x = Math.round(p.x), y = Math.round(p.y);
+    g.globalAlpha = fadeIn * Math.min(1, far * 3);
+    if (day) { g.fillStyle = '#fffbe8'; g.fillRect(x, y, 1, 1); if (far > .5) { g.fillStyle = '#c8ccdc'; g.fillRect(x - 1, y, 1, 1); } }
     else {
-      g.fillStyle = d > 0 ? '#ff4a5a' : '#4aff8a'; g.fillRect(x - d * 3, y + 2, 1, 1);                            // nav lights
-      if (Math.floor(t * 1.3 + p.y) % 3 === 0) { g.fillStyle = '#ffffff'; g.fillRect(x - d * 4, y - 1, 1, 1); } // strobe
+      g.fillStyle = Math.floor(t * 1.4 + p.x0) % 2 ? '#ff4a5a' : '#6a2233'; g.fillRect(x, y, 1, 1);
+      if (Math.floor(t * 1.1 + p.y0) % 4 === 0) { g.fillStyle = '#ffffff'; g.fillRect(x - 1, y, 1, 1); }
     }
+    g.globalAlpha = 1;
   });
 }
 // Night clouds: a few dim, moonlit banks on the right, underside lit violet by the city.
@@ -1546,7 +1536,7 @@ $id('jobs').innerHTML = JOBS.map(j => `
 
 /* ================= work scene: tiny planet under open space (Outer Wilds-inspired) ================= */
 const scene = $id('scene'), space = $id('space'), xg = space.getContext('2d');
-let SPW = 0, SPH = 0, SPS = 3, spaceStatic = null, twinkles = [], gasSprite = null, moonSprite = null;
+let SPW = 0, SPH = 0, SPS = 3, spaceStatic = null, spaceBand = null, spaceGround = null, twinkles = [], gasSprite = null, moonSprite = null;
 const FIRE = { x: 0, y: 0, level: 1 };
 const AMBER = '#e8a33d';
 const px = (g, x, y, c) => { g.fillStyle = c; g.fillRect(x, y, 1, 1); };
@@ -1570,28 +1560,34 @@ function mixHex(a, b, t) { const [r1, g1, b1] = hex(a), [r2, g2, b2] = hex(b); r
 function buildSpace() {
   SPS = pixelScale(); SPW = Math.ceil(scene.clientWidth / SPS); SPH = Math.ceil(scene.clientHeight / SPS);
   space.width = SPW; space.height = SPH;
-  const c = document.createElement('canvas'); c.width = SPW; c.height = SPH; const g = c.getContext('2d');
+  const c = document.createElement('canvas'); c.width = SPW; c.height = SPH; let g = c.getContext('2d');
   // sky: dithered bands from deep space down to a teal horizon
   const SKYB = ['#05070f', '#070b18', '#0a1224', '#0c1a2e', '#0f2433'];
   for (let y = 0; y < SPH; y++) for (let x = 0; x < SPW; x++) {
     const t = y / SPH; px(g, x, y, SKYB[Math.max(0, Math.min(4, Math.floor(t * 4.6 + (bayer(x, y) - .5) * .9)))]);
   }
-  // nebula band: teal + violet, dithered
-  for (let y = 0; y < SPH * .8; y++) for (let x = 0; x < SPW; x++) {
-    const band = Math.exp(-(((y - (SPH * .3 + (x - SPW / 2) * .22)) / (SPH * .16)) ** 2));
-    const v = (vnoise(x / 38, y / 16) * .6 + vnoise(x / 11, y / 7) * .4) * band;
-    if (v > .38 && bayer(x, y) < (v - .38) * 2.6) px(g, x, y, vnoise(x / 30 + 9, y / 30) > .5 ? '#15404f' : '#2b2152');
+  // celestial band: twice the view wide, wraps seamlessly; the sky slides across it as the planet turns
+  const BW = SPW * 2, band = document.createElement('canvas'); band.width = BW; band.height = SPH;
+  const bg = band.getContext('2d');
+  const wrapNoise = (x, y, sx, sy) => { const k = x / BW; return vnoise(x / sx, y / sy) * (1 - k) + vnoise((x - BW) / sx, y / sy) * k; };
+  for (let y = 0; y < SPH * .8; y++) for (let x = 0; x < BW; x++) {
+    const bandY = SPH * .3 + Math.sin(x / BW * Math.PI * 2) * SPH * .08;
+    const v = (wrapNoise(x, y, 38, 16) * .6 + wrapNoise(x, y, 11, 7) * .4) * Math.exp(-(((y - bandY) / (SPH * .16)) ** 2));
+    if (v > .38 && bayer(x, y) < (v - .38) * 2.6) px(bg, x, y, wrapNoise(x + 900, y, 30, 30) > .5 ? '#15404f' : '#2b2152');
   }
-  // stars
   twinkles = [];
-  const n = Math.floor(SPW * SPH / 150);
+  const n = Math.floor(BW * SPH / 150);
   for (let i = 0; i < n; i++) {
-    const x = Math.floor(hash(i, 1) * SPW), y = Math.floor(hash(i, 2) * (SPH - 40));
+    const x = Math.floor(hash(i, 1) * BW), y = Math.floor(hash(i, 2) * (SPH - 40));
     const b = hash(i, 3);
-    if (b > .96) { const col = hash(i, 5) > .5 ? '#fff4d8' : '#cfe0ff'; px(g, x, y, col); px(g, x - 1, y, col + '99'); px(g, x + 1, y, col + '99'); px(g, x, y - 1, col + '99'); px(g, x, y + 1, col + '99'); }
-    else px(g, x, y, b > .7 ? '#aab4d0' : '#4f5a78');
+    if (b > .96) { const col = hash(i, 5) > .5 ? '#fff4d8' : '#cfe0ff'; px(bg, x, y, col); px(bg, x - 1, y, col + '99'); px(bg, x + 1, y, col + '99'); px(bg, x, y - 1, col + '99'); px(bg, x, y + 1, col + '99'); }
+    else px(bg, x, y, b > .7 ? '#aab4d0' : '#4f5a78');
     if (hash(i, 4) > .86) twinkles.push({ x, y, ph: hash(i, 6) * 6.28, sp: .6 + hash(i, 7) * 1.6 });
   }
+  spaceBand = band;
+  // everything on the ground draws into its own layer, in front of the turning sky
+  const gc = document.createElement('canvas'); gc.width = SPW; gc.height = SPH; g = gc.getContext('2d');
+  spaceGround = gc;
   // ground: grassy crest, dithered soil
   for (let x = 0; x < SPW; x++) {
     const gt = groundTop(x);
@@ -1674,7 +1670,8 @@ function drawSun(g, cx, cy, s, t) {
 const embers = Array.from({ length: 16 }, (_, i) => ({ x: 0, y: -99, vy: 0, life: 0, seed: i }));
 function drawFire(g, t) {
   const fx = FIRE.x, fy = FIRE.y;
-  FIRE.level = reduce ? .9 : .85 + .15 * vnoise(t * 3, 0);
+  FIRE.pulse = (FIRE.pulse || 0) * .9;
+  FIRE.level = reduce ? .9 : .85 + .15 * vnoise(t * 3, 0) + FIRE.pulse * .25;
   for (let y = -26; y <= 8; y++) for (let x = -40; x <= 40; x++) {             // warm pool of light
     const d = Math.hypot(x, y * 1.6);
     const k = Math.max(0, 1 - d / 42) * FIRE.level;
@@ -1722,6 +1719,76 @@ function drawTrail(g, t) {
   }
 }
 
+/* Shooting stars: a thin streak with a bright head and a fading tail, gone in under a second.
+   Every 6-14s on their own, or one per bar while the campfire music plays. */
+const meteors = [];
+let nextMeteor = 4;
+function spawnMeteor(t) {
+  if (reduce || meteors.length >= 2) return;
+  const x = SPW * (.1 + Math.random() * .8), y = SPH * (.03 + Math.random() * .12), dir = Math.random() < .5 ? -1 : 1;
+  meteors.push({ x, y, vx: dir * (70 + Math.random() * 50), vy: 25 + Math.random() * 20, t0: t, life: .7 + Math.random() * .4 });
+}
+function drawMeteors(g, t) {
+  if (!music.on && t >= nextMeteor) { spawnMeteor(t); nextMeteor = t + 6 + Math.random() * 8; }
+  for (let i = meteors.length - 1; i >= 0; i--) {
+    const m = meteors[i], a = t - m.t0;
+    if (a >= m.life) { meteors.splice(i, 1); continue; }
+    const fade = Math.min(1, a / .08, (m.life - a) / .25), hx = m.x + m.vx * a, hy = m.y + m.vy * a;
+    for (let k = 0; k < 14; k++) {                                   // tail: back along the path, dimming
+      const f = k / 14;
+      g.fillStyle = `rgba(${k < 3 ? '255,250,235' : '170,210,255'},${((1 - f) * .9 * fade).toFixed(3)})`;
+      g.fillRect(Math.round(hx - m.vx * .012 * k), Math.round(hy - m.vy * .012 * k), 1, 1);
+    }
+    g.fillStyle = `rgba(255,255,255,${fade.toFixed(3)})`; g.fillRect(Math.round(hx), Math.round(hy), 1, 1);
+  }
+}
+
+/* Campfire music: opt-in, generated in the browser (an original banjo-ish pluck over a soft bass,
+   G - Em - C - D at 84 bpm). Never autoplays. Each bar launches a shooting star; beats pulse fire + stars. */
+const music = { on: false, ctx: null, timer: 0, step: 0, next: 0 };
+const CHORDS = [[55, 59, 62, 67], [52, 55, 59, 64], [48, 52, 55, 60], [50, 54, 57, 62]];   // MIDI: G, Em, C, D
+const PATTERN = [0, 2, 1, 3, 2, 1, 3, 2];
+const midi = m => 440 * Math.pow(2, (m - 69) / 12);
+function pluck(ctx, out, freq, time, vel) {
+  const o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), f = ctx.createBiquadFilter();
+  o1.type = 'triangle'; o2.type = 'square'; o1.frequency.value = freq; o2.frequency.value = freq * 2.005;
+  f.type = 'lowpass'; f.frequency.setValueAtTime(3200, time); f.frequency.exponentialRampToValueAtTime(700, time + .35);
+  const g2 = ctx.createGain(); g2.gain.value = .18;
+  o1.connect(g); o2.connect(g2); g2.connect(g); g.connect(f); f.connect(out);
+  g.gain.setValueAtTime(.0001, time); g.gain.exponentialRampToValueAtTime(vel, time + .006); g.gain.exponentialRampToValueAtTime(.0001, time + .7);
+  o1.start(time); o2.start(time); o1.stop(time + .75); o2.stop(time + .75);
+}
+function bass(ctx, out, freq, time) {
+  const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'sine'; o.frequency.value = freq;
+  o.connect(g); g.connect(out);
+  g.gain.setValueAtTime(.0001, time); g.gain.exponentialRampToValueAtTime(.35, time + .02); g.gain.exponentialRampToValueAtTime(.0001, time + 1.1);
+  o.start(time); o.stop(time + 1.2);
+}
+function schedule() {
+  const { ctx } = music, eighth = 60 / 84 / 2;
+  while (music.next < ctx.currentTime + .12) {
+    const bar = Math.floor(music.step / 8) % 4, i = music.step % 8, chord = CHORDS[bar];
+    pluck(ctx, music.out, midi(chord[PATTERN[i]] + 12), music.next, i % 2 ? .22 : .32);
+    if (i === 0 || i === 4) bass(ctx, music.out, midi(chord[0] - 12), music.next);
+    const when = (music.next - ctx.currentTime) * 1000;
+    if (i % 2 === 0) setTimeout(() => { FIRE.pulse = 1; }, when);
+    if (i === 0) setTimeout(() => spawnMeteor(performance.now() / 1000), when);
+    music.next += eighth; music.step++;
+  }
+}
+function toggleMusic() {
+  const btn = $id('music');
+  if (music.on) {
+    music.on = false; clearInterval(music.timer); music.ctx?.close(); music.ctx = null;
+  } else {
+    const Ctx = window.AudioContext || window.webkitAudioContext; if (!Ctx) return;
+    music.ctx = new Ctx(); music.out = music.ctx.createGain(); music.out.gain.value = .5; music.out.connect(music.ctx.destination);
+    music.on = true; music.step = 0; music.next = music.ctx.currentTime + .05; schedule(); music.timer = setInterval(schedule, 25);
+  }
+  btn.setAttribute('aria-pressed', String(music.on)); btn.textContent = music.on ? '♪ Campfire: on' : '♪ Campfire';
+}
+$id('music').addEventListener('click', toggleMusic);
+
 function drawSpace(t) {
   if (!spaceStatic) return;
   if (loopStart === null) loopStart = t;
@@ -1729,17 +1796,28 @@ function drawSpace(t) {
   if (!reduce && e > LOOP + 8) { loopStart = t; e = 0; }
   const g = xg;
   g.drawImage(spaceStatic, 0, 0);
-  if (!reduce) twinkles.forEach(s => { if (Math.sin(t * s.sp + s.ph) > .6) px(g, s.x, s.y, '#ffffff'); });
-  const par = reduce ? 0 : scene.getBoundingClientRect().top / SPS;
-  // far bodies, slow drift + parallax
-  const sunX = Math.floor(SPW * .93), sunY = Math.floor(SPH * .05 + 10 + par * .03);
+  // The planet turns: we stay put, the sky slides past and bends with the horizon's curve.
+  const BW = spaceBand.width, off = reduce ? 0 : (t * 1.1) % BW;
+  const drop = x => Math.round(16 * ((x - SPW / 2) / (SPW / 2)) ** 2);
+  const toView = bx => { let x = bx - off; x = ((x % BW) + BW) % BW; return x; };
+  for (let x = 0; x < SPW; x++) g.drawImage(spaceBand, Math.floor((x + off) % BW), 0, 1, SPH, x, drop(x), 1, SPH);
+  const beat = FIRE.pulse || 0;
+  if (!reduce) twinkles.forEach(s2 => {
+    const x = toView(s2.x);
+    if (x < SPW && Math.sin(t * s2.sp + s2.ph) > .6 - beat * .5) px(g, Math.round(x), s2.y + drop(x), '#ffffff');
+  });
+  // bodies ride the same sky
+  const body = (sprite, bx, y) => { const x = toView(bx); if (x < SPW + sprite.width) g.drawImage(sprite, Math.round(x - sprite.width / 2), y + drop(x)); };
+  body(gasSprite, BW * .18, Math.round(SPH * .42));
+  body(moonSprite, BW * .62, Math.round(SPH * .05 + Math.sin(t * .05) * 3));
+  const sunX = Math.round(toView(BW * .9)), sunY = Math.floor(SPH * .05 + 10) + drop(sunX);
   drawSun(g, sunX, sunY, reduce ? sunState(0) : sunState(e), t);
-  g.drawImage(gasSprite, Math.round(SPW * .01 + Math.sin(t * .01) * 4), Math.round(SPH * .5 + par * .06));
-  g.drawImage(moonSprite, Math.round(SPW * .5 + Math.sin(t * .02 + 1) * 6), Math.round(SPH * .03 + par * .09));
-  // comet: slow diagonal pass every 80s
+  // comet: its own slow pass every 80s
   const ck = reduce ? .35 : (t % 80) / 80, cx = Math.round(-30 + (SPW + 60) * ck), cy = Math.round(SPH * .34 - ck * SPH * .18);
   for (let i = 1; i < 24; i++) if (bayer(cx - i, cy + i * .3) < (1 - i / 24) * .9) px(g, cx - i, Math.round(cy + i * .35), i < 6 ? '#e8fbff' : '#7fd8e8');
   px(g, cx, cy, '#ffffff'); px(g, cx + 1, cy, '#ffffff'); px(g, cx, cy - 1, '#cfefff');
+  drawMeteors(g, t);
+  g.drawImage(spaceGround, 0, 0);
   // campfire under the EY monitor
   const ey = monitorPoint('ey'); FIRE.x = ey[0]; FIRE.y = groundTop(ey[0]) - 1;
   drawFire(g, t);
@@ -1776,10 +1854,15 @@ function drawScopes(t) {
 }
 
 /* ---------------- loop ---------------- */
+// Draw only the sections on screen; the rest of the page costs nothing while scrolled away.
+const vis = { hero: true, scene: true };
+const io = new IntersectionObserver(entries => entries.forEach(e => { vis[e.target.classList.contains('hero') ? 'hero' : 'scene'] = e.isIntersecting; }), { rootMargin: '120px' });
+io.observe(root.querySelector('.hero')); io.observe(root.querySelector('.work'));
 function frame(ms) {
   if (stopped) return;
   const t = ms / 1000;
-  drawSky(t); drawTVs(t); drawLCDs(t); drawSpace(t); drawScopes(t);
+  if (vis.hero) { drawSky(t); drawTVs(t); }
+  if (vis.scene) { drawLCDs(t); drawSpace(t); drawScopes(t); }
   if (!reduce) (raf = requestAnimationFrame(frame));
 }
 document.fonts.ready.then(() => {
@@ -1791,7 +1874,8 @@ document.fonts.ready.then(() => {
 });
 
 return () => {
-  stopped = true; cancelAnimationFrame(raf); offs.forEach(f => f()); ro?.disconnect();
+  stopped = true; cancelAnimationFrame(raf); offs.forEach(f => f()); ro?.disconnect(); io.disconnect();
+  if (music.on) { clearInterval(music.timer); music.ctx?.close(); }
   Object.values(clips).forEach(c => { c.video.pause(); c.video.removeAttribute('src'); c.video.load(); });
   delete window.supernova; delete window.lightning; delete window.planes;
   $id('stage').innerHTML = ''; $id('lcds').innerHTML = ''; $id('now').innerHTML = ''; $id('jobs').innerHTML = '';
