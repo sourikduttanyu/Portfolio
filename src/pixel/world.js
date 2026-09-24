@@ -349,18 +349,21 @@ const tvs = [0, 1, 2].map(i => {
   const cv = document.createElement('canvas'); cv.width = TV_W; cv.height = TV_H;
   const label = document.createElement('div'); label.className = 'tv-label';
   const shadow = document.createElement('div'); shadow.className = 'tv-shadow';
-  btn.append(cv, shadow, label); stage.append(btn);
+  const say = document.createElement('div'); say.className = 'say'; say.setAttribute('aria-hidden', 'true');   // hover: the set "speaks" its stack
+  btn.append(cv, say, shadow, label); stage.append(btn);
   const g = cv.getContext('2d');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
   const sg = screen.getContext('2d', { willReadFrequently: true });
-  btn.addEventListener('click', () => { takeControl(); const p = current()[i]; if (p) openCloseup(null, PROJECTS.indexOf(p)); });
+  btn.addEventListener('click', () => { takeControl(); const p = onTV(i); if (p) openCloseup(null, PROJECTS.indexOf(p)); });
   const up = -Math.PI / 2;
   const knobs = [{ from: up, to: up, t0: 0, dur: 0 }, { from: up + .6 * (i - 1), to: up + .6 * (i - 1), t0: 0, dur: 0 }];
-  return { btn, cv, g, sg, screen, label, knobs };
+  return { btn, cv, g, sg, screen, label, say, knobs };
 });
 // Channels of three; a short last channel shows NO SIGNAL on its open slots.
 const NCH = Math.ceil(PROJECTS.length / 3);
 function current() { return [0, 1, 2].map(i => PROJECTS[channel * 3 + i] ?? null); }
+// Sets are built left, right, raised middle; a channel reads left -> middle -> right.
+const onTV = i => current()[[0, 2, 1][i]];
 // Triangle: TV 1 bottom-left, TV 2 bottom-right, TV 3 centred and raised.
 // Picks the largest scale at which all three screens + captions fit above the fold.
 const GAP = 20;
@@ -387,7 +390,7 @@ function layoutStage(extra = 0) {
   tvs.forEach((tv, i) => {
     tv.cv.style.width = w + 'px'; tv.cv.style.height = TV_H * s + 'px';
     tv.btn.style.width = w + 'px'; tv.btn.style.left = pos[i][0] + 'px'; tv.btn.style.top = pos[i][1] + 'px';
-    tv.btn.style.setProperty('--px', s + 'px');                              // one art pixel, for the cast shadow
+    tv.btn.style.setProperty('--px', s + 'px'); tv.btn.style.setProperty('--cvh', TV_H * s + 'px');                              // one art pixel, for the cast shadow
   });
   stage.style.height = drop + full + 'px';
   // the remote rises into the empty space under the raised middle TV, between the lower two
@@ -442,9 +445,10 @@ function renderNow() {
       <p class="meta">${esc(p.src)} · <a href="${p.href}" target="_blank" rel="noopener noreferrer">${esc(p.linkText)} ↗</a></p>
     </article>`).join('');
   tvs.forEach((tv, i) => {
-    const p = current()[i];
+    const p = onTV(i);
     tv.btn.classList.toggle('empty', !p);
     tv.label.innerHTML = p ? `<small>${esc(p.tag)}</small>${esc(p.name)}` : `<small>CH 0${channel + 1}</small>Open slot`;
+    tv.say.innerHTML = p ? `<b>Stack</b><ul>${p.libs.map((l, k) => `<li style="--k:${k}">${esc(l)}</li>`).join('')}</ul>` : '';
     tv.btn.setAttribute('aria-label', p ? `${esc(p.name)}: ${esc(p.line)} Show details` : 'Open slot, no project on this channel yet');
   });
   const ch = $id('chLabel'), pad = n => String(n).padStart(2, '0');
@@ -656,7 +660,7 @@ function drawTVs(t) {
     const noisy = (since >= 0 && since < staticFor) || (surge && t - tv.surgeAt < .3);
     if (noisy) { staticNoise(tv.g, t); }
     else {
-      const p = current()[i], clip = p && clipFor(p.id);
+      const p = onTV(i), clip = p && clipFor(p.id);
       if (!p) scenes.nosignal(tv.sg, reduce ? 0 : t);
       else if (clip.ready) drawCover(tv.sg, clip.video, SW, SH); else scenes[p.scene](tv.sg, reduce ? 1.5 : t + i);
       tv.g.drawImage(tv.screen, SX, SY);

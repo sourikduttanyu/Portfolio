@@ -122,6 +122,30 @@
   .hero-inner > .hint svg { animation-name: point-up; }
   @keyframes point-up { 50% { transform: translateY(-3px); } }
   .work-hint { position: absolute; top: 20px; left: 24px; z-index: 2; margin: 0; }
+  /* hover: a dialog box pops out of the screen and types the stack line by line, then shrinks back into the glass */
+  .tv .say { position: absolute; left: 37%; top: 0; z-index: 6; min-width: 150px; padding: 8px 12px 9px; pointer-events: none; text-align: left;
+    background: oklch(11% 0.04 290 / .98); border: 2px solid var(--gold); border-radius: 6px;
+    box-shadow: 0 3px 0 0 var(--ui-edge), 0 0 18px oklch(85% 0.13 82 / .25);
+    transform-origin: 50% 100%; transform: translate(-50%, calc(var(--cvh, 270px) * .6 - 50%)) scale(.06); opacity: 0;
+    transition: transform .2s cubic-bezier(.5, 0, .75, 0), opacity .18s ease-in .04s; }
+  .tv .say:empty { display: none; }
+  .stage .tv:hover, .stage .tv:focus-visible { z-index: 5; }
+  .tv .say::after { content: ""; position: absolute; left: 50%; bottom: -9px; width: 12px; height: 8px; transform: translateX(-50%);
+    background: var(--gold); clip-path: polygon(0 0, 100% 0, 50% 100%); }
+  .tv .say b { display: block; margin-bottom: 4px; font: 400 10px "Silkscreen", monospace; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; }
+  .tv .say ul { margin: 0; padding: 0; list-style: none; }
+  .tv .say li { font-size: 13px; line-height: 1.5; color: var(--ink); white-space: nowrap; opacity: 0; transform: translateY(3px);
+    transition: opacity .1s, transform .1s; }
+  .tv .say li::before { content: "▸ "; color: var(--gold); }
+  .tv:hover .say, .tv:focus-visible .say { opacity: 1; transform: translate(-50%, calc(-100% - 6px)) scale(1);
+    transition: transform .34s cubic-bezier(.16, 1, .3, 1), opacity .12s ease-out; }
+  .tv:hover .say li, .tv:focus-visible .say li { opacity: 1; transform: none;
+    transition: opacity .16s ease-out, transform .16s ease-out; transition-delay: calc(.16s + var(--k) * 70ms); }
+  @media (hover: none) { .tv .say { display: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    .tv .say, .tv:hover .say, .tv:focus-visible .say { transform: translate(-50%, calc(-100% - 6px)); transition: opacity .15s; }
+    .tv .say li { opacity: 1; transform: none; transition: none; }
+  }
   /* until the first screen is opened, the name plates breathe gold so the sets read as clickable */
   .nudge .tv-label { animation: plate-call 2.4s ease-in-out infinite; }
   @keyframes plate-call { 50% { border-color: var(--gold); box-shadow: 0 3px 0 0 var(--ui-edge), 0 0 12px oklch(85% 0.13 82 / .45); } }
