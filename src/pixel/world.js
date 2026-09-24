@@ -365,12 +365,12 @@ function current() { return [0, 1, 2].map(i => PROJECTS[channel * 3 + i] ?? null
 // Triangle: TV 1 bottom-left, TV 2 bottom-right, TV 3 centred and raised.
 // Picks the largest scale at which all three screens + captions fit above the fold.
 const GAP = 20;
-function layoutStage() {
+function layoutStage(extra = 0) {
   const LABEL_H = Math.max(50, ...tvs.map(tv => tv.label.offsetHeight + 22));   // real caption height (wraps on phones)
-  const G = window.innerWidth >= 860 ? 68 : 0;                 // room for the side arrows
-  const W = stage.clientWidth - 2 * G;
+  const G = 0;
+  const W = stage.clientWidth;
   const top = stage.getBoundingClientRect().top + scrollY;
-  const below = root.querySelector('.remote').offsetHeight + $id('tabs').offsetHeight + $id('hint').offsetHeight + 44;
+  const below = root.querySelector('.remote').offsetHeight + $id('hint').offsetHeight + 44 + extra;
   const availH = Math.max(260, innerHeight - top - below);
   let fit = null;
   for (let s = 4; s >= 1; s -= .25) {
@@ -389,7 +389,15 @@ function layoutStage() {
     tv.btn.style.width = w + 'px'; tv.btn.style.left = pos[i][0] + 'px'; tv.btn.style.top = pos[i][1] + 'px';
   });
   stage.style.height = drop + full + 'px';
-  stage.style.setProperty('--arrow-y', Math.round(drop + TV_H * s * .45 - 24) + 'px');
+  // the remote rises into the empty space under the raised middle TV, between the lower two
+  const remote = root.querySelector('.remote'), gapW = pos[1][0] - (pos[0][0] + w);
+  if (overlap && gapW >= remote.offsetWidth + 24) remote.style.marginTop = -Math.max(0, drop - 24) + 'px';
+  else {                                                                    // sit just below the lowest set / caption
+    const lowest = Math.max(...tvs.map(tv => tv.btn.offsetTop + tv.btn.offsetHeight));
+    const m = Math.max(8, lowest - (drop + full) + 10);
+    remote.style.marginTop = m + 'px';
+    if (!extra && m > 8) layoutStage(m);                                    // reserve that height and fit again
+  }
 }
 // Work scene = one screen: size the three sets so they, their plates and the raised middle one
 // fit between the top edge and the ground. Narrow screens stack instead (scene grows taller).
@@ -447,7 +455,7 @@ function flip(dir) {
     ch.from = knobAngle(ch, switchAt); ch.to = ch.from + dir * (Math.PI / 3 + i * .45); ch.t0 = t0; ch.dur = dur;
     fine.from = knobAngle(fine, switchAt); fine.to = fine.from - dir * (.35 + hash(i, channel) * .9); fine.t0 = t0 + .08; fine.dur = dur;
   });
-  renderNow(); syncTabs(); attractAt = switchAt; playOnly([...current().filter(Boolean).map(p => p.id), ...JOBS.map(j => j.id)]);
+  renderNow(); attractAt = switchAt; playOnly([...current().filter(Boolean).map(p => p.id), ...JOBS.map(j => j.id)]);
   if (reduce) (raf = requestAnimationFrame(frame));
 }
 // Attract mode: until someone interacts, the sets flip themselves every ATTRACT seconds so a
@@ -458,14 +466,8 @@ function takeControl() { attract = false; root.classList.add('ch-manual'); }
 on(window, 'scroll', () => { if (attract && window.scrollY > 40) takeControl(); });
 const readIO = new IntersectionObserver(([e]) => { if (e.isIntersecting && attract) takeControl(); }, { threshold: .25 });
 readIO.observe($id('now')); offs.push(() => readIO.disconnect());
-function goToChannel(target) { if (target === channel) return; const dir = target > channel ? 1 : -1; channel = target - dir; flip(dir); }
 $id('prev').onclick = () => { takeControl(); flip(-1); };
 $id('next').onclick = () => { takeControl(); flip(1); };
-// Project tabs: every project named, the current channel's lit, click to jump there.
-const tabsEl = $id('tabs');
-tabsEl.innerHTML = PROJECTS.map((p, i) => `<button type="button" class="tab" data-i="${i}">${esc(p.name)}</button>`).join('');
-tabsEl.addEventListener('click', e => { const b = e.target.closest('.tab'); if (!b) return; takeControl(); goToChannel(Math.floor(+b.dataset.i / 3)); });
-function syncTabs() { tabsEl.querySelectorAll('.tab').forEach((b, i) => { const on = Math.floor(i / 3) === channel; b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on)); }); }
 // Swipe across the TVs on touch screens.
 let touchX = null;
 on(stage, 'touchstart', e => { touchX = e.touches[0].clientX; });
@@ -1519,7 +1521,7 @@ const JOB_SCENES = {
     },
   ],
 };
-const WORK_ORDER = ['ey', 'hanu', 'insight'];                    // career order, left to right, middle set raised
+const WORK_ORDER = ['insight', 'hanu', 'ey'];                    // most recent first, left to right; middle set raised
 const WSLOT = 7;
 const lcdWrap = $id('lcds');
 const lcds = WORK_ORDER.map((id, n) => {
@@ -1949,7 +1951,7 @@ function frame(ms) {
 }
 document.fonts.ready.then(() => {
   if (stopped) return;
-  renderNow(); syncTabs(); attractAt = performance.now() / 1000; sizeTVs(); on(window, 'resize', sizeTVs);
+  renderNow(); attractAt = performance.now() / 1000; sizeTVs(); on(window, 'resize', sizeTVs);
   buildSpace(); ro = new ResizeObserver(() => buildSpace()); ro.observe(scene);
   (raf = requestAnimationFrame(frame));
   if (reduce) setTimeout(() => (raf = requestAnimationFrame(frame)), 50);

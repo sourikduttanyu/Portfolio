@@ -207,10 +207,7 @@
   .ch-pips { display: flex; gap: 5px; }
   .ch-pips i { width: 10px; height: 4px; background: #3a2a0c; box-shadow: 0 0 0 1px #070402; }
   .ch-pips i.on { background: var(--gold); box-shadow: 0 0 6px oklch(85% 0.13 82 / .7); }
-  /* channel arrows flank the TV stage like level-select arrows; pink on hover */
-  .stage .btn.chan { position: absolute; top: var(--arrow-y, 40%); z-index: 3; width: 52px; height: 52px; min-height: 52px; padding: 0; }
-  .stage .btn.chan svg { width: 26px; height: 26px; shape-rendering: crispEdges; }
-  #prev { left: 0; } #next { right: 0; }
+  .btn.chan:hover, .btn.chan.pressed { background: var(--pink); color: oklch(12% 0.04 290); }
   .btn.chan:hover, .btn.chan.pressed { background: var(--pink); color: oklch(12% 0.04 290); }
 
   /* day/night switch with identity: a starry window at night (sun hint at the empty end), a warm sky at sunrise */
@@ -226,18 +223,9 @@
   /* work sets never grow past their TV: the plate wraps inside it */
   .wtv .tv-label { max-width: 100%; }
   .work-scene.fit .lcds { flex-wrap: nowrap; }
-  @media (max-width: 859px) { .stage .btn.chan { top: -14px; bottom: auto; width: 44px; height: 44px; min-height: 44px; } }
   /* attract mode: the lit pip fills as a countdown to the next automatic flip */
   .ch-pips i.on { background: linear-gradient(90deg, var(--gold) calc(var(--attract, 1) * 100%), #3a2a0c 0); }
   .ch-manual .ch-pips i.on { background: var(--gold); }
-  /* project tabs: pixel cartridges, the current channel's three lit */
-  .tabs { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; }
-  .tab { font-family: "Silkscreen", monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2);
-    background: var(--ui-bg); border: 2px solid var(--ui-edge); border-radius: 6px; padding: 5px 9px; min-height: 30px; cursor: pointer;
-    box-shadow: inset 0 2px 0 0 var(--ui-bg-hi), 0 3px 0 0 var(--ui-ledge); transition: transform 70ms, box-shadow 70ms, color .15s, background .15s; }
-  .tab.on { color: var(--gold); border-color: #6a4a12; box-shadow: inset 0 2px 0 0 var(--ui-bg-hi), 0 3px 0 0 var(--ui-ledge), 0 0 10px oklch(85% 0.13 82 / .35); }
-  .tab:hover { background: var(--pink); color: oklch(12% 0.04 290); }
-  .tab:active { transform: translateY(3px); box-shadow: inset 0 2px 0 0 var(--ui-bg-hi); }
 
   /* project details: quiet and readable */
   .how { margin: 2px 0 10px; }
@@ -245,3 +233,10 @@
   .how summary:hover { text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--pink); }
   .how p { margin: 8px 0 0 !important; font-size: 14px; color: var(--ink-2); }
 
+  /* bolder channel readout, arrows beside it */
+  .remote { position: relative; z-index: 2; gap: 12px; }
+  .remote .ch { font-size: 16px; min-width: 168px; padding: 12px 18px 10px; min-height: 64px; gap: 8px; }
+  .ch-num small { font-size: 11px; }
+  .ch-pips i { width: 14px; height: 5px; }
+  .remote .btn.chan { width: 56px; height: 56px; min-height: 56px; }
+  .remote .btn.chan svg { width: 28px; height: 28px; }
