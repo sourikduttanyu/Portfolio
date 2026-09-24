@@ -16,11 +16,11 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SCENES = { jellysynth: 'plasma', sentinel: 'code', 'go-pubsub': 'packets', veil: 'noise', chronos: 'chart', astral: 'meter', feastfleet: 'delivery' };
 const PROJECTS = projects.map(p => {
   const href = p.repo ?? p.live;
-  return { id: p.slug, name: p.name, tag: p.skill, line: p.tagline, plain: p.plain, results: p.results, how: p.how, stat: p.stat, pipeline: p.pipeline ?? [], open: p.source === 'open', libs: p.libraries,
+  return { id: p.slug, name: p.name, tag: p.skill, line: p.tagline, plain: p.plain, results: p.results, how: p.how, stat: p.stat, pipeline: p.pipeline ?? [], keywords: p.keywords ?? [], open: p.source === 'open', libs: p.libraries,
     stack: p.libraries.join(' · '), src: p.source === 'open' ? 'Open source' : 'Closed source',
     href, linkText: href.replace(/^https:\/\/(github\.com\/)?/, ''), scene: SCENES[p.slug] ?? 'plasma' };
 });
-const JOBS = jobs.map(j => ({ id: j.slug, co: j.company, role: j.role, when: j.period, stack: j.stack ?? [],
+const JOBS = jobs.map(j => ({ id: j.slug, co: j.company, role: j.role, when: j.period, stack: j.stack ?? [], keywords: j.keywords ?? [],
   mono: j.company.split(' ').filter(w => /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 2),
   work: j.work.map(w => [w.name, w.text, w.skill]) }));
 
@@ -283,6 +283,141 @@ const scenes = {
   },
 };
 
+/* ---------------- close-up footage: the same scenes, redrawn natively at 108x84 ----------------
+   Twice the resolution of the small sets, so the big screen gets real detail (and a few labels
+   that say what the system is doing) instead of scaled-up pixels. */
+const HW = SW * 2, HH = SH * 2;
+const label = (g, txt, x, y, col, align = 'left') => { g.font = '8px "Silkscreen"'; g.textBaseline = 'top'; g.textAlign = align; g.fillStyle = col; g.fillText(txt, x, y); g.textAlign = 'left'; };
+const PAL_PLASMA_HI = ['#0c0616', '#1f0a36', '#3a0f5c', '#5a1670', '#7a1e7a', '#a8297f', '#d13d86', '#ee5f78', '#ff8a5c', '#ffb461', '#ffd66b', '#fff0b0'];
+const hiScenes = {
+  plasma(g, t) {                                                     // JellySynth: live GPU effect + export timeline
+    for (let y = 0; y < HH - 16; y++) for (let x = 0; x < HW; x++) {
+      const v = Math.sin(x * .095 + t) + Math.sin(y * .115 - t * 1.3) + Math.sin((x + y) * .06 + t * .7) + Math.sin(Math.hypot(x - 54, y - 34) * .15 - t * 2);
+      const k = (v + 4) / 8 * 11 + (bayer(x, y) - .5) * .9;
+      g.fillStyle = PAL_PLASMA_HI[Math.max(0, Math.min(11, Math.floor(k)))]; g.fillRect(x, y, 1, 1);
+    }
+    rect(g, 0, HH - 16, HW, 16, '#0d0a14'); rect(g, 0, HH - 16, HW, 1, '#2a2438');
+    for (let i = 0; i < 26; i++) rect(g, 3 + i * 4, HH - 11, 3, 6, i % 6 === 0 ? '#3a3350' : '#221d30');   // frames
+    const ph = 3 + Math.floor((t * 9) % 104);
+    rect(g, ph, HH - 14, 1, 11, '#ffd66b'); rect(g, ph - 1, HH - 14, 3, 1, '#ffd66b');                      // playhead
+    if (Math.floor(t * 2) % 2) { rect(g, 4, 4, 3, 3, '#ff3d5a'); }
+    label(g, 'REC', 9, 3, '#ffe4ec');
+    label(g, 'F' + String(Math.floor(t * 30) % 10000).padStart(4, '0'), HW - 4, 3, '#ffe4ec', 'right');
+  },
+  code(g, t) {                                                       // Sentinel: 3 agents review a diff, a human approves
+    rect(g, 0, 0, HW, HH, '#0b111b');
+    const agents = [['SEC', '#ff5c7a'], ['DOC', '#6fd3ff'], ['PERF', '#9be58f']];
+    agents.forEach(([n, c], i) => {
+      const x = 3 + i * 26, on = (Math.floor(t * 2) + i) % 3 === 0;
+      rect(g, x, 3, 23, 10, on ? c : '#1a2433'); label(g, n, x + 12, 4, on ? '#0b111b' : c, 'center');
+    });
+    rect(g, 82, 3, 23, 10, '#1a2433'); label(g, 'SUP', 93, 4, '#ffd66b', 'center');
+    const scroll = Math.floor(t * 5);
+    for (let r = 0; r < 18; r++) {
+      const n = r + scroll, y = 17 + r * 3.4 | 0, flagged = n % 11 === 6;
+      if (flagged) rect(g, 0, y - 1, HW, 3, '#4a1025');
+      rect(g, 2, y, 5, 1, '#2c4058');
+      let x = 10 + ((n * 7) % 4) * 4;
+      for (let w = 0; w < 1 + (n * 5) % 4; w++) {
+        const len = 4 + (n * 13 + w * 7) % 14; if (x + len > HW - 4) break;
+        rect(g, x, y, len, 1, flagged && w === 1 ? '#ff5c7a' : ['#6fd3ff', '#b48cff', '#9be58f', '#c9d4e0', '#ffd66b'][(n + w) % 5]); x += len + 3;
+      }
+    }
+    const gate = Math.floor(t * 1.2) % 2;
+    rect(g, 18, HH - 13, 72, 11, gate ? '#ffd66b' : '#2a2438'); label(g, 'APPROVE?', 54, HH - 12, gate ? '#1a1320' : '#ffd66b', 'center');
+  },
+  packets(g, t) {                                                    // Go Pub/Sub: topic fan-out, retries, dead letters
+    rect(g, 0, 0, HW, HH, '#0a1017');
+    for (let y = 0; y < HH; y += 6) for (let x = (y / 6) % 2 * 3; x < HW; x += 6) rect(g, x, y, 1, 1, '#132230');
+    const hub = [22, 42], subs = [[80, 14], [84, 34], [84, 54], [80, 72]];
+    subs.forEach(([x, y]) => { for (let i = 0; i <= 60; i++) { const k = i / 60; rect(g, Math.round(hub[0] + (x - hub[0]) * k), Math.round(hub[1] + (y - hub[1]) * k), 1, 1, '#1d3346'); } });
+    rect(g, hub[0] - 8, hub[1] - 8, 17, 17, '#3de0ff'); rect(g, hub[0] - 7, hub[1] - 7, 15, 15, '#0a1017'); rect(g, hub[0] - 4, hub[1] - 4, 9, 9, '#3de0ff');
+    label(g, 'TOPIC', hub[0], hub[1] + 11, '#3de0ff', 'center');
+    subs.forEach(([x, y], s2) => {
+      const failing = s2 === 3;
+      rect(g, x - 4, y - 4, 9, 9, failing ? '#ff9f4a' : '#57f287'); rect(g, x - 3, y - 3, 7, 7, '#0a1017'); rect(g, x - 1, y - 1, 3, 3, failing ? '#ff9f4a' : '#57f287');
+      for (let p2 = 0; p2 < 5; p2++) {
+        const k = (t * 1.3 + p2 / 5 + s2 * .11) % 1;
+        rect(g, Math.round(hub[0] + (x - hub[0]) * k) - 1, Math.round(hub[1] + (y - hub[1]) * k), 3, 1, failing && k > .8 ? '#ff5c7a' : '#ffd66b');
+      }
+    });
+    rect(g, 58, HH - 10, 30, 9, '#2a1420'); rect(g, 58, HH - 10, 30, 1, '#ff5c7a'); label(g, 'DLQ', 73, HH - 9, '#ff5c7a', 'center');
+    const r = Math.floor(t * 1.5) % 4; label(g, 'RETRY ' + (r + 1) + '/3', 3, 3, r === 3 ? '#ff5c7a' : '#8aa6bf');
+    label(g, '1.54M/S', HW - 3, 3, '#57f287', 'right');
+  },
+  delivery(g, t) {                                                   // FeastFleet: order -> SQS -> rider across the grid
+    rect(g, 0, 0, HW, HH, '#0c0e13');
+    for (let bx = 0; bx < 6; bx++) for (let by = 0; by < 4; by++) {                                   // city blocks
+      const x = 4 + bx * 18, y = 16 + by * 17;
+      rect(g, x, y, 13, 12, '#161b26');
+      for (let w = 0; w < 6; w++) if (hash(bx * 9 + w, by) < .35) rect(g, x + 2 + (w % 3) * 4, y + 2 + Math.floor(w / 3) * 5, 2, 2, '#3a3350');
+    }
+    rect(g, 22, 34, 13, 12, '#ff8a5c'); rect(g, 24, 31, 9, 3, '#ffb45c'); label(g, 'FOOD', 28, 47, '#ffb45c', 'center');
+    rect(g, 76, 67, 13, 12, '#6fd3ff'); rect(g, 78, 64, 9, 3, '#9fe8ff');
+    rect(g, 3, 3, 46, 10, '#1f2536'); label(g, 'SQS', 5, 4, '#ffd66b');
+    const q = Math.floor(t * 1.5) % 6, qn = q > 3 ? 6 - q : q;
+    for (let k = 0; k < 4; k++) rect(g, 24 + k * 6, 5, 4, 6, k < qn ? '#ffd66b' : '#2a3044');
+    const path = [[35, 40], [40, 40], [40, 64], [76, 64], [76, 72]], segs = [5, 24, 36, 8], total = 73;
+    let d = ((t * .22) % 1) * total, i = 0;
+    while (i < 3 && d > segs[i]) { d -= segs[i]; i++; }
+    const [ax, ay] = path[i], [bx2, by2] = path[i + 1], f = Math.min(1, d / segs[i]), rx = ax + (bx2 - ax) * f, ry = ay + (by2 - ay) * f;
+    for (let k2 = 0; k2 < 12; k2++) { const tt = Math.max(0, d - k2 * 1.5) / segs[i]; rect(g, Math.round(ax + (bx2 - ax) * tt), Math.round(ay + (by2 - ay) * tt), 1, 1, '#2f6b4a'); }
+    rect(g, Math.round(rx) - 2, Math.round(ry) - 2, 5, 5, '#57f287'); rect(g, Math.round(rx) - 1, Math.round(ry) - 1, 3, 3, '#c8ffd6');
+    label(g, 'LAMBDA', HW - 3, 4, '#8aa6bf', 'right');
+  },
+  chart(g, t) {                                                      // Chronos: live time series, bad records quarantined
+    rect(g, 0, 0, HW, HH, '#06120c');
+    for (let y = 14; y < HH - 4; y += 12) for (let x = 0; x < HW; x += 3) rect(g, x, y, 1, 1, '#123020');
+    for (let x = 0; x < HW; x += 18) for (let y = 12; y < HH - 4; y += 3) rect(g, x, y, 1, 1, '#0f2619');
+    let prev = null, lastY = 0; const flags = [];
+    for (let x = 0; x < HW - 6; x++) {
+      const u = x + t * 22, spike = (Math.floor(u) % 53 === 17);
+      const v = Math.sin(u * .09) * 13 + Math.sin(u * .025) * 11 + Math.sin(u * .31) * 2;
+      const y = Math.round(48 - v + (spike ? -16 : 0));
+      if (spike) flags.push([x, y]);
+      if (prev !== null) { const a = Math.min(prev, y), b = Math.max(prev, y); rect(g, x, a, 1, b - a + 1, spike ? '#ff5c7a' : '#57f287'); rect(g, x, b + 1, 1, 1, '#1d5a36'); }
+      prev = y; lastY = y;
+    }
+    flags.forEach(([x, y]) => { for (let a = 0; a < 16; a++) rect(g, Math.round(x + Math.cos(a / 16 * 6.28) * 4), Math.round(y + Math.sin(a / 16 * 6.28) * 4), 1, 1, '#ff5c7a'); });
+    rect(g, HW - 7, lastY - 1, 3, 3, '#e6ffe9');
+    label(g, 'LIVE', 3, 2, '#57f287');
+    const qn = 12 + Math.floor(t * .7) % 30; label(g, 'QUARANTINE ' + qn, HW - 3, 2, '#ff5c7a', 'right');
+  },
+  meter(g, t) {                                                      // Astral: context fills, warns, snapshots to FTS5
+    rect(g, 0, 0, HW, HH, '#0d0b16');
+    label(g, 'CONTEXT', 6, 8, '#8a82a0');
+    const k = (t * .1) % 1, w = Math.floor(k * 94);
+    rect(g, 6, 20, 96, 14, '#2a2438'); rect(g, 7, 21, 94, 12, '#0d0b16');
+    const col = k < .4 ? '#57f287' : k < .55 ? '#ffd66b' : k < .7 ? '#ff9f4a' : '#ff5c7a';
+    for (let x = 0; x < w; x++) rect(g, 7 + x, 21, 1, 12, x % 3 === 2 ? '#0d0b16' : col);
+    [[.4, '40'], [.55, '55'], [.7, '70']].forEach(([m, n]) => { const x = 7 + Math.floor(94 * m); rect(g, x, 17, 1, 20, '#6c6479'); label(g, n, x + 2, 37, '#6c6479'); });
+    label(g, Math.round(k * 100) + '%', 102, 8, col, 'right');
+    rect(g, 6, 50, 96, 30, '#15121f');
+    label(g, 'FTS5', 10, 52, '#b48cff');
+    const saved = Math.floor(k * 9);
+    for (let i = 0; i < 8; i++) { const x = 10 + i * 11, on = i < saved; rect(g, x, 64, 8, 10, on ? '#b48cff' : '#241f33'); if (on) rect(g, x + 1, 66, 6, 1, '#e6d8ff'); }
+    if (k > .7 && Math.floor(t * 4) % 2) { rect(g, 6, 3, 38, 1, '#ff5c7a'); }
+    label(g, 'recall()', 102, 52, '#6fd3ff', 'right');
+  },
+  noise(g, t) {                                                      // Veil: noisy counts on device, cap, blocked ad
+    rect(g, 0, 0, HW, HH, '#0f0918');
+    const cap = 30, base = HH - 8;
+    for (let y = 12; y < base; y += 10) for (let x = 0; x < HW; x += 3) rect(g, x, y, 1, 1, '#1f1430');
+    for (let i = 0; i < 12; i++) {
+      const trueH = 10 + ((i * 37) % 30), noisy = Math.max(3, trueH + Math.round(Math.sin(t * 3.4 + i * 1.7) * 7));
+      const x = 5 + i * 8, over = noisy > cap + 8;
+      rect(g, x, base - noisy, 6, noisy, over ? '#ff5c7a' : '#b48cff'); rect(g, x, base - noisy, 6, 1, over ? '#ffb0c0' : '#e2d2ff');
+      rect(g, x + 1, base - trueH, 4, 1, '#ffffff55');                                               // true count, hidden by noise
+    }
+    for (let x = 0; x < HW; x += 3) rect(g, x, base - cap - 8, 2, 1, '#ffd66b');
+    label(g, 'CAP', 3, base - cap - 18, '#ffd66b');
+    const on = Math.floor(t * 1.1) % 2 === 0;
+    rect(g, 70, 4, 34, 20, on ? '#3a2233' : '#1a1320'); label(g, 'AD', 87, 10, on ? '#ffb0c0' : '#5a3a4a', 'center');
+    if (on) for (let i = 0; i < 20; i++) { rect(g, 77 + i, 4 + i, 1, 1, '#ff5c7a'); rect(g, 96 - i, 4 + i, 1, 1, '#ff5c7a'); }
+    label(g, 'ε=1.0', 3, 3, '#6fd3ff');
+  },
+};
+
 /* ---------------- CRT post: glow spill, scanlines, curved glass, static ---------------- */
 function avgColor(sg) {
   const d = sg.getImageData(0, 0, SW, SH).data; let r = 0, gg = 0, b = 0, n = 0;
@@ -372,6 +507,9 @@ const tvs = [0, 1, 2].map(i => {
 // Channels of three; a short last channel shows NO SIGNAL on its open slots.
 const NCH = Math.ceil(PROJECTS.length / 3);
 function current() { return [0, 1, 2].map(i => PROJECTS[channel * 3 + i] ?? null); }
+// Hover box: recruiter skills as chips, then the engineer's stack line by line.
+const sayHTML = (keywords, stack) => `<b>Skills</b><div class="say-kw">${keywords.map((k, i) => `<span style="--k:${i}">${esc(k)}</span>`).join('')}</div>`
+  + `<b>Stack</b><ul>${stack.map((l, k) => `<li style="--k:${k + keywords.length}">${esc(l)}</li>`).join('')}</ul>`;
 // Sets are built left, right, raised middle; a channel reads left -> middle -> right.
 const onTV = i => current()[[0, 2, 1][i]];
 // Triangle: TV 1 bottom-left, TV 2 bottom-right, TV 3 centred and raised.
@@ -465,7 +603,7 @@ function renderNow() {
     const p = onTV(i);
     tv.btn.classList.toggle('empty', !p);
     tv.label.innerHTML = p ? `<small>${esc(p.tag)}</small>${esc(p.name)}` : `<small>CH 0${channel + 1}</small>Open slot`;
-    tv.say.innerHTML = p ? `<b>Stack</b><ul>${p.libs.map((l, k) => `<li style="--k:${k}">${esc(l)}</li>`).join('')}</ul>` : '';
+    tv.say.innerHTML = p ? sayHTML(p.keywords, p.libs) : '';
     tv.btn.setAttribute('aria-label', p ? `${esc(p.name)}: ${esc(p.line)} Show details` : 'Open slot, no project on this channel yet');
   });
   const ch = $id('chLabel'), pad = n => String(n).padStart(2, '0');
@@ -560,8 +698,9 @@ function frontPost(g) {
 
 const cu = $id('closeup'), cuSheet = $id('cuSheet'), cuCv = $id('cuTV');
 cuCv.width = FW; cuCv.height = FH;
-const cuG = cuCv.getContext('2d'), cuScreen = document.createElement('canvas'); cuScreen.width = SW; cuScreen.height = SH;
-const cuSg = cuScreen.getContext('2d', { willReadFrequently: true }), cuNoise = cuG.createImageData(FSW, FSH);
+const cuG = cuCv.getContext('2d');
+const cuNoise = cuG.createImageData(FSW, FSH);
+const cuHi = document.createElement('canvas'); cuHi.width = FSW; cuHi.height = FSH; const cuHg = cuHi.getContext('2d');
 const cuState = { job: null, i: 0, onAt: 0, switchAt: -10, knobs: [{ from: -Math.PI / 2, to: -Math.PI / 2, t0: 0, dur: 0 }, { from: -1, to: -1, t0: 0, dur: 0 }] };
 // a project close-up walks every project; a job close-up walks that job's work items
 const cuCount = () => (cuState.job ? Math.min(JOB_SCENES[cuState.job.id].length, cuState.job.work.length) : PROJECTS.length);
@@ -638,10 +777,10 @@ function drawCloseup(t) {
     g.putImageData(cuNoise, FSX, FSY);
   } else {
     const clip = clipFor(job ? job.id : PROJECTS[cuState.i].id);
-    if (clip.ready) drawCover(cuSg, clip.video, SW, SH);
-    else if (job) JOB_SCENES[job.id][cuState.i](cuSg, reduce ? 2 : t);
-    else scenes[PROJECTS[cuState.i].scene](cuSg, reduce ? 1.5 : t);
-    g.imageSmoothingEnabled = false; g.drawImage(cuScreen, FSX, FSY, FSW, FSH);
+    const hiScene = !job && hiScenes[PROJECTS[cuState.i].scene];                          // projects; jobs use JOB_HI
+    if (clip.ready) { drawCover(cuHg, clip.video, FSW, FSH); g.drawImage(cuHi, FSX, FSY); }
+    else if (hiScene) { hiScene(cuHg, reduce ? 1.5 : t); g.drawImage(cuHi, FSX, FSY); }         // native 2x detail
+    else { JOB_HI[job.id][cuState.i](cuHg, reduce ? 2 : t); g.drawImage(cuHi, FSX, FSY); }
   }
   if (on < 1) {                                                                     // power-on: a line, then the picture opens up
     const band = on < .35 ? 0 : Math.round(FSH * ((on - .35) / .65) ** 2);
@@ -1731,6 +1870,200 @@ const JOB_SCENES = {
     },
   ],
 };
+/* Close-up versions of the job scenes at 108x84: same ideas, finer detail, and a few labels that
+   carry the real numbers from each job's text. */
+function flowBgHi(g, t, hue) {
+  const h = (hue + (reduce ? 0 : t * 9)) % 360, cols = [0, 1, 2, 3].map(k => `hsl(${(h + k * 18) % 360}, ${40 + k * 6}%, ${4 + k * 3}%)`);
+  for (let y = 0; y < HH; y++) for (let x = 0; x < HW; x++) {
+    const v = (Math.sin(x * .065 + t * .7) + Math.sin(y * .085 - t * .5) + Math.sin((x + y) * .045 + t * .35) + Math.sin(Math.hypot(x - 54, y - 42) * .11 - t * .9)) / 4;
+    g.fillStyle = cols[Math.max(0, Math.min(3, Math.floor((v + 1) / 2 * 3.99 + (bayer(x, y) - .5) * .9)))]; g.fillRect(x, y, 1, 1);
+  }
+}
+const ring = (g, cx, cy, r, col, n = 40) => { for (let a = 0; a < n; a++) P2(g, cx + Math.cos(a / n * 6.283) * r, cy + Math.sin(a / n * 6.283) * r, col); };
+const JOB_HI = {
+  insight: [
+    function llmCore(g, t) {                                   // teams' requests stream into the LLM core; a few hit the rate limit
+      flowBgHi(g, t, 275);
+      const cx = 62, cy = 44, pulse = 9 + Math.sin(t * 3) * 1.5;
+      for (let y = -20; y <= 20; y++) for (let x = -20; x <= 20; x++) {
+        const d = Math.hypot(x, y);
+        if (d < pulse) P2(g, cx + x, cy + y, d < pulse * .4 ? '#fff4ff' : d < pulse * .72 ? '#d8b4ff' : '#9a6aff');
+        else if (d < pulse + 7 && bayer(cx + x, cy + y) < (1 - (d - pulse) / 7) * .5) P2(g, cx + x, cy + y, '#5a3aa0');
+      }
+      ring(g, cx, cy, 21, '#ff5c7a', 70);
+      for (let i = 0; i < 14; i++) {
+        const k = (t * .55 + i / 14) % 1, lane = 14 + (i * 23) % 60, blocked = i % 5 === 2;
+        const x = blocked && k > .55 ? 8 + (1 - k) * 110 : 8 + k * 60, y = lane + (cy - lane) * Math.min(1, k * 1.4) * (blocked ? .6 : 1);
+        rect(g, Math.round(x), Math.round(y), 2, 2, blocked && k > .55 ? '#ff5c7a' : '#6fd3ff');
+      }
+      label(g, 'TEAMS', 3, 3, '#6fd3ff'); label(g, 'LLM', HW - 3, cy - 4, '#e6d8ff', 'right'); label(g, 'RATE LIMIT', HW - 3, 3, '#ff5c7a', 'right');
+      rect(g, 3, HH - 7, 60, 4, '#241a3a'); rect(g, 3, HH - 7, Math.round(60 * (.3 + .6 * ((t * .08) % 1))), 4, '#b48cff'); label(g, 'TOKENS', 66, HH - 10, '#b48cff');
+    },
+    function heartbeat(g, t) {                                 // live telemetry; a Z-score spike sets off alarm rings
+      rect(g, 0, 0, HW, HH, '#07100d');
+      for (let y = 12; y < HH; y += 12) for (let x = 0; x < HW; x += 3) P2(g, x, y, '#10251c');
+      const base = 46, spikeAt = 70;
+      for (let x = 0; x < HW - 8; x++) {                                                          // EWMA band
+        P2(g, x, base - 8, '#1d4a36'); P2(g, x, base + 8, '#1d4a36');
+      }
+      let prev = null;
+      for (let x = 0; x < HW - 8; x++) {
+        const u = x + t * 26, m = Math.floor(u) % 120;
+        let y = base + Math.sin(u * .4) * 2 + Math.sin(u * .13) * 3;
+        if (m > 40 && m < 48) y = base - [0, 6, -4, 22, -12, 6, -2, 0][m - 40];
+        y = Math.round(y);
+        if (prev !== null) rect(g, x, Math.min(prev, y), 1, Math.abs(prev - y) + 1, Math.abs(y - base) > 12 ? '#ff5c7a' : '#57f287');
+        prev = y;
+      }
+      const hot = (t * 26) % 120 > 30 && (t * 26) % 120 < 70;
+      if (hot) { const r = ((t * 30) % 20); ring(g, spikeAt, 20, 4 + r, '#ff5c7a', 50); ring(g, spikeAt, 20, 2 + r * .5, '#ff9f4a', 30); }
+      label(g, 'EVENT HUBS', 3, 3, '#57f287'); label(g, hot ? 'ALERT' : 'OK', HW - 3, 3, hot ? '#ff5c7a' : '#57f287', 'right'); label(g, 'Z-SCORE', HW - 3, HH - 10, '#2f7a56', 'right');
+      label(g, 'EWMA', 3, base + 11, '#2f7a56');
+    },
+    function drain(g, t) {                                     // leaked sockets pile up red, then one pooled pipe drains to green
+      rect(g, 0, 0, HW, HH, '#0c0b14');
+      const k = (t * .16) % 1, fix = k > .5, f2 = fix ? (k - .5) * 2 : 0;
+      const n = fix ? Math.round(48 * (1 - f2)) : Math.round(48 * k * 2);
+      for (let i = 0; i < 48; i++) { const x = 6 + (i % 12) * 6, y = 20 + Math.floor(i / 12) * 8; rect(g, x, y, 4, 5, i < n ? '#ff5c7a' : '#221e30'); }
+      label(g, fix ? 'POOLED KEEP-ALIVE' : 'PORTS EXHAUSTING', 6, 8, fix ? '#57f287' : '#ff5c7a');
+      rect(g, 82, 18, 20, 36, '#1a1726'); rect(g, 88, 18, 8, 36, fix ? '#57f287' : '#3a3350');                // the pool pipe
+      if (fix) for (let i = 0; i < 6; i++) rect(g, 89, 18 + ((t * 40 + i * 6) % 36), 6, 2, '#c8ffd6');
+      rect(g, 6, HH - 22, 96, 20, '#15121f'); label(g, '99.86% SLO', 10, HH - 21, '#ffd66b'); label(g, '3,412 REQ/S', 10, HH - 12, '#8a82a0');
+    },
+    function spectrum(g, t) {                                  // real-time dashboard: neon spectrum held at 60fps
+      flowBgHi(g, t, 300);
+      rect(g, 4, 16, 100, 50, '#0a0714cc');
+      for (let i = 0; i < 24; i++) {
+        const h = Math.round(8 + 16 * (.5 + .5 * Math.sin(t * 5 + i * .7)) * (.6 + .4 * Math.sin(t * 1.3 + i * .2)) + 12 * Math.abs(Math.sin(i * .9)));
+        for (let y = 0; y < h; y += 2) rect(g, 6 + i * 4, 64 - y, 3, 1, y > h - 6 ? '#ff5cae' : y > h * .6 ? '#b48cff' : '#6fd3ff');
+        rect(g, 6 + i * 4, 62 - h - 2, 3, 1, '#fff4ff');
+      }
+      label(g, 'SIGNALR', 4, 4, '#6fd3ff'); label(g, '60 FPS', HW - 4, 4, '#57f287', 'right');
+      ['OPS', 'ADMIN', 'VIEW'].forEach((r, i) => { const x = 4 + i * 34; rect(g, x, HH - 14, 31, 11, i === Math.floor(t * .5) % 3 ? '#b48cff' : '#1c1630'); label(g, r, x + 15, HH - 12, i === Math.floor(t * .5) % 3 ? '#140f22' : '#8a82a0', 'center'); });
+    },
+    function portal(g, t) {                                    // partner portal: recurring care calendar around a beating heart
+      rect(g, 0, 0, HW, HH, '#100c16');
+      const lit = Math.floor(t * 4) % 35;
+      for (let i = 0; i < 35; i++) {
+        const x = 4 + (i % 7) * 9, y = 18 + Math.floor(i / 7) * 12, on = i % 7 === 2 || i % 7 === 5;
+        rect(g, x, y, 8, 10, i === lit ? '#ffd66b' : on ? '#3a2a4a' : '#1e1828');
+        if (on) rect(g, x + 2, y + 6, 4, 2, i <= lit ? '#ff5c7a' : '#5a3a4a');
+      }
+      label(g, 'SUBSCRIPTIONS', 4, 5, '#e6d8ff');
+      const b = 1 + .18 * Math.max(0, Math.sin(t * 6)) ** 8, cx = 88, cy = 46;
+      for (let y = -12; y <= 12; y++) for (let x = -13; x <= 13; x++) {
+        const X = x / (11 * b), Y = -y / (11 * b), v = (X * X + Y * Y - .45) ** 3 - X * X * Y * Y * Y;
+        if (v < 0) P2(g, cx + x, cy + y, v > -.004 ? '#ff9fb0' : '#ff3d6a');
+      }
+      label(g, 'PATIENTS', 88, 64, '#ff9fb0', 'center'); label(g, 'DOCTORS', 88, 73, '#8a82a0', 'center');
+    },
+    function scanner(g, t) {                                   // a vision model tags bottles on the line
+      rect(g, 0, 0, HW, HH, '#0b0f14');
+      rect(g, 0, 60, HW, 6, '#2a2f3a'); for (let x = -((t * 20) % 6); x < HW; x += 6) rect(g, Math.round(x), 62, 3, 2, '#3e4555');
+      const lx = 58;
+      for (let i = 0; i < 8; i++) {
+        const x = Math.round(((i * 16 + t * 20) % 128) - 12), tagged = x > lx;
+        rect(g, x + 3, 32, 4, 4, '#2f6b4a'); rect(g, x + 2, 36, 6, 4, '#3f8f5a'); rect(g, x + 1, 40, 8, 20, '#3f8f5a'); rect(g, x + 2, 42, 2, 14, '#8fdcaa');
+        if (tagged) { rect(g, x, 24, 10, 6, '#57f287'); rect(g, x + 1, 25, 8, 4, '#0b0f14'); rect(g, x + 2, 26, 6, 2, '#57f287'); }
+      }
+      for (let y = 10; y < 60; y++) if ((y + Math.floor(t * 30)) % 3) P2(g, lx, y, '#ff3d5a');
+      rect(g, lx - 6, 4, 13, 6, '#3a3f5a'); rect(g, lx - 1, 10, 3, 2, '#ff3d5a');
+      label(g, 'CV MODEL', 3, 3, '#8aa6bf'); label(g, 'TAGGED ' + (120 + Math.floor(t * 1.25)), HW - 3, 72, '#57f287', 'right');
+    },
+    function pairTree(g, t) {                                  // pair programming: two cursors growing one tree
+      rect(g, 0, 0, HW, HH, '#0d0f17');
+      const grow = (t * .25) % 1, nodes = [[54, 70, -1]];                                     // [x, y, parent]; breadth-first binary tree
+      for (let i = 0; nodes.length < 15; i++) { const [x, y] = nodes[i], d = Math.floor(Math.log2(i + 1)) + 1; [-1, 1].forEach(s2 => nodes.push([x + s2 * 28 / d, y - 16, i])); }
+      const shown = Math.floor(nodes.length * grow) + 1;
+      nodes.slice(0, shown).forEach(([x, y, par], i) => {
+        if (par >= 0) { const [px2, py2] = nodes[par]; for (let k = 0; k <= 12; k++) P2(g, px2 + (x - px2) * k / 12, py2 + (y - py2) * k / 12, '#3a5a4a'); }
+        rect(g, Math.round(x) - 2, Math.round(y) - 2, 5, 5, i % 2 ? '#ff5cae' : '#6fd3ff');
+      });
+      const [ax, ay] = nodes[Math.min(shown, nodes.length - 1)], blink = Math.floor(t * 3) % 2;
+      if (blink) { rect(g, Math.round(ax) + 4, Math.round(ay) - 4, 1, 8, '#ff5cae'); rect(g, Math.round(ax) - 5, Math.round(ay) - 4, 1, 8, '#6fd3ff'); }
+      label(g, 'SENIOR', 3, 3, '#6fd3ff'); label(g, 'JUNIOR', HW - 3, 3, '#ff5cae', 'right'); label(g, '3 TEAMS', 54, HH - 9, '#8a82a0', 'center');
+    },
+  ],
+  hanu: [
+    function lap(g, t) {                                       // p95 needle held in the green under 100ms
+      rect(g, 0, 0, HW, HH, '#0c0f12');
+      const cx = 54, cy = 58, R = 38;
+      for (let a = 0; a <= 180; a += 1.2) {
+        const ang = Math.PI + a / 180 * Math.PI, zone = a < 90 ? '#2f8f5a' : a < 135 ? '#c9a43a' : '#b8403a';
+        for (let r = R - 5; r <= R; r++) P2(g, cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, zone);
+        if (a % 18 < 1.2) for (let r = R - 9; r < R - 6; r++) P2(g, cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, '#6c7280');
+      }
+      const v = 55 + Math.sin(t * 2.3) * 10 + Math.sin(t * 7) * 3, ang = Math.PI + v / 180 * Math.PI;
+      for (let r = 0; r < R - 7; r++) P2(g, cx + Math.cos(ang) * r, cy + Math.sin(ang) * r, '#ffffff');
+      rect(g, cx - 3, cy - 3, 7, 7, '#e6e9ef');
+      label(g, 'p95', cx, cy + 8, '#8aa6bf', 'center'); label(g, Math.round(v * 1.1) + 'ms', cx, cy + 17, '#57f287', 'center');
+      label(g, 'C++', 3, 3, '#6fd3ff'); label(g, 'O(N) TO O(1)', HW - 3, 3, '#ffd66b', 'right');
+    },
+    function shield(g, t) {                                    // security gates zap bugs before merge
+      rect(g, 0, 0, HW, HH, '#0e0c14');
+      ['SEMGREP', 'GITLEAKS', 'SONAR'].forEach((n, i) => { const y = 14 + i * 18; rect(g, 56, y, 50, 13, '#1c2a24'); rect(g, 56, y, 2, 13, '#57f287'); label(g, n, 60, y + 3, '#9be58f'); });
+      for (let y = 10; y < 70; y++) P2(g, 50 + Math.round(Math.sin(y * .3 + t * 4) * 1.5), y, '#6fd3ff');          // the shield
+      for (let i = 0; i < 6; i++) {
+        const k = (t * .5 + i / 6) % 1, x = Math.round(4 + k * 46), y = 16 + (i * 13) % 50;
+        if (k > .92) { ring(g, 50, y, 3 + (k - .92) * 60, '#ffd66b', 16); continue; }
+        rect(g, x, y, 4, 3, '#ff5c7a'); P2(g, x - 1, y - 1, '#ff5c7a'); P2(g, x + 4, y - 1, '#ff5c7a'); P2(g, x - 1, y + 3, '#ff5c7a'); P2(g, x + 4, y + 3, '#ff5c7a');
+      }
+      label(g, 'CRITICAL 0', 3, HH - 10, '#57f287'); label(g, 'COV ~55%', HW - 3, HH - 10, '#ffd66b', 'right');
+    },
+    function coins(g, t) {                                     // spend falls ~40% while the scale set breathes with load
+      rect(g, 0, 0, HW, HH, '#0d1210');
+      const bars = [40, 39, 41, 38, 33, 29, 26, 24, 24, 23];
+      bars.forEach((h, i) => { const x = 4 + i * 6; rect(g, x, 66 - h, 4, h, i < 4 ? '#c9a43a' : '#57f287'); rect(g, x, 66 - h, 4, 1, '#fff2b0'); });
+      for (let x = 4; x < 64; x += 2) P2(g, x, 26, '#6c7280');
+      label(g, 'AZURE SPEND', 3, 3, '#c9d4e0'); label(g, '-40%', 50, 14, '#57f287', 'center');
+      const load = .5 + .5 * Math.sin(t * .9), n = 3 + Math.round(load * 5);
+      label(g, 'VMSS', 86, 3, '#8aa6bf', 'center');
+      for (let i = 0; i < 8; i++) { const x = 72 + (i % 2) * 15, y = 16 + Math.floor(i / 2) * 13; rect(g, x, y, 12, 10, i < n ? '#2f8f96' : '#1a2224'); if (i < n) rect(g, x + 2, y + 2, 3, 1, '#9fe8e0'); }
+      label(g, 'TERRAFORM', HW - 3, HH - 10, '#b48cff', 'right');
+    },
+    function donut(g, t) {                                     // FinOps dashboard: flowing area + turning donut
+      flowBgHi(g, t, 200);
+      rect(g, 3, 14, 60, 50, '#081018cc');
+      for (let x = 0; x < 58; x++) {
+        const y = Math.round(44 - 12 * Math.sin((x + t * 12) * .12) - 6 * Math.sin((x + t * 12) * .05));
+        for (let yy = y; yy < 62; yy++) P2(g, 4 + x, yy, yy === y ? '#6fd3ff' : bayer(x, yy) < .35 ? '#1d4a66' : '#0f2638');
+      }
+      const cx = 86, cy = 40, spin = t * .8, parts = [['#6fd3ff', .45], ['#b48cff', .3], ['#ffd66b', .25]];
+      for (let y = -16; y <= 16; y++) for (let x = -16; x <= 16; x++) {
+        const d = Math.hypot(x, y); if (d > 16 || d < 9) continue;
+        let a = ((Math.atan2(y, x) - spin) / 6.283 % 1 + 1) % 1, c = parts[2][0];
+        for (let i = 0, acc = 0; i < 3; i++) { acc += parts[i][1]; if (a < acc) { c = parts[i][0]; break; } }
+        P2(g, cx + x, cy + y, c);
+      }
+      label(g, 'LIVE REST', 3, 3, '#6fd3ff'); label(g, 'ENTRA ID', HW - 3, 3, '#ffd66b', 'right'); label(g, 'REACT + TS', HW - 3, HH - 10, '#8aa6bf', 'right');
+    },
+  ],
+  ey: [
+    function lanes(g, t) {                                     // sensors -> MQTT -> 3 Kafka topics -> TimescaleDB
+      rect(g, 0, 0, HW, HH, '#0b1210');
+      for (let i = 0; i < 4; i++) { const y = 16 + i * 16; rect(g, 3, y, 10, 10, '#2a3a30'); rect(g, 6, y + 3, 4, 4, Math.floor(t * 3 + i) % 2 ? '#57f287' : '#1d4a36'); }
+      rect(g, 20, 14, 14, 58, '#1a2a24'); label(g, 'MQTT', 27, 74, '#8aa6bf', 'center');
+      [22, 42, 62].forEach((y, i) => {
+        rect(g, 40, y - 2, 46, 6, '#152420');
+        for (let p2 = 0; p2 < 5; p2++) { const x = 40 + ((t * 26 + p2 * 10 + i * 4) % 46); rect(g, Math.round(x), y, 4, 2, ['#ffd66b', '#6fd3ff', '#b48cff'][i]); }
+      });
+      label(g, 'KAFKA x3', 63, 4, '#ffd66b', 'center');
+      rect(g, 90, 22, 15, 42, '#2a2440'); rect(g, 90, 22, 15, 4, '#b48cff'); rect(g, 90, 42, 15, 1, '#3a3350'); rect(g, 90, 52, 15, 1, '#3a3350');
+      label(g, 'TSDB', 97, 68, '#b48cff', 'center'); label(g, 'AWS', 3, 3, '#ff9f4a');
+    },
+    function race(g, t) {                                      // slow query drip vs. an instant cache hit: 250ms -> 38ms
+      rect(g, 0, 0, HW, HH, '#0e0c14');
+      const k = (t * .45) % 1;
+      rect(g, 4, 20, 100, 16, '#1a1726'); rect(g, 4, 50, 100, 16, '#1a1726');
+      label(g, 'SPARK QUERY', 4, 10, '#8a82a0'); label(g, 'REDIS CACHE', 4, 40, '#ff5c7a');
+      const slow = Math.min(1, k * 1.0), fast = Math.min(1, k * 6.5);
+      for (let i = 0; i < Math.round(98 * slow); i += 3) rect(g, 5 + i, 26, 2, 4, '#6c6479');
+      rect(g, 5, 55, Math.round(98 * fast), 6, '#ff5c7a'); if (fast < 1) rect(g, 5 + Math.round(98 * fast) - 3, 53, 3, 10, '#fff0f4');
+      label(g, '250ms', 104, 10, '#8a82a0', 'right'); label(g, '38ms', 104, 40, '#ff5c7a', 'right');
+      label(g, '-85%', 54, HH - 12, '#57f287', 'center');
+    },
+  ],
+};
 const WORK_ORDER = ['insight', 'hanu', 'ey'];                    // most recent first, left to right; middle set raised
 const WSLOT = 7;
 const lcdWrap = $id('lcds');
@@ -1745,7 +2078,7 @@ const lcds = WORK_ORDER.map((id, n) => {
   tape.textContent = j.when.split(/\s+[–-]\s+/).map(d => d.replace(/(\w{3})\w*\s+\d{2}(\d{2})/, '$1 $2').toUpperCase()).join(' → ');
   const scope = document.createElement('canvas'); scope.width = 84; scope.height = 14; scope.className = 'scope'; scope.setAttribute('aria-hidden', 'true'); scope.style.width = '252px'; scope.style.height = '42px';
   const say = document.createElement('div'); say.className = 'say'; say.setAttribute('aria-hidden', 'true');
-  say.innerHTML = `<b>Stack</b><ul>${j.stack.map((l, k) => `<li style="--k:${k}">${esc(l)}</li>`).join('')}</ul>`;
+  say.innerHTML = sayHTML(j.keywords, j.stack);
   d.append(scope, cv, tape, say, shadow, cap); lcdWrap.append(d);
   d.addEventListener('mouseenter', () => placeSay(d, say, n === 0 ? 'left' : 'right'));
   d.tabIndex = 0; d.setAttribute('role', 'button');

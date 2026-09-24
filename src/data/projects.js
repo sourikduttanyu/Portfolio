@@ -1,6 +1,7 @@
 // Source of truth for claims: Sourik_Master_Profile.md (honesty guardrails apply).
 // Libraries are taken from each repo's manifests and imports (requirements.txt, go.mod,
-// package.json), capped at the five an engineer would look for first.
+// package.json), capped at the five an engineer would look for first. `keywords` are the
+// recruiter-facing skills (plain job-post terms), drawn only from the master profile.
 //
 // tier 'feature' = large entry with a full clip; 'compact' = smaller entry with a small clip.
 // Clips: `scripts/encode-clip.sh <recording> <slug>` writes public/clips/<slug>.mp4 + .jpg.
@@ -8,6 +9,7 @@
 export const projects = [
   {
     slug: 'jellysynth',
+    keywords: ['GPU programming', 'Video processing', 'Real-time systems', 'Browser performance'],
     tier: 'feature',
     name: 'JellySynth',
     skill: 'Real-time systems · GPU',
@@ -23,6 +25,7 @@ export const projects = [
   },
   {
     slug: 'feastfleet',
+    keywords: ['AWS', 'Serverless', 'Event-driven architecture', 'NoSQL'],
     tier: 'compact',
     name: 'FeastFleet',
     skill: 'Serverless · AWS',
@@ -38,6 +41,7 @@ export const projects = [
   },
   {
     slug: 'chronos',
+    keywords: ['Python', 'REST APIs', 'PostgreSQL', 'Real-time streaming'],
     tier: 'compact',
     name: 'Chronos',
     skill: 'Backend · Data',
@@ -53,6 +57,7 @@ export const projects = [
   },
   {
     slug: 'sentinel',
+    keywords: ['Python', 'LLM agents', 'AI evaluation', 'Security tooling'],
     tier: 'feature',
     name: 'Sentinel',
     skill: 'Agentic AI',
@@ -68,6 +73,7 @@ export const projects = [
   },
   {
     slug: 'go-pubsub',
+    keywords: ['Go', 'Distributed systems', 'Concurrency', 'Observability'],
     tier: 'feature',
     name: 'Go Pub/Sub Broker',
     skill: 'Distributed systems',
@@ -83,6 +89,7 @@ export const projects = [
   },
   {
     slug: 'astral',
+    keywords: ['Python', 'Developer tooling', 'Full-text search', 'MCP'],
     tier: 'compact',
     name: 'Astral',
     skill: 'Developer tools',
@@ -98,6 +105,7 @@ export const projects = [
   },
   {
     slug: 'veil',
+    keywords: ['Go', 'PostgreSQL', 'React', 'Privacy engineering'],
     tier: 'feature',
     name: 'Veil',
     skill: 'Privacy · Backend',

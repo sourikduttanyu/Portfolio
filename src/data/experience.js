@@ -1,7 +1,7 @@
 // Source of truth: Sourik_Master_Profile.md (project root). Keep claims inside its
 // "honesty guardrails": 13,000 = addressable users, 99.86% = internal SLO, ~40% = affected
 // resource categories, C++ = hot-path optimization, EWMA shipped at Insight.
-// `stack` lists only technologies named in that job's `text` (shown in the hover box on its TV).
+// `keywords` = recruiter-facing skills; `stack` lists only technologies named in that job's `text` (shown in the hover box on its TV).
 // Each job shows on one work monitor (public/clips/<slug>.mp4 replaces the placeholder).
 
 export const experience = [
@@ -10,6 +10,7 @@ export const experience = [
     company: 'Insight Enterprises',
     role: 'Software Engineer, Cloud & AI Platform',
     period: 'Jan 2023 – Nov 2023',
+    keywords: ['Java', 'Microservices', 'Kubernetes', 'Azure', 'LLM platforms'],
     stack: ['Spring Boot', 'AKS', 'Azure OpenAI', 'Kafka', 'Redis', 'Angular'],
     work: [
       {
@@ -54,6 +55,7 @@ export const experience = [
     company: 'Hanu Software',
     role: 'Software Engineer, API & Cloud Security',
     period: 'Jan 2022 – Jan 2023',
+    keywords: ['C++', 'C#', 'API performance', 'CI/CD security', 'Infrastructure as code'],
     stack: ['C++', 'C#', 'CosmosDB', 'Terraform', 'Databricks', 'React + TypeScript'],
     work: [
       {
@@ -83,6 +85,7 @@ export const experience = [
     company: 'Ernst & Young',
     role: 'Software Engineer Intern',
     period: 'May 2021 – Jul 2021',
+    keywords: ['Data streaming', 'Kafka', 'AWS', 'IoT', 'Caching'],
     stack: ['MQTT', 'Kafka', 'AWS', 'TimescaleDB', 'Redis', 'Spark'],
     work: [
       {

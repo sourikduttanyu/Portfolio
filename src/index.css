@@ -139,6 +139,12 @@
   .tv .say.left::after { left: auto; right: -9px; clip-path: polygon(0 0, 0 100%, 100% 50%); }
   .tv .say b { display: block; margin-bottom: 4px; font: 400 10px "Silkscreen", monospace; color: var(--gold); letter-spacing: .14em; text-transform: uppercase; }
   .tv .say ul { margin: 0; padding: 0; list-style: none; }
+  .tv .say { max-width: 260px; }
+  .say-kw { display: flex; flex-wrap: wrap; gap: 4px; margin: 0 0 9px; }
+  .say-kw span { padding: 2px 7px 3px; border-radius: 4px; background: oklch(85% 0.13 82 / .14); border: 1px solid oklch(85% 0.13 82 / .45);
+    font-size: 12px; font-weight: 500; color: var(--ink); white-space: nowrap; opacity: 0; transform: translateY(3px); transition: opacity .1s, transform .1s; }
+  .tv:hover .say-kw span, .tv:focus-visible .say-kw span { opacity: 1; transform: none;
+    transition: opacity .16s ease-out, transform .16s ease-out; transition-delay: calc(.16s + var(--k) * 60ms); }
   .tv .say li { font-size: 13px; line-height: 1.5; color: var(--ink); white-space: nowrap; opacity: 0; transform: translateY(3px);
     transition: opacity .1s, transform .1s; }
   .tv .say li::before { content: "▸ "; color: var(--gold); }
@@ -149,7 +155,7 @@
   @media (hover: none) { .tv .say { display: none; } }
   @media (prefers-reduced-motion: reduce) {
     .tv .say, .tv .say.left, .tv .say.right, .tv:hover .say, .tv:focus-visible .say { transform: translate(0, -50%); transition: opacity .15s; }
-    .tv .say li { opacity: 1; transform: none; transition: none; }
+    .tv .say li, .say-kw span { opacity: 1; transform: none; transition: none; }
   }
   /* until the first screen is opened, the name plates breathe gold so the sets read as clickable */
   .nudge .tv-label { animation: plate-call 2.4s ease-in-out infinite; }
