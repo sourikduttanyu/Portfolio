@@ -395,7 +395,8 @@ function drawTVs(t) {
     tv.g.clearRect(0, 0, TV_W, TV_H); tv.g.drawImage(TV_FRAME, 0, 0);
     tv.knobs.forEach((k, j) => drawKnob(tv.g, KNOBS[j][0], KNOBS[j][1], knobAngle(k, t)));
     const since = t - switchAt - i * .06;               // slight stagger between sets
-    const noisy = since >= 0 && since < staticFor;
+    const surge = tv.surgeAt != null && t - tv.surgeAt >= 0 && t - tv.surgeAt < .7;
+    const noisy = (since >= 0 && since < staticFor) || (surge && t - tv.surgeAt < .3);
     if (noisy) { staticNoise(tv.g, t); }
     else {
       const clip = clipFor(current()[i].id);
@@ -406,7 +407,7 @@ function drawTVs(t) {
         tv.g.fillText('CH' + (channel + 1), SX + 3, SY + 3);
       }
     }
-    crtPost(tv.g, tv.sg, noisy); drawDigit(tv.g, channel + 1);
+    crtPost(tv.g, tv.sg, noisy); drawDigit(tv.g, surge ? 1 + Math.floor(Math.random() * 6) : channel + 1);
   });
 }
 
@@ -456,13 +457,13 @@ const MIDTOWN = [
   { x: .52, w: 6, h: 70, s: 'strips', r: 'flat' },                 // Central Park Tower
   { x: .57, w: 5, h: 78, s: 'grid', r: 'flat' },                   // 432 Park: pencil-thin grid
   { x: .63, w: 12, h: 60, s: 'glass', r: 'taper' },                // One Vanderbilt
-  { x: .7, icon: 'esb' }, { x: .79, icon: 'chrysler' },
+  { x: .79, icon: 'chrysler' },
   { x: .86, w: 10, h: 42, s: 'bands', r: 'setback' }, { x: .92, w: 8, h: 36, s: 'grid', r: 'antenna' },
   { x: .97, w: 12, h: 30, s: 'masonry', r: 'flat' },
 ];
 const DOWNTOWN = [
   { x: .0, w: 16, h: 34, s: 'masonry', r: 'crown' }, { x: .07, w: 14, h: 46, s: 'glass', r: 'slant' },
-  { x: .15, w: 20, h: 30, s: 'grid', r: 'setback' }, { x: .3, icon: 'wtc' },
+  { x: .15, w: 20, h: 30, s: 'grid', r: 'setback' },
   { x: .38, w: 13, h: 56, s: 'glass', r: 'flat' }, { x: .44, w: 11, h: 40, s: 'bands', r: 'antenna' },
   { x: .5, icon: 'spruce' }, { x: .57, icon: 'woolworth' }, { x: .635, icon: 'pine70' }, { x: .69, icon: 'wall40' },
   { x: .755, w: 18, h: 36, s: 'grid', r: 'flat' }, { x: .83, w: 13, h: 48, s: 'glass', r: 'slant' },
@@ -541,7 +542,7 @@ function buildCity(P, W, H) {
         dot(g, xx, yy, col(xx > x + (w >> 1) - 2 ? P.side : yy === y ? P.rim : P.face));
       if (i < 2) for (let yy = y + 2; yy < y + h - 1; yy += 2) { dot(g, x - 1, yy, col(P.win[0])); dot(g, x + 1, yy, col(P.win[0])); }
     });
-    box(g, x, y - 12, 1, 12, col(P.side)); dot(g, x, y - 13, P.day ? col(P.side) : '#ff5c7a'); rods.esb = [x, y - 13];
+    box(g, x, y - 20, 1, 20, col(P.side)); box(g, x - 1, y - 6, 3, 1, col(P.side)); dot(g, x, y - 21, P.day ? col(P.side) : '#ff5c7a'); rods.esb = [x, y - 21];
   }
   function chrysler(g, xf, dk) {
     const col = c => tint(c, P.haze, dk), x = Math.round(xf * W), h = Math.round(40 * K), top = HY - h;
@@ -554,7 +555,7 @@ function buildCity(P, W, H) {
     box(g, x, top - 16, 1, 7, col(P.faceHi));
   }
   function wtc(g, xf) {                                                     // One WTC: tapered, faceted, lit left / dark right
-    const x = Math.round(xf * W), h = Math.round(100 * K), top = HY - h;
+    const x = Math.round(xf * W), h = Math.min(Math.round(100 * K), HY - ROD.wtcMaxTop - 29), top = HY - h;
     for (let y = top; y < HY; y++) {
       const k = (HY - y) / h, half = Math.round(8 - k * 5.5);
       for (let xx = x - half; xx <= x + half; xx++) {
@@ -565,7 +566,7 @@ function buildCity(P, W, H) {
         dot(g, xx, y, c);
       }
     }
-    box(g, x, top - 18, 1, 18, P.rim); dot(g, x, top - 19, P.day ? '#ffffff' : '#ff5c7a'); rods.wtc = [x, top - 19];
+    box(g, x, top - 28, 1, 28, P.rim); box(g, x - 1, top - 4, 3, 4, P.rim); dot(g, x, top - 29, P.day ? '#ffffff' : '#ff5c7a'); rods.wtc = [x, top - 29];
   }
   function spruce(g, xf) {                                                  // 8 Spruce: rippled stainless skin
     const x0 = Math.round(xf * W), w = 12, h = Math.round(74 * K), top = HY - h;
@@ -615,11 +616,13 @@ function buildCity(P, W, H) {
 
   // midtown: farther, hazier (depth), then downtown: closer, full detail
   MIDTOWN.forEach(b => b.icon === 'esb' ? esb(fg, b.x, P.hazeK) : b.icon === 'chrysler' ? chrysler(fg, b.x, P.hazeK) : tower(fg, b, P.hazeK));
+  const drawRods = () => { esb(mg, ROD.esb, 0); wtc(mg, ROD.wtc); };   // lightning-rod towers: in the open gaps, on top
   DOWNTOWN.forEach(b => {
     if (b.icon === 'wtc') wtc(mg, b.x); else if (b.icon === 'spruce') spruce(mg, b.x);
     else if (b.icon === 'woolworth') woolworth(mg, b.x); else if (b.icon === 'pine70') pine70(mg, b.x);
     else if (b.icon === 'wall40') wall40(mg, b.x); else tower(mg, b, 0);
   });
+  drawRods();
 
   // --- Brooklyn Bridge: stone courses, deep arches, cornice, cables ---
   const tx = Math.round(W * .09), tw = 22, ttop = Math.round(HY - 86 * K), deck = Math.round(HY - 20 * K);
@@ -743,10 +746,25 @@ const DITHER = Array.from({ length: 17 }, (_, k) => {
   for (let y = 0; y < 4; y++) for (let x = 0; x < 4; x++) if (bayer(x, y) < k / 16) g.fillRect(x, y, 1, 1);
   return c;
 });
+// Where the rod towers go: in the open sky between the TVs (left/middle and middle/right),
+// falling back to behind a lower TV with its tall rod clearing the top when there's no gap.
+const ROD = { wtc: .3, esb: .7, wtcMaxTop: 0 };
+function placeRods() {
+  const hero = sky.parentElement.getBoundingClientRect();
+  const [L, R, M] = tvs.map(tv => tv.cv.getBoundingClientRect());
+  if (!hero.width || !L.width) return;
+  const art = x => (x - hero.left) / hero.width;
+  ROD.wtc = M.left - L.right > 6 ? art((L.right + M.left) / 2) : art(L.left + L.width / 2);
+  ROD.esb = R.left - M.right > 6 ? art((M.right + R.left) / 2) : art(R.left + R.width / 2);
+  const links = root.querySelector('.links').getBoundingClientRect();         // keep the spire below the header text
+  const nearText = ROD.wtc * hero.width + hero.left < links.right + 24;
+  ROD.wtcMaxTop = nearText ? Math.ceil((links.bottom - hero.top + 10) / hero.height * SKY_H) : 0;
+}
 function buildBrooklyn() {
   const hero = sky.parentElement;
   SKY_W = 320; SKY_H = Math.max(160, Math.round(SKY_W * hero.clientHeight / Math.max(1, hero.clientWidth)));
   sky.width = SKY_W; sky.height = SKY_H; HY = SKY_H - Math.round(SKY_H * .26); PY = HY + Math.round((SKY_H - HY) * .38);
+  placeRods();
   const mk = () => { const c = document.createElement('canvas'); c.width = SKY_W; c.height = SKY_H; return [c, c.getContext('2d')]; };
   const [dayCv, dg] = mk(), [nightCv, ng] = mk();
   bk = { night: buildCity(NIGHT, SKY_W, SKY_H), dawn: buildCity(DAWN, SKY_W, SKY_H), clouds: buildDawnExtras(SKY_W), dayCv, dg, nightCv, ng };
@@ -899,8 +917,13 @@ function drawSky(t) {
   if (!bk) buildBrooklyn();
   kg.clearRect(0, 0, SKY_W, SKY_H);
   const day = dayAmount(t);
-  if (!reduce && day === 0 && t >= storm.next) { storm.at = t; storm.bolt = makeBolt(); storm.next = t + 6 + Math.random() * 14; }
+  if (!reduce && day === 0 && t >= storm.next) {
+    storm.at = t; storm.bolt = makeBolt(); storm.next = t + 6 + Math.random() * 14;
+    if (storm.bolt.target) surgeNearest(storm.bolt.target[0], t);
+  }
   const f = reduce || day > 0 ? 0 : flashLevel(t - storm.at);
+  root.classList.toggle('storm-lit', f > .05);
+  if (f > .05) root.style.setProperty('--flash', f.toFixed(2));
   if (day < 1) {
     drawCity(kg, bk.night, t, f);
     if (f > 0) {
@@ -933,6 +956,15 @@ function drawSky(t) {
       if (!reduce) { d.y += d.v; d.x -= d.v * .25; if (d.y > SKY_H) { d.y = -3; d.x = Math.random() * (SKY_W + 30); } }
     }
   }
+}
+function surgeNearest(rodX, t) {
+  const hero = sky.parentElement.getBoundingClientRect(), x = hero.left + rodX / SKY_W * hero.width;
+  let best = null, bd = Infinity;
+  tvs.forEach(tv => { const r = tv.cv.getBoundingClientRect(), d = Math.abs(r.left + r.width / 2 - x); if (d < bd) { bd = d; best = tv; } });
+  if (!best) return;
+  best.surgeAt = t + .02;
+  best.knobs.forEach((k, j) => { k.from = knobAngle(k, t); k.to = k.from + (j ? -.7 : .9) * (Math.random() < .5 ? 1 : -1); k.t0 = t; k.dur = .18; });
+  best.btn.classList.add('surge'); setTimeout(() => best.btn.classList.remove('surge'), 750);
 }
 function setDay(on, t = performance.now() / 1000) {
   mode.from = dayAmount(t); mode.day = on; mode.at = t;
