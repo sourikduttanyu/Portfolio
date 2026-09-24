@@ -12,11 +12,13 @@ const ICONS = {
   down: ['.........', '.........', 'XXXXXXXXX', '.XXXXXXX.', '..XXXXX..', '...XXX...', '....X....', '.........', '.........'],
   left: ['.........', '.....X...', '....XX...', '...XXX...', '..XXXX...', '...XXX...', '....XX...', '.....X...', '.........'],
   right: ['.........', '...X.....', '...XX....', '...XXX...', '...XXXX..', '...XXX...', '...XX....', '...X.....', '.........'],
+  up: ['.........', '....X....', '...XXX...', '..XXXXX..', '.XXXXXXX.', 'XXXXXXXXX', '.........', '.........', '.........'],
+  close: ['.........', '.X.....X.', '..X...X..', '...X.X...', '....X....', '...X.X...', '..X...X..', '.X.....X.', '.........'],
   details: ['.XXXXXXX.', 'X.......X', '.XXXXXXX.', '.X.....X.', '.X.XXX.X.', '.X.....X.', '.X.XX..X.', '.XXXXXXX.', 'X.......X'],
   work: ['...XXX...', '.XX...XX.', 'X..XXX..X', 'XXXXXXXXX', 'X.XXXXX.X', 'XXXXXXXXX', 'X..XXX..X', '.XX...XX.', '...XXX...'],
 }
 const SCENES = [
-  { id: 'intro', label: 'Intro' },
+  { id: 'intro', label: 'Home' },
   { id: 'projects', label: 'Projects' },
   { id: 'work', label: 'Work' },
   { id: 'details', label: 'Experience' },
@@ -123,8 +125,11 @@ export default function PixelWorld() {
             </span>
           </button>
           <h1 className="name" id="name">SOURIK DUTTA</h1>
-          <p className="role">Full-stack software engineer <span>· MS in Computer Science, NYU</span></p>
-          <p className="about">Brooklyn, NY. About two years shipping full-stack systems at Insight Enterprises and Hanu Software, from high-throughput distributed backends to real-time frontends, and owning them end to end.</p>
+          <div className="intro-card">
+            <p className="intro-meta">Brooklyn, NY <span aria-hidden="true">·</span> MS in Computer Science, NYU</p>
+            <p className="role">Full-stack software engineer</p>
+            <p className="about">About two years shipping full-stack systems at Insight Enterprises and Hanu Software, from high-throughput distributed backends to real-time frontends, and owning them end to end.</p>
+          </div>
           <div className="links">
             <a className="btn primary" href="Sourik_Dutta_Resume.pdf" {...ext}>Résumé</a>
             <a className="btn" href="https://github.com/sourikduttanyu" {...ext}>GitHub</a>
@@ -139,7 +144,7 @@ export default function PixelWorld() {
             <div className="ch" id="chLabel" aria-live="polite">CH 01</div>
             <button className="btn chan" id="next" aria-label="Next channel"><PixelIcon rows={ICONS.right} /></button>
           </div>
-          <p className="hint" id="hint">← → or swipe to flip · click a screen for details</p>
+          <p className="hint" id="hint"><PixelIcon rows={ICONS.up} />Click a screen for details</p>
         </div>
       </section>
 
@@ -153,6 +158,7 @@ export default function PixelWorld() {
       <section className="work" aria-labelledby="work-h">
         <div className="work-scene" id="scene">
           <canvas id="space" aria-hidden="true" />
+          <div className="kicker work-kicker">Work experience <span><PixelIcon rows={ICONS.down} />Click a screen for details</span></div>
           <div className="work-inner">
             <h2 id="work-h" className="sr-only">Work experience</h2>
             <div className="lcds" id="lcds" />
@@ -169,6 +175,21 @@ export default function PixelWorld() {
           <div className="work-inner"><div className="jobs" id="jobs" /></div>
         </div>
       </section>
+
+      <dialog className="closeup" id="closeup" aria-labelledby="cuName">
+        <div className="cu-wrap">
+          <div className="cu-set">
+            <canvas id="cuTV" aria-hidden="true" />
+            <div className="remote cu-remote">
+              <button className="btn chan" id="cuPrev" type="button" aria-label="Previous project"><PixelIcon rows={ICONS.left} /></button>
+              <div className="ch" id="cuCh" aria-live="polite" />
+              <button className="btn chan" id="cuNext" type="button" aria-label="Next project"><PixelIcon rows={ICONS.right} /></button>
+            </div>
+          </div>
+          <article className="cu-sheet" id="cuSheet" />
+        </div>
+        <button className="btn cu-close" id="cuClose" type="button" aria-label="Close"><PixelIcon rows={ICONS.close} /></button>
+      </dialog>
 
       <footer className="site-footer">
         <div className="work-inner footer-inner">

@@ -22,7 +22,7 @@ const PROJECTS = projects.map(p => {
 });
 const JOBS = jobs.map(j => ({ id: j.slug, co: j.company, role: j.role, when: j.period,
   mono: j.company.split(' ').filter(w => /^[A-Z]/.test(w)).map(w => w[0]).join('').slice(0, 2),
-  work: j.work.map(w => [w.name, w.text]) }));
+  work: j.work.map(w => [w.name, w.text, w.skill]) }));
 
 /* ---------------- pixel helpers ---------------- */
 const C = {
@@ -136,9 +136,8 @@ function buildTVFrame() {
 }
 // Antennas: 2px chrome rods (lit left edge, shaded right), ball tips, outlined from outside
 // so the thin shapes keep their colour. Composited under the body.
-function buildAntenna() {
-  const rods = [[[50, 16], [34, 2]], [[58, 16], [78, 2]]];
-  return paint(TV_W, TV_H, (fx, fy) => {
+function buildAntenna(rods = [[[50, 16], [34, 2]], [[58, 16], [78, 2]]], w = TV_W, h = TV_H) {
+  return paint(w, h, (fx, fy) => {
     for (const [[x0, y0], [x1, y1]] of rods) {
       if (Math.hypot(fx - x1, fy - y1) < 2) return fx - x1 + fy - y1 < -.5 ? [255, 255, 255] : [196, 200, 214];   // ball tip
       const t = (fy - y0) / (y1 - y0);
@@ -178,7 +177,7 @@ const knobAngle = (k, t) => {
 };
 
 /* 7-segment channel readout on the panel */
-const SEG = { 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc' };
+const SEG = { 1: 'bc', 2: 'abged', 3: 'abgcd', 4: 'fgbc', 5: 'afgcd', 6: 'afgedc', 7: 'abc' };
 function drawDigit(g, n) {
   rect(g, 69, 57, 13, 8, '#0a0708'); rect(g, 69, 64, 13, 1, '#5a5264');
   const on = '#ff3d4a', off = '#2a1216', s = SEG[n] || '';
@@ -354,7 +353,7 @@ const tvs = [0, 1, 2].map(i => {
   const g = cv.getContext('2d');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
   const sg = screen.getContext('2d', { willReadFrequently: true });
-  btn.addEventListener('click', () => { takeControl(); const p = current()[i]; if (p) $id('p-' + p.id)?.scrollIntoView({ block: 'start' }); });
+  btn.addEventListener('click', () => { takeControl(); const p = current()[i]; if (p) openCloseup(null, PROJECTS.indexOf(p)); });
   const up = -Math.PI / 2;
   const knobs = [{ from: up, to: up, t0: 0, dur: 0 }, { from: up + .6 * (i - 1), to: up + .6 * (i - 1), t0: 0, dur: 0 }];
   return { btn, cv, g, sg, screen, label, knobs };
@@ -370,7 +369,8 @@ function layoutStage(extra = 0) {
   const G = 0;
   const W = stage.clientWidth;
   const top = stage.getBoundingClientRect().top + scrollY;
-  const below = root.querySelector('.remote').offsetHeight + $id('hint').offsetHeight + 44 + extra;
+  const nav = root.querySelector('.scene-nav'), bar = nav.getBoundingClientRect().left <= 0 ? nav.offsetHeight : 0;   // phones: bottom bar
+  const below = root.querySelector('.remote').offsetHeight + $id('hint').offsetHeight + 44 + bar + extra;
   const availH = Math.max(260, innerHeight - top - below);
   let fit = null;
   for (let s = 4; s >= 1; s -= .25) {
@@ -416,6 +416,10 @@ function layoutWork() {
     lcds.forEach(l => { l.d.style.marginTop = l.n === 1 ? '0px' : raise; });
   } else lcds.forEach(l => { l.d.style.marginTop = '0px'; });
   lcds.forEach(l => { l.cv.style.width = TV_W * s + 'px'; l.cv.style.height = TV_H * s + 'px'; l.d.style.width = Math.max(TV_W * s, 200) + 'px'; });
+  lcds.forEach(l => {                                              // tape sits over the front face's lower-right corner
+    l.tape.style.fontSize = Math.max(9, Math.round(3.4 * s)) + 'px';
+    l.tape.style.left = l.cv.offsetLeft + 90 * s - l.tape.offsetWidth + 'px'; l.tape.style.top = l.cv.offsetTop + 74 * s + 'px';
+  });
 }
 function sizeTVs() {
   layoutStage(); bk = null;
@@ -444,9 +448,9 @@ function renderNow() {
     tv.btn.setAttribute('aria-label', p ? `${esc(p.name)}: ${esc(p.line)} Show details` : 'Open slot, no project on this channel yet');
   });
   const ch = $id('chLabel'), pad = n => String(n).padStart(2, '0');
-  ch.innerHTML = `<span class="ch-num">CH ${pad(channel + 1)}<small> /${pad(NCH)}</small></span>`
+  ch.innerHTML = `<span class="ch-what">Projects</span><span class="ch-num">CH ${pad(channel + 1)}<small> /${pad(NCH)}</small></span>`
     + `<span class="ch-pips" aria-hidden="true">${Array.from({ length: NCH }, (_, i) => `<i class="${i === channel ? 'on' : ''}"></i>`).join('')}</span>`;
-  ch.setAttribute('aria-label', `Channel ${channel + 1} of ${NCH}`);
+  ch.setAttribute('aria-label', `Projects, channel ${channel + 1} of ${NCH}`);
 }
 function flip(dir) {
   channel = (channel + dir + NCH) % NCH;
@@ -469,12 +473,173 @@ const readIO = new IntersectionObserver(([e]) => { if (e.isIntersecting && attra
 readIO.observe($id('now')); offs.push(() => readIO.disconnect());
 $id('prev').onclick = () => { takeControl(); flip(-1); };
 $id('next').onclick = () => { takeControl(); flip(1); };
-// Swipe across the TVs on touch screens.
-let touchX = null;
-on(stage, 'touchstart', e => { touchX = e.touches[0].clientX; });
-on(stage, 'touchend', e => { if (touchX === null) return; const dx = e.changedTouches[0].clientX - touchX; touchX = null; if (Math.abs(dx) > 40) { takeControl(); flip(dx < 0 ? 1 : -1); } });
-on(window, 'keydown', e => { if (e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.key === 'ArrowRight') { takeControl(); flip(1); press('next'); } if (e.key === 'ArrowLeft') { takeControl(); flip(-1); press('prev'); } });
+on(window, 'keydown', e => { if (cu.open || e.altKey || e.ctrlKey || e.metaKey || /INPUT|TEXTAREA/.test(e.target.tagName)) return; if (e.key === 'ArrowRight') { takeControl(); flip(1); press('next'); } if (e.key === 'ArrowLeft') { takeControl(); flip(-1); press('prev'); } });
 function press(id) { const b = $id(id); b.classList.add('pressed'); setTimeout(() => b.classList.remove('pressed'), 130); }
+
+/* ---------------- close-up: one project on a big front-view set ----------------
+   Clicking a TV opens a modal <dialog>: the set powers on, the screen plays the project's
+   footage at 2x, and a solid spec sheet beside it carries the readable points.
+   Prev/next walk every project; Esc or a click outside the set, sheet and remote closes it. */
+const FW = 156, FH = 144, FSX = 14, FSY = 34, FSW = SW * 2, FSH = SH * 2;
+const F_KNOBS = [[139, 46], [139, 60]];
+const FRONT_TV = (() => {
+  const body = paint(FW, FH, (fx, fy, x, y) => {
+    if (x >= 70 && x <= 86 && y >= 19 && y <= 23) return y === 19 ? PLASTIC[3] : PLASTIC[1];                        // antenna base
+    if (y >= 137 && y <= 141 && ((x >= 18 && x <= 36) || (x >= 120 && x <= 138))) return y === 137 ? PLASTIC[3] : PLASTIC[1];   // feet
+    if (x < 4 || x > 151 || y < 24 || y > 136) return null;
+    const cx = Math.min(x - 4, 151 - x), cy = Math.min(y - 24, 136 - y);
+    if (cx < 3 && cy < 3 && (3 - cx) ** 2 + (3 - cy) ** 2 > 10) return null;                                          // rounded cabinet corners
+    if (x === 5) return mix(PLASTIC[4], RIM_PINK, .7);                                                                  // pink rim light
+    if (x === 150) return mix(PLASTIC[3], RIM_CYAN, .6);                                                                // cyan back light
+    if (y === 25) return x < 70 ? PLASTIC[6] : PLASTIC[5];                                                              // lip highlight
+    if (y >= 133) return PLASTIC[2];
+    if ([[7, 27], [147, 27], [7, 130], [147, 130]].some(([sx, sy]) => x >= sx && x <= sx + 1 && y >= sy && y <= sy + 1)) return x === 7 || x === 147 ? PLASTIC[5] : PLASTIC[1];
+    // bezel: outer lip, recessed ring (shadow top-left, lit bottom-right), glass
+    if (x >= 8 && x <= 127 && y >= 28 && y <= 123) {
+      if (x >= FSX && x < FSX + FSW && y >= FSY && y < FSY + FSH) return [11, 10, 18];
+      if (x === 8 || y === 28) return PLASTIC[2];
+      if (x === 127 || y === 123) return PLASTIC[5];
+      if (x <= 10 || y <= 30) return [22, 19, 30];
+      if (x >= 125 || y >= 121) return [62, 58, 74];
+      return [43, 39, 53];
+    }
+    // maker's plate under the screen
+    if (y >= 126 && y <= 130 && x >= 54 && x <= 82) return y === 126 ? [214, 218, 230] : y === 130 ? [96, 100, 116] : (x + y) % 5 ? [160, 164, 180] : [186, 190, 204];
+    if (x === 129) return PLASTIC[2];                                                                                     // panel seam
+    if (x === 130) return PLASTIC[5];
+    // control panel: knob wells, 7-segment housing, speaker slots, power button + LED
+    if (F_KNOBS.some(([kx, ky]) => Math.hypot(fx - kx - .5, fy - ky - .5) < 5.6)) return PLASTIC[2];
+    if (y >= 90 && y <= 116 && x >= 133 && x <= 146) { const r = (y - 90) % 3; if (r === 0) return PLASTIC[1]; if (r === 1) return PLASTIC[5]; }
+    if (y >= 121 && y <= 126 && x >= 133 && x <= 138) return y === 121 ? PLASTIC[5] : PLASTIC[1];
+    if (y >= 123 && y <= 124 && x >= 143 && x <= 144) return [255, 61, 127];
+    return ramp(PLASTIC, 4.9 - (y - 24) / 112 * 1.7, x, y);
+  });
+  const c = document.createElement('canvas'); c.width = FW; c.height = FH;
+  const g = c.getContext('2d');
+  g.drawImage(buildAntenna([[[74, 20], [50, 2]], [[82, 20], [108, 3]]], FW, FH), 0, 0); g.drawImage(body, 0, 0);
+  return c;
+})();
+function frontPost(g) {
+  g.fillStyle = 'rgba(0,0,0,.28)';                                                   // scanlines
+  for (let y = 1; y < FSH; y += 2) g.fillRect(FSX, FSY + y, FSW, 1);
+  g.fillStyle = 'rgba(0,0,0,.3)';                                                    // curved-glass vignette
+  g.fillRect(FSX, FSY, FSW, 2); g.fillRect(FSX, FSY + FSH - 2, FSW, 2); g.fillRect(FSX, FSY, 2, FSH); g.fillRect(FSX + FSW - 2, FSY, 2, FSH);
+  g.fillStyle = 'rgba(0,0,0,.14)';
+  g.fillRect(FSX + 2, FSY + 2, FSW - 4, 2); g.fillRect(FSX + 2, FSY + FSH - 4, FSW - 4, 2); g.fillRect(FSX + 2, FSY + 2, 2, FSH - 4); g.fillRect(FSX + FSW - 4, FSY + 2, 2, FSH - 4);
+  g.fillStyle = '#2b2735';                                                           // rounded glass corners
+  for (const [x, y, w] of [[0, 0, 4], [0, 1, 2], [0, 2, 1], [0, 3, 1]]) {
+    g.fillRect(FSX + x, FSY + y, w, 1); g.fillRect(FSX + FSW - w, FSY + y, w, 1);
+    g.fillRect(FSX + x, FSY + FSH - 1 - y, w, 1); g.fillRect(FSX + FSW - w, FSY + FSH - 1 - y, w, 1);
+  }
+  g.fillStyle = 'rgba(255,255,255,.14)';                                             // glare streak + hot dot
+  for (let i = 0; i < 34; i++) g.fillRect(FSX + 6 + i, FSY + 6 + Math.floor(i * i / 130), 1, 1);
+  for (let i = 0; i < 14; i++) g.fillRect(FSX + 6, FSY + 7 + i, 1, 1);
+  g.fillStyle = 'rgba(255,255,255,.4)'; g.fillRect(FSX + 8, FSY + 8, 2, 1);
+}
+
+const cu = $id('closeup'), cuSheet = $id('cuSheet'), cuCv = $id('cuTV');
+cuCv.width = FW; cuCv.height = FH;
+const cuG = cuCv.getContext('2d'), cuScreen = document.createElement('canvas'); cuScreen.width = SW; cuScreen.height = SH;
+const cuSg = cuScreen.getContext('2d', { willReadFrequently: true }), cuNoise = cuG.createImageData(FSW, FSH);
+const cuState = { job: null, i: 0, onAt: 0, switchAt: -10, knobs: [{ from: -Math.PI / 2, to: -Math.PI / 2, t0: 0, dur: 0 }, { from: -1, to: -1, t0: 0, dur: 0 }] };
+// a project close-up walks every project; a job close-up walks that job's work items
+const cuCount = () => (cuState.job ? Math.min(JOB_SCENES[cuState.job.id].length, cuState.job.work.length) : PROJECTS.length);
+function sizeCloseup() {
+  const narrow = innerWidth < 860;
+  const availW = narrow ? innerWidth - 40 : Math.min(innerWidth * .52, 780), availH = narrow ? innerHeight * .46 : innerHeight - 170;
+  const s = Math.max(1, Math.floor(Math.min(availW / FW, availH / FH) * 2) / 2);
+  cuCv.style.width = FW * s + 'px'; cuCv.style.height = FH * s + 'px';
+}
+function renderCloseup() {
+  const pad = n => String(n).padStart(2, '0'), N = cuCount(), job = cuState.job;
+  let label;
+  if (job) {
+    label = `${job.co}: ${job.work[cuState.i][0]}`;
+    if (cuSheet.dataset.job !== job.id) cuSheet.innerHTML = `
+      <div class="tag">${esc(job.role)} · <span class="nowrap">${esc(job.when)}</span></div>
+      <h2 id="cuName">${esc(job.co)}</h2>
+      <ol class="cu-work">${job.work.slice(0, N).map(([n, text, skill], k) => `
+        <li><button type="button" data-k="${k}" class="${k === cuState.i ? 'on' : ''}"${k === cuState.i ? ' aria-current="true"' : ''}>
+          <span class="cu-work-head"><span class="cu-work-n">${String(k + 1).padStart(2, '0')}</span><b>${esc(n)}</b><span class="cu-work-skill">${esc(skill)}</span></span>
+          <span class="cu-work-text">${esc(text)}</span>
+        </button></li>`).join('')}</ol>`;
+    cuSheet.dataset.job = job.id;
+    cuSheet.querySelectorAll('.cu-work button').forEach((b, k) => { b.classList.toggle('on', k === cuState.i); if (k === cuState.i) b.setAttribute('aria-current', 'true'); else b.removeAttribute('aria-current'); });
+    cuSheet.querySelector('.cu-work .on').scrollIntoView({ block: 'nearest' });
+  } else {
+    const p = PROJECTS[cuState.i];
+    label = p.name; delete cuSheet.dataset.job;
+    cuSheet.innerHTML = `
+      <div class="tag">${esc(p.tag)}</div>
+      <h2 id="cuName">${esc(p.name)}</h2>
+      <p class="cu-line">${esc(p.line)}</p>
+      <p>${esc(p.plain)}</p>
+      <h3>Key results</h3>
+      <ul class="cu-points">${p.results.split(' · ').map(r => `<li>${esc(r)}</li>`).join('')}</ul>
+      <p class="meta"><b>Stack</b> ${esc(p.libs.join(' · '))}</p>
+      ${p.pipeline.length ? `<p class="meta"><b>Flow</b> ${esc(p.pipeline.join(' → '))}</p>` : ''}
+      <details class="how"><summary>How it works</summary><p>${esc(p.how)}</p></details>
+      <p class="meta">${esc(p.src)} · <a href="${p.href}" target="_blank" rel="noopener noreferrer">${esc(p.linkText)} ↗</a></p>`;
+    cuSheet.scrollTop = 0;
+  }
+  const ch = $id('cuCh');
+  ch.innerHTML = `<span class="ch-num">CH ${pad(cuState.i + 1)}<small> /${pad(N)}</small></span>`
+    + `<span class="ch-pips" aria-hidden="true">${Array.from({ length: N }, (_, k) => `<i class="${k === cuState.i ? 'on' : ''}"></i>`).join('')}</span>`;
+  ch.setAttribute('aria-label', `${label}, ${cuState.i + 1} of ${N}`);
+  const c = clipFor(job ? job.id : PROJECTS[cuState.i].id); if (c.ready && !reduce) c.video.play().catch(() => {});
+}
+root.classList.add('nudge');
+function openCloseup(job, i) {
+  root.classList.remove('nudge');
+  cuState.job = job; cuState.i = i; cuState.onAt = performance.now() / 1000; cuState.switchAt = -10;
+  renderCloseup(); sizeCloseup();
+  document.documentElement.classList.add('cu-lock');
+  cu.showModal();
+  if (reduce) (raf = requestAnimationFrame(frame));
+}
+function stepCloseup(dir, to) {
+  const t = performance.now() / 1000;
+  cuState.i = to ?? (cuState.i + dir + cuCount()) % cuCount(); cuState.switchAt = t;
+  cuState.knobs.forEach((k, j) => { k.from = knobAngle(k, t); k.to = k.from + dir * (j ? -.7 : Math.PI / 3); k.t0 = t + j * .08; k.dur = reduce ? 0 : .32; });
+  renderCloseup();
+  if (reduce) (raf = requestAnimationFrame(frame));
+}
+function drawCloseup(t) {
+  const g = cuG, job = cuState.job;
+  g.clearRect(0, 0, FW, FH); g.drawImage(FRONT_TV, 0, 0);
+  if (job) { g.save(); g.translate(5, 1); drawEmblem(g, job.id); g.restore(); }
+  cuState.knobs.forEach((k, j) => drawKnob(g, F_KNOBS[j][0], F_KNOBS[j][1], knobAngle(k, t)));
+  g.save(); g.translate(64, 15); drawDigit(g, cuState.i + 1); g.restore();
+  const on = reduce ? 1 : (t - cuState.onAt) / .45;
+  if (!reduce && t - cuState.switchAt < .26) {                                       // channel change: static
+    const d = cuNoise.data;
+    for (let k = 0; k < d.length; k += 8) { const v = Math.random() * 255 | 0; d[k] = d[k + 4] = v; d[k + 1] = d[k + 5] = v; d[k + 2] = d[k + 6] = v + 10; d[k + 3] = d[k + 7] = 255; }
+    g.putImageData(cuNoise, FSX, FSY);
+  } else {
+    const clip = clipFor(job ? job.id : PROJECTS[cuState.i].id);
+    if (clip.ready) drawCover(cuSg, clip.video, SW, SH);
+    else if (job) JOB_SCENES[job.id][cuState.i](cuSg, reduce ? 2 : t);
+    else scenes[PROJECTS[cuState.i].scene](cuSg, reduce ? 1.5 : t);
+    g.imageSmoothingEnabled = false; g.drawImage(cuScreen, FSX, FSY, FSW, FSH);
+  }
+  if (on < 1) {                                                                     // power-on: a line, then the picture opens up
+    const band = on < .35 ? 0 : Math.round(FSH * ((on - .35) / .65) ** 2);
+    g.fillStyle = '#07060c';
+    g.fillRect(FSX, FSY, FSW, Math.floor((FSH - band) / 2)); g.fillRect(FSX, FSY + Math.ceil((FSH + band) / 2), FSW, Math.floor((FSH - band) / 2));
+    if (on < .35) { const w = Math.round(FSW * on / .35); g.fillStyle = '#f4f0ff'; g.fillRect(FSX + (FSW - w) / 2, FSY + FSH / 2 - 1, w, 2); }
+    else { g.fillStyle = `rgba(244,240,255,${(1 - on).toFixed(3)})`; g.fillRect(FSX, FSY, FSW, FSH); }
+  }
+  frontPost(g);
+}
+$id('cuPrev').onclick = () => { stepCloseup(-1); press('cuPrev'); };
+$id('cuNext').onclick = () => { stepCloseup(1); press('cuNext'); };
+$id('cuClose').onclick = () => cu.close();
+on(cu, 'click', e => {
+  const k = e.target.closest('.cu-work button'); if (k) { stepCloseup(0, +k.dataset.k); return; }
+  if (!e.target.closest('#cuTV, .cu-sheet, .cu-remote, #cuClose')) cu.close(); });
+on(cu, 'keydown', e => { if (e.key === 'ArrowRight') { stepCloseup(1); press('cuNext'); } if (e.key === 'ArrowLeft') { stepCloseup(-1); press('cuPrev'); } });
+on(cu, 'close', () => document.documentElement.classList.remove('cu-lock'));
+on(window, 'resize', () => { if (cu.open) sizeCloseup(); });
 
 function drawTVs(t) {
   if (attract) {                                                        // attract-mode countdown + flip
@@ -1554,18 +1719,18 @@ const lcds = WORK_ORDER.map((id, n) => {
   const cv = document.createElement('canvas'); cv.width = TV_W; cv.height = TV_H;
   const shadow = document.createElement('div'); shadow.className = 'tv-shadow';
   const cap = document.createElement('div'); cap.className = 'tv-label';
+  // dates on label-maker tape stuck across the set's lower-right corner: "Jan 2023 – Nov 2023" -> "JAN 23 → NOV 23"
+  const tape = document.createElement('div'); tape.className = 'tape'; tape.setAttribute('aria-hidden', 'true');
+  tape.textContent = j.when.split(/\s+[–-]\s+/).map(d => d.replace(/(\w{3})\w*\s+\d{2}(\d{2})/, '$1 $2').toUpperCase()).join(' → ');
   const scope = document.createElement('canvas'); scope.width = 84; scope.height = 14; scope.className = 'scope'; scope.setAttribute('aria-hidden', 'true'); scope.style.width = '252px'; scope.style.height = '42px';
-  d.append(scope, cv, shadow, cap); lcdWrap.append(d);
+  d.append(scope, cv, tape, shadow, cap); lcdWrap.append(d);
   d.tabIndex = 0; d.setAttribute('role', 'button');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
   const up = -Math.PI / 2;
-  const entry = { j, n, d, cv, cap, g: cv.getContext('2d'), screen, sg: screen.getContext('2d', { willReadFrequently: true }),
+  const entry = { j, n, d, cv, cap, tape, g: cv.getContext('2d'), screen, sg: screen.getContext('2d', { willReadFrequently: true }),
     scopeG: scope.getContext('2d'), scope, tuned: false, idx: -1, switchAt: -10,
     knobs: [{ from: up, to: up, t0: 0, dur: 0 }, { from: up + .5 * (n - 1), to: up + .5 * (n - 1), t0: 0, dur: 0 }] };
-  const open = () => {
-    const card = $id('log-' + j.id); card.scrollIntoView({ block: 'start' }); card.classList.add('active');
-    card.focus({ preventScroll: true }); setTimeout(() => card.classList.remove('active'), 2400);
-  };
+  const open = () => openCloseup(j, Math.max(0, entry.idx));
   d.addEventListener('click', open); d.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } });
   ['mouseenter', 'focus'].forEach(ev => d.addEventListener(ev, () => { entry.tuned = true; }));
   ['mouseleave', 'blur'].forEach(ev => d.addEventListener(ev, () => { entry.tuned = false; }));
@@ -1606,8 +1771,8 @@ function setWorkChannel(l, idx, t) {
   fine.from = knobAngle(fine, t); fine.to = fine.from - (.3 + hash(l.n, idx) * .6); fine.t0 = t + .06; fine.dur = dur;
   const name = l.j.work[idx][0];
   l.cap.innerHTML = `<span class="plate-co">${esc(l.j.co)}</span><span class="plate-role">${esc(l.j.role)}</span>`
-    + `<span class="plate-when">${esc(l.j.when)}</span><small class="plate-now">▸ ${esc(name)}</small>`;
-  l.d.setAttribute('aria-label', `${esc(l.j.co)}, now showing ${esc(name)}. Open job details`);
+    + `<small class="plate-now">▸ ${esc(name)}</small>`;
+  l.d.setAttribute('aria-label', `${esc(l.j.co)}, ${esc(l.j.when)}, now showing ${esc(name)}. Open job details`);
   root.querySelectorAll(`#log-${l.j.id} li`).forEach((li, i) => li.classList.toggle('on', i === idx));
 }
 function drawLCDs(t) {
@@ -2014,6 +2179,7 @@ function frame(ms) {
   const t = ms / 1000;
   if (vis.hero) { drawSky(t); drawTVs(t); }
   if (vis.scene) { drawLCDs(t); drawSpace(t); drawScopes(t); }
+  if (cu.open) drawCloseup(t);
   if (!reduce) (raf = requestAnimationFrame(frame));
 }
 document.fonts.ready.then(() => {
@@ -2025,7 +2191,7 @@ document.fonts.ready.then(() => {
 });
 
 return () => {
-  stopped = true; cancelAnimationFrame(raf); offs.forEach(f => f()); ro?.disconnect(); io.disconnect();
+  stopped = true; cancelAnimationFrame(raf); if (cu.open) cu.close(); offs.forEach(f => f()); ro?.disconnect(); io.disconnect();
   if (music.on) { clearInterval(music.timer); music.ctx?.close(); }
   Object.values(clips).forEach(c => { c.video.pause(); c.video.removeAttribute('src'); c.video.load(); });
   delete window.supernova; delete window.lightning; delete window.planes;
