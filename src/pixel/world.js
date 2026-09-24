@@ -330,7 +330,7 @@ function clipFor(slug) {
   const c = clips[slug] = { video: v, ready: false };
   v.muted = true; v.loop = true; v.playsInline = true; v.preload = 'auto';
   v.addEventListener('loadeddata', () => { c.ready = true; if (!reduce) v.play().catch(() => {}); });
-  v.src = `/clips/${slug}.mp4`;
+  v.src = `clips/${slug}.mp4`;
   return c;
 }
 function drawCover(g, v, w, h) {
