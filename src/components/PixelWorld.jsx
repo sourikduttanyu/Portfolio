@@ -58,8 +58,9 @@ function SceneNav() {
   }
   useEffect(() => {
     const onScroll = () => {
-      const probe = window.scrollY + window.innerHeight * .35
-      setCurrent(SCENES.reduce((best, s) => (sceneTop(s.id) <= probe ? s.id : best), 'intro'))
+      // a scene is current once you've scrolled to it; the very top is always Intro
+      const y = window.scrollY
+      setCurrent(y < 10 ? 'intro' : SCENES.reduce((best, s) => (sceneTop(s.id) <= y + 60 ? s.id : best), 'intro'))
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
