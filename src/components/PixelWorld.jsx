@@ -9,6 +9,8 @@ const ext = { target: '_blank', rel: 'noopener noreferrer' }
 const ICONS = {
   intro: ['....X....', '...XXX...', '..XXXXX..', '.XXXXXXX.', 'XXXXXXXXX', '.X.....X.', '.X.XXX.X.', '.X.X.X.X.', '.XXX.XXX.'],
   projects: ['..X...X..', '...X.X...', 'XXXXXXXXX', 'X.....XX.', 'X.....X.X', 'X.....XX.', 'X.....X.X', 'XXXXXXXXX', '.X.....X.'],
+  left: ['.........', '.....X...', '....XX...', '...XXX...', '..XXXX...', '...XXX...', '....XX...', '.....X...', '.........'],
+  right: ['.........', '...X.....', '...XX....', '...XXX...', '...XXXX..', '...XXX...', '...XX....', '...X.....', '.........'],
   work: ['...XXX...', '.XX...XX.', 'X..XXX..X', 'XXXXXXXXX', 'X.XXXXX.X', 'XXXXXXXXX', 'X..XXX..X', '.XX...XX.', '...XXX...'],
 }
 const SCENES = [
@@ -18,8 +20,12 @@ const SCENES = [
 ]
 const sceneTop = id => {
   if (id === 'intro') return 0
-  const el = document.getElementById(id === 'projects' ? 'stage' : 'scene')
-  return el.getBoundingClientRect().top + window.scrollY - (id === 'projects' ? 16 : 0)
+  if (id === 'work') return document.getElementById('scene').getBoundingClientRect().top + window.scrollY
+  // Projects: land so the descriptions are fully on screen, with as much of the TV row above as fits.
+  const y = window.scrollY, stage = document.getElementById('stage').getBoundingClientRect().top + y - 16
+  const nowBottom = document.getElementById('now').getBoundingClientRect().bottom + y
+  const nowTop = document.getElementById('now').getBoundingClientRect().top + y
+  return Math.min(Math.max(stage, nowBottom - window.innerHeight + 24), nowTop - 8)   // too tall to fit: start at its top
 }
 function PixelIcon({ rows }) {
   return (
@@ -82,9 +88,9 @@ export default function PixelWorld() {
           <div className="stage" id="stage" />
 
           <div className="remote">
-            <button className="btn" id="prev" aria-label="Previous channel">◀</button>
+            <button className="btn chan" id="prev" aria-label="Previous channel"><PixelIcon rows={ICONS.left} /></button>
             <div className="ch" id="chLabel" aria-live="polite">CH 01</div>
-            <button className="btn" id="next" aria-label="Next channel">▶</button>
+            <button className="btn chan" id="next" aria-label="Next channel"><PixelIcon rows={ICONS.right} /></button>
           </div>
           <p className="hint" id="hint">← → keys flip the channel · click a screen for details</p>
         </div>
