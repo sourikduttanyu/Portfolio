@@ -1,255 +1,181 @@
-@import "tailwindcss";
+/* Pixel world styles, ported 1:1 from the approved sketch. */
 
-@theme {
-  --color-graphite-100: #07111f;
-  --color-graphite-200: #0c1a30;
-  --color-graphite: #1a3354;
-  --color-stormy-teal: #266c7a;
-  --color-stormy-teal-light: #509ba8;
-  --color-yale-blue: #253a54;
-  --color-yale-blue-light: #708da8;
-  --color-alabaster: #dde8f5;
-  --color-brand-white: #f0f8ff;
-  --color-brand-orange: #cc8258;
-  --color-signal-green: #569e71;
-
-  --font-sans: "Exo 2", sans-serif;
-  --font-mono: "Fira Code", "JetBrains Mono", monospace;
-}
-
-@layer base {
-  html {
-    font-size: 16px;
-    -webkit-text-size-adjust: 100%;
-    scroll-behavior: smooth;
+  :root {
+    --night: oklch(14% 0.045 290);
+    --night-deep: oklch(10% 0.035 290);
+    --ink: oklch(94% 0.02 300);
+    --ink-2: oklch(80% 0.03 300);
+    --ink-3: oklch(66% 0.04 300);
+    --pink: oklch(70% 0.21 355);
+    --cyan: oklch(84% 0.12 205);
+    --violet: oklch(80% 0.11 295);
+    --line: oklch(30% 0.05 290);
+    color-scheme: dark;
   }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
   body {
-    @apply bg-graphite-100 text-alabaster font-sans antialiased selection:bg-stormy-teal selection:text-brand-white overflow-x-hidden;
-    line-height: 1.6;
-    letter-spacing: 0.01em;
+    margin: 0; background: var(--night-deep); color: var(--ink-2);
+    font: 400 16px/1.55 "Space Grotesk", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased; overflow-x: hidden;
   }
-  h1, h2, h3 {
-    line-height: 1.15;
-    letter-spacing: -0.02em;
+  canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+  .px { font-family: "Silkscreen", monospace; text-transform: uppercase; letter-spacing: .06em; }
+
+  /* ---------- Hero ---------- */
+  .hero { position: relative; min-height: 100svh; display: flex; flex-direction: column; overflow: hidden;
+    background: linear-gradient(var(--night-deep), var(--night) 70%); }
+  #sky { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero-inner { position: relative; z-index: 1; width: min(1200px, 100% - 32px); margin: 0 auto; flex: 1;
+    display: flex; flex-direction: column; padding: 32px 0 20px; }
+  .name { font-family: "Press Start 2P", monospace; color: var(--ink); font-size: clamp(22px, 4.4vw, 52px);
+    line-height: 1.15; margin: 0; text-shadow: 3px 3px 0 var(--pink), -2px -2px 0 oklch(40% 0.12 250 / .6); }
+  .role { margin: 18px 0 0; color: var(--ink); font-size: clamp(16px, 2vw, 20px); }
+  .role span { color: var(--ink-3); }
+  .about { margin: 8px 0 0; max-width: 62ch; color: var(--ink-2); font-size: 15px; }
+  .links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; }
+  :focus-visible { outline: 3px solid var(--cyan); outline-offset: 3px; }
+
+  /* ---------- Game UI kit: one button, one plate, one LCD. Works over night and sunrise. ---------- */
+  :root { --ui-bg: oklch(22% 0.05 290); --ui-bg-hi: oklch(29% 0.07 290); --ui-edge: oklch(8% 0.03 290);
+    --ui-ledge: oklch(13% 0.04 290); --ui-border: oklch(38% 0.08 290); --plate: oklch(11% 0.04 290 / .9); }
+  .btn { font-family: "Silkscreen", monospace; font-size: 14px; text-transform: uppercase; color: var(--ink);
+    text-decoration: none; padding: 10px 14px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+    background: var(--ui-bg); border: 2px solid var(--ui-edge); border-radius: 7px; cursor: pointer;
+    box-shadow: inset 0 2px 0 0 var(--ui-bg-hi), 0 4px 0 0 var(--ui-ledge), 0 5px 0 1px var(--ui-edge);
+    transition: transform 70ms ease-out, box-shadow 70ms ease-out, background 120ms; }
+  .btn:hover { background: var(--ui-bg-hi); }
+  .btn:active, .btn.pressed { transform: translateY(4px); box-shadow: inset 0 2px 0 0 var(--ui-bg-hi), 0 0 0 0 var(--ui-ledge), 0 1px 0 1px var(--ui-edge); }
+  .btn.primary { background: var(--pink); color: oklch(12% 0.04 290);
+    box-shadow: inset 0 2px 0 0 oklch(80% 0.15 355), 0 4px 0 0 oklch(45% 0.18 355), 0 5px 0 1px var(--ui-edge); }
+  .btn.primary:hover { background: oklch(75% 0.19 355); }
+  .btn.primary:active { box-shadow: inset 0 2px 0 0 oklch(80% 0.15 355), 0 0 0 0 oklch(45% 0.18 355), 0 1px 0 1px var(--ui-edge); }
+
+  /* name plate: captions keep their cyan + white on any sky */
+  .tv-label { display: inline-block; margin-top: 6px; padding: 6px 12px 7px; font-size: 13px; color: var(--ink);
+    background: var(--plate); border: 2px solid var(--ui-border); border-radius: 7px; box-shadow: 0 3px 0 0 var(--ui-edge);
+    transition: color .15s, border-color .15s; }
+  .tv-label small { display: block; font-family: "Silkscreen", monospace; font-size: 11px; color: var(--cyan); letter-spacing: .1em; }
+  .tv:hover .tv-label, .tv:focus-visible .tv-label { color: var(--pink); border-color: var(--pink); }
+  .tv.empty { cursor: default; }
+  .tv.empty .tv-label, .tv.empty:hover .tv-label { color: var(--ink-3); border-color: var(--ui-border); }
+  /* storm: every strike rim-lights the sets; a rod hit makes the nearest caption flicker */
+  .storm-lit .tv canvas { filter: brightness(calc(1 + var(--flash, 0) * .4)) drop-shadow(0 0 calc(var(--flash, 0) * 10px) rgb(200 180 255 / .85)); }
+  .tv.surge .tv-label { animation: surge-flicker .75s steps(1) both; }
+  @keyframes surge-flicker { 0%, 30%, 60% { opacity: .25; border-color: #fff3d0; } 15%, 45%, 80%, 100% { opacity: 1; } }
+
+  /* LCD readout */
+  .remote .ch { font-family: "Press Start 2P", monospace; font-size: 12px; color: var(--cyan); min-width: 104px; text-align: center;
+    padding: 12px 10px; background: #071316; border: 2px solid var(--ui-edge); border-radius: 7px;
+    box-shadow: inset 0 3px 0 0 #020708, inset 0 0 0 2px #0d2a30, 0 2px 0 0 var(--ui-border); text-shadow: 0 0 6px oklch(84% 0.12 205 / .6); }
+  .hint { align-self: center; text-align: center; font-size: 12px; color: var(--ink-2); margin-top: 10px; padding: 4px 10px;
+    background: var(--plate); border-radius: 6px; }
+
+  /* day / night switch: same button language, rounder, knob slides with an ease-out */
+  .daynight { position: absolute; top: 24px; right: 0; z-index: 2; background: none; border: 0; padding: 4px; cursor: pointer; }
+  .daynight-track { display: block; position: relative; width: 74px; height: 40px; background: var(--ui-bg);
+    border: 2px solid var(--ui-edge); border-radius: 13px;
+    box-shadow: inset 0 3px 0 0 var(--ui-ledge), 0 4px 0 0 var(--ui-ledge), 0 5px 0 1px var(--ui-edge); transition: background .45s, transform 70ms, box-shadow 70ms; }
+  .daynight:hover .daynight-track { background: var(--ui-bg-hi); }
+  .daynight:active .daynight-track { transform: translateY(4px); box-shadow: inset 0 3px 0 0 var(--ui-ledge), 0 0 0 0 var(--ui-ledge), 0 1px 0 1px var(--ui-edge); }
+  .daynight-knob { position: absolute; top: 3px; left: 3px; width: 30px; height: 28px; display: flex; align-items: center; justify-content: center;
+    background: oklch(36% 0.09 290); border: 2px solid var(--ui-edge); border-radius: 10px; box-shadow: inset 0 -3px 0 0 oklch(20% 0.06 290), inset 0 2px 0 0 oklch(46% 0.1 290);
+    transition: transform .45s cubic-bezier(.2, .9, .2, 1), background .45s, box-shadow .45s; }
+  .daynight-knob canvas { width: 22px; height: 22px; }
+  .daynight.is-day .daynight-track { background: oklch(42% 0.09 45); }
+  .daynight.is-day .daynight-knob { transform: translateX(34px); background: oklch(80% 0.14 70); box-shadow: inset 0 -3px 0 0 oklch(60% 0.14 50), inset 0 2px 0 0 oklch(90% 0.1 85); }
+
+
+  .stage { position: relative; margin-top: 20px; }
+  .tv { position: absolute; }
+  .tv { animation: bob var(--d) ease-in-out infinite; animation-delay: var(--delay);
+    background: none; border: 0; padding: 0; cursor: pointer; color: inherit; text-align: center; }
+  .tv:nth-child(1) { --d: 6.2s; --delay: -1s; --r: -2deg; }
+  .tv:nth-child(2) { --d: 7.4s; --delay: -3s; --r: 1.5deg; }
+  .tv:nth-child(3) { --d: 6.8s; --delay: -5s; --r: -1deg; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(var(--r)); }
+    50% { transform: translateY(-14px) rotate(calc(var(--r) * -0.6)); }
   }
-}
+  .tv-shadow { width: 60%; height: 8px; margin: 6px auto 0; background: oklch(5% 0.02 290 / .55);
+    border-radius: 50%; filter: blur(2px); animation: shadow var(--d) ease-in-out infinite; animation-delay: var(--delay); }
+  @keyframes shadow { 50% { transform: scaleX(.8); opacity: .6; } }
+  .tv:hover .tv-label { color: var(--pink); }
 
-@layer utilities {
-  .grid-bg {
-    background-size: 40px 40px;
-    background-image:
-      linear-gradient(to right, rgba(37, 58, 84, 0.5) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(37, 58, 84, 0.5) 1px, transparent 1px);
-    mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  .remote { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 8px; }
+  .hero-inner > .hint { display: block; width: fit-content; margin-left: auto; margin-right: auto; }
+  /* readable strip: what the three screens are showing */
+  .now { width: min(1200px, 100% - 32px); margin: 0 auto; padding: 40px 0 72px;
+    display: grid; gap: 32px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .now article { scroll-margin-top: 24px; }
+  .now .tag { font-family: "Silkscreen", monospace; font-size: 12px; color: var(--cyan); text-transform: uppercase; letter-spacing: .1em; }
+  .now h2 { font-family: "Press Start 2P", monospace; font-size: 14px; color: var(--ink); margin: 10px 0 12px; line-height: 1.4; }
+  .now p { margin: 0 0 10px; max-width: 60ch; }
+  .now .meta { font-size: 14px; color: var(--ink-3); }
+  .now .meta b { color: var(--ink); font-weight: 500; }
+  .now a { color: var(--ink); text-underline-offset: 4px; text-decoration-color: var(--pink); }
+  @media (max-width: 860px) { .now { grid-template-columns: 1fr; } }
+
+  /* ---------- Wooden beam divider ---------- */
+  .beam-wrap { position: relative; padding-bottom: 12px; }
+  #beam { width: 100%; height: auto; }
+  #sign { margin: -34px auto 0; position: relative; }
+
+  /* ---------- Work: LCD layer ---------- */
+  .work { background: #05070f; padding: 0; }
+  .work-scene { position: relative; overflow: hidden; padding: 150px 0 210px; }
+  #space { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .work-scene .work-inner { position: relative; z-index: 1; }
+  .lcd { position: relative; cursor: pointer; }
+  .scope { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .lcd:hover .scope, .lcd:focus-visible .scope { opacity: 1; }
+  .loop-clock { position: absolute; right: 16px; bottom: 10px; z-index: 1; font: 11px "Silkscreen", monospace; color: rgba(232,163,61,.5); }
+  .work-inner { width: min(1200px, 100% - 32px); margin: 0 auto; }
+
+  /* job details: same language as the project strip (.now) */
+  .log-panel { background: var(--night-deep); padding: 40px 0 88px; }
+  .jobs { display: grid; gap: 32px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .job { scroll-margin-top: 24px; }
+  .job .tag { font-family: "Silkscreen", monospace; font-size: 12px; color: var(--cyan); text-transform: uppercase; letter-spacing: .1em; }
+  .job h3 { font-family: "Press Start 2P", monospace; font-size: 14px; color: var(--ink); margin: 10px 0 12px; line-height: 1.4;
+    text-decoration: underline 3px transparent; text-underline-offset: 8px; transition: text-decoration-color .4s; }
+  .job.active h3 { text-decoration-color: var(--pink); }
+  .job ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .job li { max-width: 60ch; }
+  .nowrap { white-space: nowrap; }
+  .job li b { color: var(--ink); font-weight: 500; }
+  @media (max-width: 860px) { .jobs { grid-template-columns: 1fr; } }
+  .lcd:hover .tv-label, .lcd:focus-visible .tv-label { color: var(--pink); border-color: var(--pink); }
+  .lcds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-items: center; gap: 48px 4%; margin: 0; }
+  @keyframes drift {
+    0%, 100% { transform: translateY(0) rotate(var(--r)); }
+    50% { transform: translateY(-6px) rotate(calc(var(--r) * -0.5)); }
   }
+  .lcd { animation: drift var(--d) ease-in-out infinite; animation-delay: var(--delay); text-align: center; max-width: 100%; }
+  .lcd canvas { max-width: 100%; height: auto !important; margin: 0 auto; }
+  .lcd:nth-child(1) { --d: 10.5s; --delay: -2s; --r: .5deg; justify-self: end; }
+  .lcd:nth-child(2) { --d: 12s; --delay: -4s; --r: -.5deg; justify-self: start; margin-top: 24px; }
+  .lcd:nth-child(3) { --d: 10s; --delay: -1s; --r: .3deg; grid-column: 1 / -1; margin-top: -8px; }
+  @media (max-width: 700px) { .lcds { grid-template-columns: 1fr; } .lcd:nth-child(n) { justify-self: center; margin-top: 0; } }
 
-  .grid-pulse {
-    animation: grid-pulse-anim 4s infinite alternate;
-  }
 
-  .sharp-border {
-    @apply border border-yale-blue;
-  }
-}
-
-@keyframes grid-pulse-anim {
-  0% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0.7;
-  }
-}
-
-/* ── Reduced motion ────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-}
-
-/* ── Skip to content ───────────────────────────────────── */
-.skip-link {
-  position: absolute;
-  top: -100px;
-  left: 1rem;
-  z-index: 9999;
-  padding: 0.5rem 1.25rem;
-  background: var(--color-stormy-teal-light);
-  color: var(--color-graphite-100);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  text-decoration: none;
-  border: none;
-  transition: top 0.15s ease;
-}
-.skip-link:focus {
-  top: 1rem;
-  outline: 2px solid var(--color-graphite-100);
-  outline-offset: 2px;
-}
-
-/* ── Global focus ring ──────────────────────────────────── */
-:focus-visible {
-  outline: 2px solid var(--color-stormy-teal-light);
-  outline-offset: 3px;
-}
-
-/* ── Lag cursor ─────────────────────────────────────────── */
-.lag-cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  background: #2dd4f0;
-  border: none;
-  border-radius: 50%;
-  pointer-events: none;
-  opacity: 0;
-  z-index: 2000;
-  transform: translate3d(-50%, -50%, 0) scale(1);
-  transition: opacity 80ms ease-out;
-  will-change: transform;
-  mix-blend-mode: difference;
-}
-.lag-cursor.visible { opacity: 1; }
-.lag-cursor.is-text  { opacity: 0; }
-
-@media (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  body.lag-cursor-enabled,
-  body.lag-cursor-enabled * { cursor: none !important; }
-  body.lag-cursor-enabled.lag-cursor-text-mode,
-  body.lag-cursor-enabled.lag-cursor-text-mode * { cursor: auto !important; }
-  body.lag-cursor-enabled.lag-cursor-text-mode input,
-  body.lag-cursor-enabled.lag-cursor-text-mode textarea,
-  body.lag-cursor-enabled.lag-cursor-text-mode [contenteditable] { cursor: text !important; }
-}
-
-/* ── Grain texture overlay ──────────────────────────────── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9998;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  background-repeat: repeat;
-}
-
-/* ── Reduced motion ─────────────────────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ── Scrollbar hide ─────────────────────────────────────── */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-/* ── Skill pill hover glow ──────────────────────────────── */
-.skill-pill:hover {
-  box-shadow: 0 0 14px var(--glow-color, rgba(45,212,240,0.3));
-  transform: translateY(-1px);
-}
-
-/* Signal track — traveling data dots on side rails */
-@keyframes signal-down {
-  0%   { transform: translateY(0);     opacity: 0; }
-  8%   { opacity: 1; }
-  92%  { opacity: 1; }
-  100% { transform: translateY(86vh);  opacity: 0; }
-}
-@keyframes signal-down-b {
-  0%   { transform: translateY(0);     opacity: 0; }
-  8%   { opacity: 0.8; }
-  92%  { opacity: 0.8; }
-  100% { transform: translateY(64vh);  opacity: 0; }
-}
-@keyframes signal-up {
-  0%   { transform: translateY(0);      opacity: 0; }
-  8%   { opacity: 0.9; }
-  92%  { opacity: 0.9; }
-  100% { transform: translateY(-86vh);  opacity: 0; }
-}
-@keyframes signal-up-b {
-  0%   { transform: translateY(0);      opacity: 0; }
-  8%   { opacity: 0.75; }
-  92%  { opacity: 0.75; }
-  100% { transform: translateY(-68vh);  opacity: 0; }
-}
-
-/* ── Instrument the UI (overdrive C) ─────────────────────── */
-
-/* System matrix — ripple wave across pills on category hover.
-   Keyframes end at identity so resting/framer transform is preserved;
-   backwards fill (no forwards) leaves :hover lift intact after the wave. */
-@keyframes pill-ripple {
-  0%   { transform: translateY(0)    scale(1); }
-  45%  { transform: translateY(-4px) scale(1.05); }
-  100% { transform: translateY(0)    scale(1); }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .cap-row:hover .skill-pill {
-    animation: pill-ripple 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
-    animation-delay: calc(var(--i, 0) * 28ms);
-    will-change: transform;
-  }
-}
-
-/* Service Logs — timeline spine draws top→down, nodes charge as they scroll in.
-   Base yale-blue border + resting node stay as the static fallback. */
-@keyframes spine-draw {
-  from { transform: scaleY(0); }
-  to   { transform: scaleY(1); }
-}
-@keyframes node-charge {
-  from { background-color: var(--color-yale-blue);        box-shadow: 0 0 0 rgba(80,155,168,0); }
-  to   { background-color: var(--color-stormy-teal-light); box-shadow: 0 0 12px rgba(80,155,168,0.5); }
-}
-.ol-spine { display: none; }
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .ol-timeline { view-timeline-name: --ol-track; view-timeline-axis: block; }
-    .ol-spine {
-      display: block;
-      transform-origin: top;
-      animation: spine-draw linear both;
-      animation-timeline: --ol-track;
-      animation-range: entry 0% cover 55%;
+  @media (max-width: 859px) {
+    .tv-label { font-size: 12px; }
     }
-    .ol-node {
-      animation: node-charge linear both;
-      animation-timeline: view();
-      animation-range: entry 35% cover 30%;
-    }
+  @media (prefers-reduced-motion: reduce) {
+    .tv, .lcd, .tv-shadow { animation: none; }
+    html { scroll-behavior: auto; }
   }
-}
 
-/* Aurora blob drift animations */
-@keyframes aurora-a {
-  0%, 100% { transform: translateY(0px)    scale(1.00); }
-  33%       { transform: translateY(-110px) scale(1.06); }
-  66%       { transform: translateY(65px)   scale(0.94); }
-}
-@keyframes aurora-b {
-  0%, 100% { transform: translateY(-55px)  scale(0.96); }
-  50%       { transform: translateY(90px)   scale(1.08); }
-}
-@keyframes aurora-c {
-  0%, 100% { transform: translateY(40px)   scale(1.04); }
-  40%       { transform: translateY(-95px)  scale(0.91); }
-  80%       { transform: translateY(55px)   scale(1.07); }
-}
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .skip-link { position: absolute; left: 16px; top: -100px; z-index: 100; padding: 8px 12px; background: oklch(22% 0.05 290); color: var(--ink); }
+  .skip-link:focus { top: 16px; }
+
+  /* footer: contact, same button kit */
+  .site-footer { background: var(--night-deep); border-top: 2px solid var(--ui-border); padding: 36px 0 44px; }
+  .footer-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; }
+  .footer-name { font-family: "Press Start 2P", monospace; font-size: 14px; color: var(--ink); margin: 0 0 8px; text-shadow: 2px 2px 0 var(--pink); }
+  .footer-meta { margin: 0; font-size: 14px; color: var(--ink-3); max-width: 60ch; }
+  .site-footer .links { margin-top: 0; }
+  .music { position: absolute; left: 16px; bottom: 14px; z-index: 2; font-size: 12px; min-height: 40px; padding: 8px 12px; }
+  .music[aria-pressed="true"] { color: #e8a33d; }
