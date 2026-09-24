@@ -810,7 +810,7 @@ function buildBrooklyn() {
   placeRods();
   const mk = () => { const c = document.createElement('canvas'); c.width = SKY_W; c.height = SKY_H; return [c, c.getContext('2d')]; };
   const [dayCv, dg] = mk(), [nightCv, ng] = mk();
-  bk = { night: buildCity(NIGHT, SKY_W, SKY_H), dawn: buildCity(DAWN, SKY_W, SKY_H), clouds: buildDawnExtras(SKY_W), dayCv, dg, nightCv, ng };
+  bk = { night: buildCity(NIGHT, SKY_W, SKY_H), dawn: buildCity(DAWN, SKY_W, SKY_H), clouds: buildDawnExtras(SKY_W), nightClouds: buildNightClouds(SKY_W), dayCv, dg, nightCv, ng };
   drops = Array.from({ length: Math.round(90 * SKY_H / 180) }, () => ({ x: Math.random() * SKY_W, y: Math.random() * SKY_H, v: 1.4 + Math.random() * 1.6 }));
 }
 /* Thunderstorm: random strikes every 6-20s. Double flash (bright, dip, bright, fade),
@@ -856,7 +856,7 @@ function drawBolt(g, path) {
 function drawFerry(g, L, t) {
   const day = L.P.day, tt = reduce ? 0 : t;
   // ferry: NYC-ferry white/blue, crosses right to left every 40s, wake behind
-  const fk = (tt % 40) / 40, fx = Math.round(SKY_W + 30 - fk * (SKY_W + 70)), fy = HY + 3;
+  const fk = (tt % 40) / 40, fx = Math.round(SKY_W + 30 - fk * (SKY_W + 70)), fy = HY + Math.round((PY - HY) * .6);   // mid-river
   for (let i = 0; i < 26; i++) if (hash(i, Math.floor(tt * 6)) < .6 - i / 50) { g.fillStyle = '#e8ecff88'; g.fillRect(fx + 24 + i, fy + 3 + (i % 2), 1, 1); }
   g.fillStyle = day ? '#f4f4f8' : '#c8c8e0'; g.fillRect(fx, fy, 24, 3);
   g.fillStyle = '#2a5aa8'; g.fillRect(fx, fy + 2, 24, 1);
@@ -885,7 +885,9 @@ function drawPromenade(g, L, t) {
     }
     for (let y = PY + 6; y < SKY_H; y += 2) if (hash(lx, y + Math.floor(tt * 4)) < .6) { g.fillStyle = 'rgba(255,200,130,.35)'; g.fillRect(lx + Math.round(Math.sin(y + tt) * 1), y, 1, 1); }
   });
-  // walkers: umbrellas at night, joggers at sunrise; two-frame legs
+  // walkers: umbrellas at night, joggers at sunrise; two-frame legs. They pass behind the
+  // near warehouse (clipped at its edge) instead of walking across its face.
+  g.save(); g.beginPath(); g.rect(0, 0, SKY_W - 40, SKY_H); g.clip();
   walkers.forEach((w, i) => {
     const span = SKY_W + 20, x = Math.round(((w.off + tt * w.speed * w.dir) % span + span) % span) - 10, y = PY + 4 + w.y;
     const step = Math.floor(tt * (day ? 6 : 4) + i) % 2;
@@ -895,11 +897,84 @@ function drawPromenade(g, L, t) {
     g.fillStyle = w.coat; g.fillRect(x, y - 4, 2, 1);
     if (!day) { g.fillStyle = w.umb; g.fillRect(x - 2, y - 10, 6, 1); g.fillRect(x - 1, y - 11, 4, 1); g.fillStyle = '#07050c'; g.fillRect(x + 1, y - 9, 1, 2); }
   });
+  g.restore();
   // rain splashes on the boardwalk (night only)
   if (!day && !reduce) for (let k = 0; k < 10; k++) {
     const sx = Math.floor(hash(k, Math.floor(t * 8)) * SKY_W), sy = PY + 6 + Math.floor(hash(k + 20, Math.floor(t * 8)) * (SKY_H - PY - 6));
     g.fillStyle = '#b8aef066'; g.fillRect(sx - 1, sy, 1, 1); g.fillRect(sx + 1, sy, 1, 1); g.fillRect(sx, sy - 1, 1, 1);
   }
+}
+
+/* Air traffic: jets at cruising altitude, fast but far away, so they drift across in about a
+   minute. Twin engine contrails merge, widen, drift with the wind and fade over ~45s.
+   Night: dark silhouettes with red/green wing lights and a white strobe. Dawn: silver, sunlit. */
+const planes = [];
+let nextPlane = 2;
+function headerBottomArt() {
+  const hero = sky.parentElement.getBoundingClientRect(), links = root.querySelector('.links').getBoundingClientRect();
+  return hero.height ? Math.ceil((links.bottom - hero.top) / hero.height * SKY_H) : 60;
+}
+function updatePlanes(t) {
+  if (reduce) return;
+  if (t >= nextPlane && planes.filter(p => !p.gone).length < 2) {
+    const dir = Math.random() < .5 ? 1 : -1, laneTop = headerBottomArt() + 4, y = Math.round(laneTop + Math.random() * Math.max(4, (HY - 58) - laneTop));
+    const speed = 4.5 + Math.random() * 2.5;
+    planes.push({ x: dir > 0 ? -12 : SKY_W + 12, y, vx: dir * speed, vy: (Math.random() - .5) * .35, dir, trail: [], lastPuff: t, big: Math.random() < .25 });
+    nextPlane = t + 10 + Math.random() * 15;
+  }
+  planes.forEach(p => {
+    const dt = Math.min(.1, t - (p.t ?? t)); p.t = t;
+    if (!p.gone) {
+      p.x += p.vx * dt; p.y += p.vy * dt;
+      if (t - p.lastPuff > .2) { p.trail.push({ x: p.x - p.dir * 4, y: p.y + 1, t }); p.lastPuff = t; }
+      if (p.x < -20 || p.x > SKY_W + 20) p.gone = true;
+    }
+    p.trail = p.trail.filter(q => t - q.t < 45);
+  });
+  for (let i = planes.length - 1; i >= 0; i--) if (planes[i].gone && !planes[i].trail.length) planes.splice(i, 1);
+}
+function drawPlanes(g, day, t) {
+  planes.forEach(p => {
+    p.trail.forEach((q, qi) => {                                    // contrail: twin lines -> one soft band
+      const a = t - q.t, fade = Math.max(0, 1 - a / 45);
+      const drift = a * .12, spread = a < 4 ? 1 : 0, w = 1 + Math.min(2, a / 12);
+      const prev = p.trail[qi - 1], y = Math.round(q.y + a * .04);
+      const x0 = Math.round(q.x + drift), x1 = prev ? Math.round(prev.x + (t - prev.t) * .12) : x0;
+      for (let x = Math.min(x0, x1); x <= Math.max(x0, x1); x++) {
+      const col = day ? `rgba(255,${226 - a * .6 | 0},${214 - a | 0},${(.55 * fade).toFixed(3)})` : `rgba(170,150,230,${(.28 * fade).toFixed(3)})`;
+      g.fillStyle = col;
+      if (spread) { g.fillRect(x, y - 1, 1, 1); g.fillRect(x, y + 1, 1, 1); }
+      else for (let k = 0; k < w; k++) if (bayer(x, y + k) < fade + .2) g.fillRect(x, y - Math.floor(w / 2) + k, 1, 1);
+      }
+    });
+    if (p.gone) return;
+    const x = Math.round(p.x), y = Math.round(p.y), d = p.dir, body = day ? '#e6e8f2' : '#0b0916', shade = day ? '#9aa0b8' : '#191430';
+    const len = p.big ? 9 : 7;
+    for (let k = 0; k < len; k++) { g.fillStyle = k === len - 1 ? shade : body; g.fillRect(x - d * k, y, 1, 1); }   // fuselage
+    g.fillStyle = shade; g.fillRect(x - d * 3, y + 1, 1, 1); g.fillRect(x - d * 4, y + 1, 1, 1);                // wings (swept)
+    g.fillStyle = body; g.fillRect(x - d * 2, y + 1, 1, 1);
+    g.fillStyle = shade; g.fillRect(x - d * (len - 1), y - 1, 1, 1); g.fillRect(x - d * (len - 1), y - 2, 1, 1);   // tail fin
+    if (day) { g.fillStyle = '#ffffff'; g.fillRect(x - d, y, 1, 1); }                                             // sun glint
+    else {
+      g.fillStyle = d > 0 ? '#ff4a5a' : '#4aff8a'; g.fillRect(x - d * 3, y + 2, 1, 1);                            // nav lights
+      if (Math.floor(t * 1.3 + p.y) % 3 === 0) { g.fillStyle = '#ffffff'; g.fillRect(x - d * 4, y - 1, 1, 1); } // strobe
+    }
+  });
+}
+// Night clouds: a few dim, moonlit banks on the right, underside lit violet by the city.
+function buildNightClouds(W) {
+  const c = document.createElement('canvas'); c.width = W; c.height = HY; const g = c.getContext('2d');
+  [[.72, .12, 26], [.9, .26, 20], [.58, .3, 16]].forEach(([fx, fy, r]) => {
+    const cx = Math.round(fx * W), cy = Math.round(fy * HY) + 6;
+    for (let y = -r; y <= r / 2; y++) for (let x = -r * 2; x <= r * 2; x++) {
+      const v = Math.max(...[[0, 0, 1], [-r * .9, 3, .75], [r * .9, 2, .8], [-r * 1.6, 5, .5], [r * 1.5, 5, .55]].map(([ox, oy, s]) => 1 - Math.hypot((x - ox) / (r * s), (y - oy) / (r * s * .5))));
+      if (v <= 0 || !(bayer(cx + x, cy + y) < v * 2.2)) continue;
+      const under = y / (r / 2);
+      g.fillStyle = under > .5 ? '#3a2a5e' : under > 0 ? '#2a2048' : v > .5 ? '#1d1838' : '#161230';
+      g.fillRect(cx + x, cy + y, 1, 1);
+    }
+  });
+  return c;
 }
 
 /* Day/night: `mode.day` is the target; the dissolve runs 1.6s in either direction. */
@@ -941,8 +1016,9 @@ function drawCity(g, L, t, f) {
       if (d <= 6) { g.fillStyle = d < 3 ? '#fffbe8' : '#ffe39a'; g.fillRect(sx + x, sunY + y, 1, 1); }
       else if (d < 14 && bayer(sx + x, sunY + y) < (1 - (d - 6) / 8) * .55) { g.fillStyle = '#ffd08a'; g.fillRect(sx + x, sunY + y, 1, 1); }
     }
-    g.drawImage(bk.clouds, 0, 0);
   }
+  drawPlanes(g, L.P.day, t);                                                // planes and trails pass behind the clouds
+  g.drawImage(L.P.day ? bk.clouds : bk.nightClouds, 0, 0);
   g.drawImage(L.far, 0, 0);
   g.drawImage(L.mid, 0, 0);
   drawRiver(g, L, t);
@@ -958,6 +1034,7 @@ function drawCity(g, L, t, f) {
 }
 function drawSky(t) {
   if (!bk) buildBrooklyn();
+  updatePlanes(t);
   kg.clearRect(0, 0, SKY_W, SKY_H);
   const day = dayAmount(t);
   if (!reduce && day === 0 && t >= storm.next) {
@@ -1043,6 +1120,7 @@ $id('dayNight').addEventListener('click', () => setDay(!mode.day));
   btn.classList.toggle('is-day', mode.day); root.classList.toggle('is-day', mode.day);
   drawSwitchIcon(mode.day);
 }
+window.planes = () => { nextPlane = 0; };
 window.lightning = (rod) => { storm.next = 0; if (rod) storm.forceRod = rod; };
 
 /* ---------------- aged wood beam + Zelda vine + hanging sign ---------------- */
@@ -1715,7 +1793,7 @@ document.fonts.ready.then(() => {
 return () => {
   stopped = true; cancelAnimationFrame(raf); offs.forEach(f => f()); ro?.disconnect();
   Object.values(clips).forEach(c => { c.video.pause(); c.video.removeAttribute('src'); c.video.load(); });
-  delete window.supernova; delete window.lightning;
+  delete window.supernova; delete window.lightning; delete window.planes;
   $id('stage').innerHTML = ''; $id('lcds').innerHTML = ''; $id('now').innerHTML = ''; $id('jobs').innerHTML = '';
 };
 }
