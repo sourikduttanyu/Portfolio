@@ -31,6 +31,25 @@ const sceneTop = id => {
   const nowTop = document.getElementById('now').getBoundingClientRect().top + y
   return Math.min(Math.max(stage, nowBottom - window.innerHeight + 24), nowTop - 8)   // too tall to fit: start at its top
 }
+// Camera-like glide between scenes: duration grows with distance so the journey (beam, vine,
+// planets) is actually seen; eased in and out; any wheel/touch/key hands control back.
+let glideRaf = 0
+function glide(top) {
+  cancelAnimationFrame(glideRaf)
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, top); return }
+  const from = window.scrollY, dist = top - from, dur = Math.min(2600, 900 + Math.abs(dist) * .45), t0 = performance.now()
+  const ease = k => (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
+  const stop = () => { cancelAnimationFrame(glideRaf); off() }
+  const off = () => ['wheel', 'touchstart', 'keydown'].forEach(e => window.removeEventListener(e, stop))
+  ;['wheel', 'touchstart', 'keydown'].forEach(e => window.addEventListener(e, stop, { passive: true }))
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur)
+    window.scrollTo(0, from + dist * ease(k))
+    if (k < 1) glideRaf = requestAnimationFrame(step); else off()
+  }
+  document.documentElement.style.scrollBehavior = 'auto'                  // our own easing, not the browser's
+  glideRaf = requestAnimationFrame(step)
+}
 function PixelIcon({ rows }) {
   return (
     <svg viewBox="0 0 9 9" aria-hidden="true">
@@ -54,7 +73,7 @@ function SceneNav() {
   }, [])
   const go = id => {
     setHint(false)
-    window.scrollTo({ top: sceneTop(id), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' })
+    glide(sceneTop(id))
   }
   useEffect(() => {
     const onScroll = () => {
@@ -69,7 +88,7 @@ function SceneNav() {
   return (
     <>
     <button type="button" className={`scroll-cue${hint ? ' show' : ''}`} tabIndex={hint ? 0 : -1} aria-hidden={!hint}
-      onClick={() => { setHint(false); const now = document.getElementById('now'); window.scrollTo({ top: now.getBoundingClientRect().top + window.scrollY - 16, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }) }}>
+      onClick={() => { setHint(false); const now = document.getElementById('now'); glide(now.getBoundingClientRect().top + window.scrollY - 16) }}>
       <PixelIcon rows={ICONS.down} /><span>Scroll for projects</span>
     </button>
     <nav className={`scene-nav${hint ? ' hint' : ''}`} aria-label="Scenes">
