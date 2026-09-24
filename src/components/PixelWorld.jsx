@@ -76,8 +76,8 @@ export default function PixelWorld() {
             </span>
           </button>
           <h1 className="name" id="name">SOURIK DUTTA</h1>
-          <p className="role">Backend &amp; distributed systems engineer <span>· MS in Computer Science, NYU</span></p>
-          <p className="about">Brooklyn, NY. About two years building high-throughput, reliable backends at Insight Enterprises and Hanu Software, and owning them end to end.</p>
+          <p className="role">Full-stack software engineer <span>· MS in Computer Science, NYU</span></p>
+          <p className="about">Brooklyn, NY. About two years shipping full-stack systems at Insight Enterprises and Hanu Software, from high-throughput distributed backends to real-time frontends, and owning them end to end.</p>
           <div className="links">
             <a className="btn primary" href="Sourik_Dutta_Resume.pdf" {...ext}>Résumé</a>
             <a className="btn" href="https://github.com/sourikduttanyu" {...ext}>GitHub</a>
@@ -122,7 +122,7 @@ export default function PixelWorld() {
         <div className="work-inner footer-inner">
           <div>
             <p className="footer-name">SOURIK DUTTA</p>
-            <p className="footer-meta">Brooklyn, NY · MS in Computer Science, NYU · Open to backend, distributed-systems and platform roles</p>
+            <p className="footer-meta">Brooklyn, NY · MS in Computer Science, NYU · Open to full-stack, backend and platform roles</p>
           </div>
           <nav className="links" aria-label="Contact">
             <a className="btn primary" href="Sourik_Dutta_Resume.pdf" {...ext}>Résumé</a>
