@@ -390,8 +390,8 @@ function layoutStage() {
 }
 function sizeTVs() {
   layoutStage(); bk = null;
-  const ms = Math.max(2, Math.min(4.5, Math.floor(root.querySelector('.work-inner').clientWidth * .46 / MON.ultra.W * 2) / 2));
-  lcds.forEach(l => { l.cv.style.width = l.W * ms + 'px'; l.cv.style.height = l.H * ms + 'px'; });
+  const ws = pixelScale();
+  lcds.forEach(l => { l.cv.style.width = TV_W * ws + 'px'; l.cv.style.height = TV_H * ws + 'px'; });
   drawBeam(); drawSign();
 }
 
@@ -451,6 +451,7 @@ function drawTVs(t) {
       }
     }
     crtPost(tv.g, tv.sg, noisy); drawDigit(tv.g, surge ? 1 + Math.floor(Math.random() * 6) : channel + 1);
+    screenGlow(tv.btn, tv.sg, t);
   });
 }
 
@@ -728,11 +729,21 @@ function buildCity(P, W, H) {
     box(og, bx, by - 3, 9, 1, Q.bench); box(og, bx, by - 1, 9, 1, Q.bench); dot(og, bx + 1, by, Q.bench); dot(og, bx + 7, by, Q.bench);
   });
   // Jane's Carousel: glass pavilion on the pier beside the bridge
-  const cx0 = Math.round(W * .15), cw = 30, cy0 = PY - 16, C = P.carousel;
-  box(og, cx0 - 1, cy0 - 3, cw + 2, 3, Q.rail); box(og, cx0, cy0 - 4, cw, 1, Q.railHi);
-  box(og, cx0, cy0, cw, 16, C.glass);
-  for (let x = cx0; x < cx0 + cw; x += 5) box(og, x, cy0, 1, 16, Q.rail);
-  box(og, cx0 + 4, cy0 + 12, cw - 8, 2, C.top);                             // carousel platform (horses animate on top)
+  // Open and lit: slim steel frame, clear glass, a warm interior; the canopy, bulbs and horses
+  // are drawn live (drawPromenade) so they turn.
+  const cx0 = Math.round(W * .13), cw = 38, cy0 = PY - 22;
+  box(og, cx0 - 2, cy0 - 3, cw + 4, 2, Q.railHi); box(og, cx0 - 2, cy0 - 1, cw + 4, 1, Q.rail);          // roof slab
+  box(og, cx0 - 1, cy0, 1, PY - cy0, Q.rail); box(og, cx0 + cw, cy0, 1, PY - cy0, Q.rail);                 // corner posts
+  for (let y = cy0; y < PY; y++) for (let x = cx0; x < cx0 + cw; x++) {                                    // interior
+    const warm = P.day ? (y - cy0 < 4 ? '#b8cce0' : '#a8bcd4') : (bayer(x, y) < (y - cy0) / 22 ? '#3a2416' : '#2a1a12');
+    dot(og, x, y, warm);
+  }
+  if (P.day) for (let k = 0; k < 3; k++) for (let i = 0; i < 10; i++) dot(og, cx0 + 4 + k * 12 + i, cy0 + 2 + i, '#e8f0ff88');   // glass reflections
+  const pcx = cx0 + cw / 2;
+  for (let y = PY - 5; y < PY - 1; y++) for (let x = cx0 + 2; x < cx0 + cw - 2; x++) {                      // round platform
+    const e = ((x - pcx) / (cw / 2 - 2)) ** 2 + ((y - (PY - 3)) / 2) ** 2;
+    if (e <= 1) dot(og, x, y, e > .7 ? '#d8a040' : y < PY - 3 ? '#9a3a30' : '#6a2420');
+  }
   // DUMBO warehouse, close to camera, framing the right edge
   const wx = W - 40, wy = HY - 46;
   for (let y = wy; y < H; y++) for (let x = wx; x < W; x++) {
@@ -870,12 +881,7 @@ const walkers = [
 ];
 function drawPromenade(g, L, t) {
   const P = L.P, pm = L.promenade, day = P.day, tt = reduce ? 0 : t;
-  // carousel horses bob and circle under warm light
-  const [cx0, cy0, cw] = pm.carousel;
-  for (let k = 0; k < 6; k++) {
-    const ph = tt * 1.4 + k * (Math.PI / 3), hx = cx0 + 5 + Math.round((Math.sin(ph) * .5 + .5) * (cw - 12)), hy = cy0 + 8 + Math.round(Math.sin(ph * 2) * 1.5);
-    g.fillStyle = Math.cos(ph) > 0 ? '#fff1c4' : '#c8a070'; g.fillRect(hx, hy, 3, 2); g.fillRect(hx + 2, hy - 1, 1, 1); g.fillRect(hx + 1, hy + 2, 1, 2);
-  }
+  drawCarousel(g, pm, tt, day);
   // lamp halos (night) with a faint flicker, and their smear on the wet boardwalk
   if (!day) pm.lamps.forEach((lx, i) => {
     const ly = PY - 29, k = .8 + .2 * vnoise(tt * 2 + i * 7, i);
@@ -965,6 +971,40 @@ function buildNightClouds(W) {
     }
   });
   return c;
+}
+
+// Jane's Carousel, live: a turning striped canopy with bulbs, a brass pole, and horses on poles
+// circling in depth (the far ones pass behind the pole, dimmer), all bobbing.
+function drawCarousel(g, pm, tt, day) {
+  const [cx0, cy0, cw] = pm.carousel, pcx = cx0 + cw / 2, R = cw / 2 - 5, top = cy0 + 1, base = PY - 5;
+  const put = (x, y, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), 1, 1); };
+  if (!day) for (let y = PY; y < PY + 10; y++) for (let x = cx0 - 4; x < cx0 + cw + 4; x++)            // light spilling onto the boardwalk
+    if (bayer(x, y) < (1 - (y - PY) / 10) * .45) put(x, y, 'rgba(255,190,110,.28)');
+  const horse = (a, back) => {
+    const x = pcx + Math.cos(a) * R, bob = Math.sin(tt * 2.2 + a * 3) * 1.5, y = base - 6 + bob;
+    const body = back ? '#8a6a50' : '#fff1dc', mane = back ? '#6a3a2a' : '#c0503a', pole = back ? '#8a7040' : '#f0c860';
+    for (let yy = top + 7; yy < base; yy++) put(x + 1, yy, pole);
+    const dir = -Math.sin(a) > 0 ? 1 : -1;
+    put(x, y, body); put(x + 1, y, body); put(x + 2, y, body); put(x + dir * 2 + 1, y - 1, body); put(x + dir * 2 + 1, y - 2, mane);
+    put(x, y + 1, body); put(x + 2, y + 1, body); put(x, y + 2, mane); put(x + 2, y + 2, mane);
+  };
+  const angles = Array.from({ length: 5 }, (_, k) => tt * .9 + k * Math.PI * 2 / 5);
+  angles.filter(a => Math.sin(a) < 0).forEach(a => horse(a, true));                    // far side first
+  for (let y = top + 6; y < base; y++) put(pcx, y, '#e8c060');                          // brass centre pole
+  angles.filter(a => Math.sin(a) >= 0).forEach(a => horse(a, false));
+  for (let r = 0; r < 6; r++) {                                                         // canopy: stripes turn with the ride
+    const half = Math.round(4 + r * (cw / 2 - 5) / 5);
+    for (let x = -half; x <= half; x++) {
+      const stripe = Math.floor((x * 6 / Math.max(1, half) + tt * 3) % 2 + 2) % 2;
+      put(pcx + x, top + r, stripe ? (day ? '#d04a3a' : '#ff5a44') : (day ? '#f4e8d0' : '#fff0d8'));
+    }
+  }
+  put(pcx, top - 1, '#e8c060'); put(pcx, top - 2, '#e8c060');
+  const edge = top + 6, half = Math.round(cw / 2 - 1);
+  for (let x = -half; x <= half; x++) {                                                  // scalloped gold edge with bulbs
+    put(pcx + x, edge + (Math.abs(x) % 3 === 1 ? 1 : 0), '#d8a040');
+    if (x % 2 === 0) put(pcx + x, edge + 2, (Math.floor(tt * 3) + x) % 4 === 0 ? '#ffffff' : day ? '#ffe0a0' : '#ffd66b');
+  }
 }
 
 /* Day/night: `mode.day` is the target; the dissolve runs 1.6s in either direction. */
@@ -1283,199 +1323,172 @@ function drawSign() {
   sgn.drawImage(vine, 0, 0);
 }
 
-/* ---------------- work monitors: two ultrawide gaming panels + one 16:9 ---------------- */
-const MON = {
-  ultra: { W: 116, H: 72, sx: 6, sy: 4, sw: 98, sh: 42 },   // 21:9
-  std:   { W: 80,  H: 62, sx: 6, sy: 4, sw: 64, sh: 36 },   // 16:9
-};
-const PANEL = ['#07060b', '#1a1822', '#26232f', '#34303e', '#4a4558', '#6e6884'].map(hex);
-const ACCENT = hex('#ff2e55');
-
-function buildMonitor(kind) {
-  const m = MON[kind], ultra = kind === 'ultra';
-  const bx0 = m.sx - 3, bx1 = m.sx + m.sw + 2, by0 = m.sy - 3, by1 = m.sy + m.sh + (ultra ? 5 : 4);
-  const cx = Math.floor((bx0 + bx1) / 2);
-  return paint(m.W, m.H, (fx, fy, x, y) => {
-    // panel thickness on the right edge
-    if (x > bx1 && x <= bx1 + 2 && y >= by0 + (x - bx1) && y <= by1 - 1) return x === bx1 + 2 ? RIM_CYAN : PANEL[2];
-    if (x >= bx0 && x <= bx1 && y >= by0 && y <= by1) {
-      // curved ultrawide: top and bottom edges bow in toward the corners
-      const edge = Math.min(x - bx0, bx1 - x);
-      if (ultra && edge < 10 && (y === by0 || y === by1) ) return null;
-      if (ultra && edge < 4 && (y === by0 + 1 || y === by1 - 1)) return null;
-      if (x >= m.sx && x < m.sx + m.sw && y >= m.sy && y < m.sy + m.sh) return [4, 4, 8];
-      if (x === bx0 + (ultra && (y < by0 + 3 || y > by1 - 3) ? 1 : 0)) return mix(PANEL[4], RIM_PINK, .6);
-      if (y === by0 || (ultra && y === by0 + 1 && edge < 10)) return PANEL[4];
-      if (y > m.sy + m.sh) {                                                    // chin
-        if (Math.abs(x - cx) <= 2 && y === by1 - 2) return ultra ? ACCENT : PANEL[5];  // logo mark
-        return ramp(PANEL, 2.4 - (y - m.sy - m.sh) * .15, x, y);
+/* ---------------- work CRTs: one set per job, flipping through that job's projects ---------------- */
+// Wordless, vivid screens (54x42), in the order of each job's work items in src/data/experience.js.
+const P2 = (g, x, y, c) => { g.fillStyle = c; g.fillRect(Math.round(x), Math.round(y), 1, 1); };
+const glowDot = (g, x, y, c, halo) => { P2(g, x, y, c); if (halo) { g.fillStyle = halo; g.fillRect(Math.round(x) - 1, Math.round(y), 1, 1); g.fillRect(Math.round(x) + 1, Math.round(y), 1, 1); g.fillRect(Math.round(x), Math.round(y) - 1, 1, 1); g.fillRect(Math.round(x), Math.round(y) + 1, 1, 1); } };
+const JOB_SCENES = {
+  insight: [
+    function llmCore(g, t) {                                   // requests pour into a glowing core; a few bounce off the rate-limit ring
+      rect(g, 0, 0, SW, SH, '#0a0718');
+      const cx = 27, cy = 21, pulse = 4.5 + Math.sin(t * 3) * .8;
+      for (let y = -9; y <= 9; y++) for (let x = -9; x <= 9; x++) {
+        const d = Math.hypot(x, y);
+        if (d < pulse) P2(g, cx + x, cy + y, d < pulse * .45 ? '#fff4ff' : d < pulse * .75 ? '#d8b4ff' : '#9a6aff');
+        else if (d < pulse + 4 && bayer(cx + x, cy + y) < (1 - (d - pulse) / 4) * .5) P2(g, cx + x, cy + y, '#5a3aa0');
       }
-      return ramp(PANEL, 2.2 + hash(0, y) * .3, x, y);                         // thin bezel
-    }
-    if (ultra) {
-      // slim neck, angled back
-      if (y > by1 && y <= by1 + 10 && x >= cx - 2 && x <= cx + 2) return x === cx - 2 ? PANEL[4] : x === cx + 2 ? PANEL[1] : PANEL[3];
-      // V-shaped gaming legs spreading out, red accent line on each
-      const ly = y - (by1 + 9);
-      if (ly >= 0 && ly <= 6) {
-        const spread = 4 + ly * 4;                                     // chunky, shallow V legs (6px thick)
-        const L = x >= cx - spread - 6 && x <= cx - spread, R = x >= cx + spread && x <= cx + spread + 6;
-        if (L || R) {
-          if (ly === 6) return PANEL[1];                                           // foot pads
-          if (ly === 0) return PANEL[5];                                           // lit top
-          if (ly === 2 && ((L && x <= cx - spread - 2) || (R && x >= cx + spread + 2))) return ACCENT;  // one red stripe
-          return L ? PANEL[4] : PANEL[3];
+      for (let a = 0; a < 24; a++) { const ang = a / 24 * Math.PI * 2 + t * .6; if (a % 2) P2(g, cx + Math.cos(ang) * 13, cy + Math.sin(ang) * 11, '#6fd3ff'); }
+      for (let i = 0; i < 22; i++) {
+        const ang = hash(i, 1) * Math.PI * 2, ph = (t * .45 + i / 22) % 1, cycle = Math.floor(t * .45 + i / 22);
+        const limited = hash(i, cycle) < .2;
+        let r = 30 * (1 - ph);
+        if (limited && r < 13) r = 26 - r;                      // bounced back out
+        const col = limited && 30 * (1 - ph) < 13 ? '#ff5c9a' : r < 13 ? '#ffffff' : '#6fd3ff';
+        P2(g, cx + Math.cos(ang) * r, cy + Math.sin(ang) * r * .85, col);
+      }
+      for (let i = 0; i < 8; i++) { const ang = hash(i, 7) * 6.28, r = ((t * .7 + i / 8) % 1) * 26; P2(g, cx + Math.cos(ang) * r, cy + Math.sin(ang) * r * .85, '#57f287'); }
+    },
+    function heartbeat(g, t) {                                 // live signal; the anomaly spike sets off alarm rings
+      rect(g, 0, 0, SW, SH, '#050d16');
+      for (let x = 0; x < SW; x += 6) for (let y = 3; y < SH; y += 6) P2(g, x, y, '#0f2233');
+      let prev = null; const beat = (t % 3) / 3;
+      for (let x = 0; x < SW; x++) {
+        const u = (x / SW + t * .35) % 1, spike = Math.abs(u - .72) < .02;
+        const y = Math.round(24 + Math.sin(u * 40) * 1.5 + (spike ? -14 * (1 - Math.abs(u - .72) / .02) : 0));
+        if (prev !== null) for (let yy = Math.min(prev, y); yy <= Math.max(prev, y); yy++) glowDot(g, x, yy, spike ? '#ff5c9a' : '#6ff0ff', spike ? '#ff5c9a44' : '#6ff0ff22');
+        prev = y;
+      }
+      for (let k = 0; k < 3; k++) { const r = ((beat + k / 3) % 1) * 14; for (let a = 0; a < 20; a++) { const an = a / 20 * 6.28; if (bayer(a, k) < 1 - r / 14) P2(g, 44 + Math.cos(an) * r, 9 + Math.sin(an) * r, '#ff5c9a'); } }
+      rect(g, 42, 6, 5, 5, '#ffd66b'); rect(g, 41, 11, 7, 1, '#ffd66b');
+    },
+    function drain(g, t) {                                     // sockets pile up red, then one pooled pipe drains to green
+      rect(g, 0, 0, SW, SH, '#080a12');
+      const k = (t % 10) / 10, fixed = k > .5, level = fixed ? 30 - (k - .5) / .5 * 22 : 8 + k / .5 * 22;
+      rect(g, 8, 4, 2, 34, '#3a4060'); rect(g, 44, 4, 2, 34, '#3a4060'); rect(g, 8, 37, 38, 2, '#3a4060');
+      for (let y = 37 - Math.round(level); y < 37; y++) for (let x = 10; x < 44; x++) P2(g, x, y, bayer(x, y + Math.floor(t * 8)) < .5 ? (fixed ? '#1f8a5a' : '#8a1f3a') : (fixed ? '#2fbf7a' : '#c02a50'));
+      for (let i = 0; i < 12; i++) { const bx = 12 + (i * 7) % 30, by = 36 - ((t * (6 + i % 3) + i * 5) % Math.max(2, level)); P2(g, bx, by, fixed ? '#bfffe0' : '#ffc0d0'); }
+      if (fixed) { rect(g, 44, 34, 8, 2, '#57f287'); for (let x = 46; x < 54; x += 2) P2(g, x + Math.floor(t * 10) % 2, 35, '#bfffe0'); }
+    },
+    function spectrum(g, t) {                                  // real-time dashboard: a neon spectrum at 60fps
+      rect(g, 0, 0, SW, SH, '#07060f');
+      for (let b = 0; b < 12; b++) {
+        const h = Math.round(6 + (Math.sin(t * 5 + b * .9) * .5 + .5) * 26 * (.6 + .4 * vnoise(b, t * 3)));
+        for (let y = 0; y < h; y++) { const f = y / 32; rect(g, 3 + b * 4, 39 - y, 3, 1, f < .4 ? '#3de0ff' : f < .7 ? '#b48cff' : '#ff3d9f'); }
+        rect(g, 3 + b * 4, 38 - h - 2, 3, 1, '#ffffff');
+      }
+    },
+    function portal(g, t) {                                    // care calendar lighting up around a beating heart
+      rect(g, 0, 0, SW, SH, '#0c0a14');
+      const lit = Math.floor(t * 3) % 24;
+      for (let i = 0; i < 24; i++) { const x = 3 + (i % 6) * 5, y = 6 + Math.floor(i / 6) * 8; rect(g, x, y, 4, 6, i === lit ? '#57f2c8' : hash(i, 2) < .4 ? '#1f5a5a' : '#1a1a2e'); }
+      const big = Math.sin(t * 5) > .3, hx = 40, hy = 18;
+      const HEART = big ? ['.XX.XX.', 'XXXXXXX', 'XXXXXXX', '.XXXXX.', '..XXX..', '...X...'] : ['.X.X.', 'XXXXX', '.XXX.', '..X..'];
+      HEART.forEach((row, r) => [...row].forEach((c, q) => { if (c === 'X') P2(g, hx + q - (big ? 3 : 2), hy + r - 3, r === 0 || q === 1 ? '#ff9ac0' : '#ff3d7f'); }));
+    },
+    function scanner(g, t) {                                   // a laser tags bottles on the line
+      rect(g, 0, 0, SW, SH, '#0b0a0e');
+      rect(g, 0, 32, SW, 3, '#2a2530'); for (let x = -(t * 20 % 4); x < SW; x += 4) P2(g, x, 33, '#4a4252');
+      const lx = 30;
+      for (let y = 4; y < 32; y++) if ((y + Math.floor(t * 20)) % 3) P2(g, lx, y, '#ff3d5a');
+      rect(g, lx - 3, 2, 7, 3, '#3a3f5a');
+      for (let i = 0; i < 5; i++) {
+        const bx = ((i * 13 + t * 16) % (SW + 12)) - 6;
+        rect(g, bx + 1, 21, 2, 2, '#3a8a5a'); rect(g, bx, 23, 4, 9, '#4ab070'); P2(g, bx + 1, 24, '#aaf0c0');
+        if (bx > lx) { ['#57f287'].forEach(c => { P2(g, bx - 2, 19, c); P2(g, bx - 1, 19, c); P2(g, bx + 5, 19, c); P2(g, bx + 4, 19, c); P2(g, bx - 2, 20, c); P2(g, bx + 5, 20, c); }); }
+      }
+    },
+    function pairTree(g, t) {                                  // two cursors growing one tree together
+      rect(g, 0, 0, SW, SH, '#080c14');
+      const k = (t % 8) / 8, depth = Math.floor(k * 6) + 1;
+      const branch = (x, y, len, ang, d, who) => {
+        if (d > depth) return;
+        const ex = x + Math.cos(ang) * len, ey = y + Math.sin(ang) * len, n = Math.ceil(len);
+        for (let i = 0; i <= n; i++) P2(g, x + (ex - x) * i / n, y + (ey - y) * i / n, d < 3 ? '#9be58f' : who ? '#ff9ac0' : '#ffe08a');
+        branch(ex, ey, len * .72, ang - .5, d + 1, 0); branch(ex, ey, len * .72, ang + .5, d + 1, 1);
+      };
+      branch(27, 40, 9, -Math.PI / 2, 1, 0);
+      if (Math.floor(t * 3) % 2) { rect(g, 14 + Math.sin(t) * 6, 8, 1, 4, '#ff6fa0'); rect(g, 38 + Math.cos(t) * 6, 10, 1, 4, '#ffd66b'); }
+    },
+  ],
+  hanu: [
+    function lap(g, t) {                                       // fast laps, needle held in the green
+      rect(g, 0, 0, SW, SH, '#070b12');
+      for (let a = 0; a < 60; a++) { const an = a / 60 * 6.28; P2(g, 27 + Math.cos(an) * 22, 17 + Math.sin(an) * 11, '#1f2a44'); }
+      for (let i = 0; i < 12; i++) { const an = t * 4 - i * .07; P2(g, 27 + Math.cos(an) * 22, 17 + Math.sin(an) * 11, i ? (i < 4 ? '#bff4ff' : '#3de0ff') : '#ffffff'); }
+      const cx = 44, cy = 38;
+      for (let a = 0; a <= 12; a++) { const an = Math.PI + a / 12 * Math.PI; P2(g, cx + Math.cos(an) * 8, cy + Math.sin(an) * 8, a < 8 ? '#57f287' : '#ff5c7a'); }
+      const nd = Math.PI + (.35 + Math.sin(t * 7) * .06) * Math.PI;
+      for (let r = 0; r < 7; r++) P2(g, cx + Math.cos(nd) * r, cy + Math.sin(nd) * r, '#ffffff');
+    },
+    function shield(g, t) {                                    // bugs zapped at the shield
+      rect(g, 0, 0, SW, SH, '#070a14');
+      const S = ['..XXXXX..', '.XXXXXXX.', 'XXXXXXXXX', 'XXXXXXXXX', 'XXXXXXXXX', '.XXXXXXX.', '.XXXXXXX.', '..XXXXX..', '...XXX...', '....X....'];
+      S.forEach((row, r) => [...row].forEach((c, q) => { if (c === 'X') P2(g, 23 + q, 15 + r, q < 4 ? '#6ff0ff' : '#2ab0d0'); }));
+      for (let a = 0; a < 30; a++) { const an = a / 30 * 6.28; if (bayer(a, Math.floor(t * 4)) < .5) P2(g, 27 + Math.cos(an) * 10, 20 + Math.sin(an) * 10, '#1f6a8a'); }
+      for (let i = 0; i < 6; i++) {
+        const an = hash(i, 3) * 6.28, ph = (t * .5 + i / 6) % 1, r = 26 - ph * 16;
+        const x = 27 + Math.cos(an) * r, y = 20 + Math.sin(an) * r;
+        if (r > 11) { P2(g, x, y, '#ff3d5a'); P2(g, x + 1, y, '#ff3d5a'); P2(g, x, y - 1, '#aa1a3a'); }
+        else for (let s2 = 0; s2 < 5; s2++) P2(g, x + (hash(i, s2) - .5) * 6, y + (hash(s2, i) - .5) * 6, '#ffd66b');
+      }
+    },
+    function coins(g, t) {                                     // spend shrinks while instances breathe with load
+      rect(g, 0, 0, SW, SH, '#0c0a08');
+      const k = Math.min(1, (t % 8) / 6), n = Math.round(10 - 4 * k);
+      for (let i = 0; i < n; i++) { rect(g, 8, 34 - i * 3, 12, 2, '#ffc83d'); rect(g, 8, 35 - i * 3, 12, 1, '#b8861a'); P2(g, 9, 34 - i * 3, '#fff0b0'); }
+      for (let y = 0; y < 6; y++) rect(g, 24 - y + 2, 12 + y, 1 + y * 0 + 1, 1, '#57f287');
+      rect(g, 25, 6, 2, 8, '#57f287');
+      const up = 2 + Math.round((Math.sin(t * .8) * .5 + .5) * 4);
+      for (let v = 0; v < 6; v++) rect(g, 34 + (v % 3) * 6, 12 + Math.floor(v / 3) * 8, 5, 6, v < up ? '#3de0ff' : '#18202e');
+    },
+    function donut(g, t) {                                     // live FinOps: flowing area + turning donut
+      rect(g, 0, 0, SW, SH, '#08081a');
+      for (let x = 0; x < 30; x++) { const y = Math.round(28 - (Math.sin((x + t * 12) * .2) * .5 + .5) * 16); for (let yy = y; yy < 38; yy++) P2(g, x + 2, yy, yy === y ? '#3de0ff' : yy % 2 ? '#1a3a6a' : '#12284a'); }
+      const cx = 43, cy = 20;
+      for (let y = -9; y <= 9; y++) for (let x = -9; x <= 9; x++) { const d = Math.hypot(x, y); if (d < 9 && d > 5) { const a = (Math.atan2(y, x) - t * .8 + 20 * Math.PI) % (2 * Math.PI); P2(g, cx + x, cy + y, a < 2.2 ? '#b48cff' : a < 4 ? '#ffd66b' : '#57f287'); } }
+    },
+  ],
+  ey: [
+    function lanes(g, t) {                                     // sensor data streaming down three Kafka lanes
+      rect(g, 0, 0, SW, SH, '#0c0a06');
+      [9, 20, 31].forEach((ly, i) => {
+        for (let x = 6; x < SW - 6; x += 2) P2(g, x, ly, '#241e10');
+        for (let p = 0; p < 4; p++) {
+          const x = 6 + ((t * (14 + i * 4) + p * 11) % (SW - 12));
+          for (let k = 1; k < 6; k++) P2(g, x - k, ly, ['#ffb347', '#ffd66b', '#ff8a5c'][i] + (k < 3 ? 'aa' : '44'));
+          glowDot(g, x, ly, '#fff3d0', ['#ffb347', '#ffd66b', '#ff8a5c'][i] + '88');
         }
-        if (ly <= 1 && Math.abs(x - cx) < 5) return PANEL[3];                        // hub
-      }
-    } else {
-      if (y > by1 && y <= by1 + 7 && x >= cx - 2 && x <= cx + 2) return x === cx - 2 ? PANEL[4] : PANEL[2];
-      if (inPoly(fx, fy, [[cx - 16, by1 + 12], [cx + 16, by1 + 12], [cx + 12, by1 + 8], [cx - 12, by1 + 8]])) return ramp(PANEL, 3.4 - (by1 + 12 - y) * .2, x, y);
-      if (y >= by1 + 12 && y <= by1 + 13 && x >= cx - 16 && x <= cx + 16) return y === by1 + 12 ? PANEL[4] : PANEL[1];
-    }
-    return null;
-  }, PANEL[0], true);
-}
-const MON_FRAMES = { ultra: buildMonitor('ultra'), std: buildMonitor('std') };
-
-/* ---------------- flagship: curved ultrawide (Insight) ---------------- */
-MON.curved = { W: 134, H: 88, sx: 9, sy: 11, sw: 112, sh: 44 };
-const METAL_S = ['#1b1d24', '#3c404c', '#5d6170', '#8a8f9e', '#b8bcc8', '#e2e5ee'].map(hex);
-const GUN = ['#050508', '#101017', '#191922', '#23232e'].map(hex);
-const CURVE = { c: 5, e: 3 };                              // centre sags c px, ends grow e px
-function curveAt(x) {
-  const m = MON.curved, cx = m.sx + m.sw / 2, t = (x - cx) / (m.sw / 2 + 2);
-  const off = CURVE.c * (1 - t * t) - CURVE.e * t * t;     // vertical shift of the top edge
-  return { top: Math.round(m.sy + off), bot: Math.round(m.sy + m.sh + CURVE.c * (1 - t * t) + CURVE.e * t * t) };
-}
-function buildCurved() {
-  const m = MON.curved, cx = Math.floor(m.sx + m.sw / 2);
-  const baseY = m.H - 6;
-  return paint(m.W, m.H, (fx, fy, x, y) => {
-    // panel: 2px gunmetal bezel following the curve, silver trim on the outer edge
-    if (x >= m.sx - 2 && x <= m.sx + m.sw + 1) {
-      const { top, bot } = curveAt(Math.min(Math.max(x, m.sx), m.sx + m.sw - 1));
-      if (y >= top - 2 && y <= bot + 2) {
-        if (x >= m.sx && x < m.sx + m.sw && y >= top && y < bot) return [4, 4, 8];
-        if (y === top - 2 || x === m.sx - 2) return METAL_S[3];                         // silver trim, top + left
-        if (x === m.sx + m.sw + 1) return METAL_S[2];
-        if (y === bot + 2) return GUN[0];
-        if (y >= bot && Math.abs(x - cx) <= 2 && y === bot + 1) return METAL_S[5];      // emblem
-        return GUN[2];
-      }
-      // depth: back edge of the panel shows past the right end, following the curve
-      if (x === m.sx + m.sw + 1) {
-        const { top, bot } = curveAt(m.sx + m.sw - 1);
-        if (y >= top - 1 && y <= bot + 1) return RIM_CYAN;
-      }
-      // rear shell visible just under the panel centre (where the arm mounts)
-      const b = curveAt(cx).bot;
-      if (Math.abs(x - cx) <= 12 && y > b + 2 && y <= b + 4) return y === b + 3 ? GUN[3] : GUN[1];
-    }
-    // brushed-aluminium arm: slim, lit left edge, anodized groove
-    const armTop = curveAt(cx).bot + 5;
-    if (y >= armTop && y < baseY - 1 && x >= cx - 2 && x <= cx + 2) {
-      if (x === cx - 2) return METAL_S[4];
-      if (x === cx + 2) return METAL_S[0];
-      return x === cx - 1 ? METAL_S[3] : (y % 4 === 0 ? METAL_S[2] : METAL_S[1]);
-    }
-    // crescent base: wide, thin, polished top face
-    const dx = (x - cx) / 30, dy = (y - baseY) / 3.2, inner = ((x - cx) / 22) ** 2 + ((y - baseY + 2.2) / 2.6) ** 2;
-    if (dx * dx + dy * dy <= 1 && inner > 1 && y >= baseY - 1) return y === baseY - 1 ? METAL_S[4] : y === baseY ? METAL_S[3] : METAL_S[1];
-    return null;
-  }, GUN[0], true);
-}
-MON_FRAMES.curved = buildCurved();
-
-// Draw the flat screen buffer warped onto the curve, one column at a time.
-function drawCurvedScreen(g, screen, m) {
-  for (let i = 0; i < m.sw; i++) {
-    const { top, bot } = curveAt(m.sx + i);
-    g.drawImage(screen, i, 0, 1, m.sh, m.sx + i, top, 1, bot - top);
-  }
-  // glass: soft vertical sheen that follows the bend, plus faint edge falloff
-  for (let i = 0; i < m.sw; i++) {
-    const { top, bot } = curveAt(m.sx + i), t = Math.abs(i - m.sw / 2) / (m.sw / 2);
-    g.fillStyle = `rgba(0,0,0,${(t * t * .25).toFixed(3)})`; g.fillRect(m.sx + i, top, 1, bot - top);
-    if (i > m.sw * .62 && i < m.sw * .7) { g.fillStyle = 'rgba(255,255,255,.035)'; g.fillRect(m.sx + i, top, 1, bot - top); }
-  }
-}
-
-// Placeholder footage per job, drawn at the screen's native pixel size.
-const workScenes = {
-  insight(g, t, W, H) {
-    rect(g, 0, 0, W, H, '#0a1020');
-    const gx = Math.floor(W * .42);
-    for (let i = 0; i < 6; i++) rect(g, 4, 6 + i * 6, 3, 3, '#6fd3ff');                           // clients
-    rect(g, gx - 5, 8, 10, H - 16, '#2a1f4a'); rect(g, gx - 4, 9, 8, H - 18, '#b48cff');            // API gateway
-    rect(g, gx - 3, 10, 6, H - 20, '#2a1f4a');
-    const pods = [[W - 30, 6], [W - 30, 17], [W - 30, 28]];
-    pods.forEach(([px, py], i) => {
-      const hot = (Math.floor(t * 2) + i) % 3 === 0;
-      rect(g, px, py, 22, 8, hot ? '#1f5a3a' : '#15302a'); rect(g, px + 1, py + 1, 20, 6, '#0a1020');
-      for (let k = 0; k < 4; k++) rect(g, px + 3 + k * 5, py + 3, 3, 2, hot && k < 3 ? '#57f287' : '#2f6b4a');
-    });
-    for (let p = 0; p < 14; p++) {                                                                  // requests
-      const k = (t * .7 + p / 14) % 1, lane = p % 6, pod = p % 3;
-      const x = k < .5 ? 7 + (gx - 12) * (k / .5) : gx + 5 + (pods[pod][0] - gx - 6) * ((k - .5) / .5);
-      const y = k < .5 ? 7 + lane * 6 : pods[pod][1] + 4;
-      rect(g, Math.round(x), Math.round(y), 2, 1, '#ffd66b');
-    }
-    g.font = '8px "Silkscreen"'; g.textBaseline = 'top'; g.fillStyle = '#57f287';
-    const txt = 'SLO 99.86%'; g.fillText(txt, W - Math.ceil(g.measureText(txt).width) - 3, H - 9);
-  },
-  hanu(g, t, W, H) {
-    rect(g, 0, 0, W, H, '#0c0f14');
-    const cw = Math.floor(W * .58);
-    for (let y = 6; y < H - 2; y += 8) for (let x = 2; x < cw; x += 3) rect(g, x, y, 1, 1, '#1b2430');
-    for (let x = 2; x < cw; x += 3) rect(g, x, 12, 2, 1, '#ff5c7a');                               // 100ms threshold
-    let prev = null;
-    for (let x = 2; x < cw; x++) {                                                                  // p95 stays under it
-      const y = Math.round(26 + Math.sin((x + t * 18) * .21) * 5 + Math.sin((x + t * 18) * .07) * 4);
-      if (prev !== null) rect(g, x, Math.min(prev, y), 1, Math.abs(prev - y) + 1, '#6fd3ff');
-      prev = y;
-    }
-    const sx = cw + 6, fixed = Math.floor((t * 1.5) % 9);                                         // SAST findings -> zero
-    for (let i = 0; i < 8; i++) {
-      const ok = i < fixed;
-      rect(g, sx, 4 + i * 4, 3, 3, ok ? '#57f287' : '#ff5c7a');
-      rect(g, sx + 5, 5 + i * 4, 10 + (i * 7) % 18, 1, ok ? '#2f6b4a' : '#6b2a3a');
-    }
-    g.font = '8px "Silkscreen"'; g.textBaseline = 'top'; g.fillStyle = '#6fd3ff';
-    g.fillText('P95 <100MS', 3, H - 9);
-  },
-  ey(g, t, W, H) {
-    rect(g, 0, 0, W, H, '#0e0c08');
-    for (let i = 0; i < 3; i++) {                                                                  // sensors (factory blocks)
-      rect(g, 2, 5 + i * 11, 6, 6, '#6b5a3a'); rect(g, 3, 3 + i * 11, 2, 2, '#6b5a3a');
-      if (Math.floor(t * 3 + i) % 2) rect(g, 4, 7 + i * 11, 2, 2, '#ffb347');
-    }
-    const lanes = [8, 18, 28];                                                                      // three Kafka topics
-    lanes.forEach((ly, i) => {
-      for (let x = 12; x < W - 14; x += 2) rect(g, x, ly, 1, 1, '#2e2a1e');
-      for (let p = 0; p < 5; p++) {
-        const k = (t * (.45 + i * .08) + p / 5) % 1;
-        rect(g, 12 + Math.round(k * (W - 28)), ly - 1, 2, 3, ['#ffb347', '#ffd66b', '#ff8a5c'][i]);
-      }
-    });
-    rect(g, W - 12, 4, 10, 12, '#243a2a'); rect(g, W - 12, 20, 10, 12, '#243a2a');                // consumer groups
-    rect(g, W - 10, 6, 6, 1, '#57f287'); rect(g, W - 10, 22, 6, 1, '#57f287');
-  },
+        rect(g, 1, ly - 2, 4, 5, '#6b5a3a'); rect(g, SW - 5, ly - 2, 4, 5, Math.floor(t * 4 + i) % 2 ? '#57f287' : '#2f6b4a');
+      });
+    },
+    function race(g, t) {                                      // slow query drip vs. an instant cache bolt
+      rect(g, 0, 0, SW, SH, '#0a0810');
+      rect(g, 4, 6, 8, 10, '#6a5a8a'); rect(g, 4, 5, 8, 2, '#9a8ab8'); rect(g, 4, 15, 8, 2, '#4a3a6a');           // database
+      rect(g, 4, 26, 8, 8, '#c02a3a'); rect(g, 5, 27, 6, 6, '#ff5c5c');                                        // cache chip
+      rect(g, 44, 14, 8, 12, '#1a2a3a'); const k = (t % 3) / 3;
+      rect(g, 45, 15, 6, 10, k < .15 ? '#57f287' : '#12202e');                                                  // dashboard lights on the bolt
+      P2(g, 12 + k * 32, 11, '#ff8a5c'); P2(g, 12 + k * 32 - 1, 11, '#ff8a5c66');                               // the slow drip
+      if (k < .15) for (let x = 12; x < 44; x++) P2(g, x, 30 - ((x >> 2) % 2) * 3 + Math.floor((x - 12) / 11) * -2, '#fff3a0');
+    },
+  ],
 };
-
+const WORK_ORDER = ['ey', 'hanu', 'insight'];                    // career order, left to right, middle set raised
+const WSLOT = 7;
 const lcdWrap = $id('lcds');
-const MONITOR_JOBS = [{ job: 'insight', kind: 'curved' }, { job: 'hanu', kind: 'ultra' }, { job: 'ey', kind: 'std' }];
-const lcds = MONITOR_JOBS.map(({ job, kind }) => {
-  const j = JOBS.find(q => q.id === job), m = MON[kind];
-  const d = document.createElement('div'); d.className = 'lcd ' + kind;
-  const cv = document.createElement('canvas'); cv.width = m.W; cv.height = m.H;
+const lcds = WORK_ORDER.map((id, n) => {
+  const j = JOBS.find(q => q.id === id);
+  const d = document.createElement('div'); d.className = 'tv wtv';
+  const cv = document.createElement('canvas'); cv.width = TV_W; cv.height = TV_H;
+  const shadow = document.createElement('div'); shadow.className = 'tv-shadow';
   const cap = document.createElement('div'); cap.className = 'tv-label';
-  cap.innerHTML = `<small>${esc(j.when)}</small>${esc(j.co)} · ${esc(j.role)}`;
   const scope = document.createElement('canvas'); scope.width = 84; scope.height = 14; scope.className = 'scope'; scope.setAttribute('aria-hidden', 'true'); scope.style.width = '252px'; scope.style.height = '42px';
-  d.append(scope, cv, cap); lcdWrap.append(d);
-  d.tabIndex = 0; d.setAttribute('role', 'button'); d.setAttribute('aria-label', `${esc(j.co)}: open ship log entry`);
-  const screen = document.createElement('canvas'); screen.width = m.sw; screen.height = m.sh;
-  const entry = { j, kind, m, cv, g: cv.getContext('2d'), screen, sg: screen.getContext('2d', { willReadFrequently: true }), W: m.W, H: m.H, scopeG: scope.getContext('2d'), scope, tuned: false };
+  d.append(scope, cv, shadow, cap); lcdWrap.append(d);
+  d.tabIndex = 0; d.setAttribute('role', 'button');
+  const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
+  const up = -Math.PI / 2;
+  const entry = { j, n, d, cv, cap, g: cv.getContext('2d'), screen, sg: screen.getContext('2d', { willReadFrequently: true }),
+    scopeG: scope.getContext('2d'), scope, tuned: false, idx: -1, switchAt: -10,
+    knobs: [{ from: up, to: up, t0: 0, dur: 0 }, { from: up + .5 * (n - 1), to: up + .5 * (n - 1), t0: 0, dur: 0 }] };
   const open = () => {
     const card = $id('log-' + j.id); card.scrollIntoView({ block: 'start' }); card.classList.add('active');
     card.focus({ preventScroll: true }); setTimeout(() => card.classList.remove('active'), 2400);
@@ -1485,46 +1498,46 @@ const lcds = MONITOR_JOBS.map(({ job, kind }) => {
   ['mouseleave', 'blur'].forEach(ev => d.addEventListener(ev, () => { entry.tuned = false; }));
   return entry;
 });
+function setWorkChannel(l, idx, t) {
+  l.idx = idx; l.switchAt = t;
+  const [ch, fine] = l.knobs, dur = reduce ? 0 : .32;
+  ch.from = knobAngle(ch, t); ch.to = ch.from + Math.PI / 3 + l.n * .3; ch.t0 = t; ch.dur = dur;
+  fine.from = knobAngle(fine, t); fine.to = fine.from - (.3 + hash(l.n, idx) * .6); fine.t0 = t + .06; fine.dur = dur;
+  const name = l.j.work[idx][0];
+  l.cap.innerHTML = `<small>${esc(name)}</small>${esc(l.j.co)}`;
+  l.d.setAttribute('aria-label', `${esc(l.j.co)}, now showing ${esc(name)}. Open job details`);
+  root.querySelectorAll(`#log-${l.j.id} li`).forEach((li, i) => li.classList.toggle('on', i === idx));
+}
 function drawLCDs(t) {
-  lcds.forEach(({ j, kind, m, g, screen, sg }, n) => {
-    g.clearRect(0, 0, m.W, m.H);
-    if (kind === 'curved') {                                    // ambient violet glow hugging the curve
-      for (let i = -4; i < m.sw + 4; i++) {
-        const { top, bot } = curveAt(Math.min(Math.max(m.sx + i, m.sx), m.sx + m.sw - 1));
-        const fade = 1 - Math.abs(i - m.sw / 2) / (m.sw / 2 + 6);
-        g.fillStyle = `rgba(180,140,255,${(.09 * fade).toFixed(3)})`;
-        g.fillRect(m.sx + i, top - 5, 1, 3); g.fillRect(m.sx + i, bot + 3, 1, 2);
-      }
-    }
-    g.drawImage(MON_FRAMES[kind], 0, 0);
+  lcds.forEach(l => {
+    const scenes = JOB_SCENES[l.j.id], count = Math.min(scenes.length, l.j.work.length);
+    const idx = reduce ? 0 : Math.floor((t + l.n * 2.3) / WSLOT) % count;
+    if (idx !== l.idx) setWorkChannel(l, idx, l.idx < 0 ? -10 : t);
+    const g = l.g;
+    g.clearRect(0, 0, TV_W, TV_H); g.drawImage(TV_FRAME, 0, 0);
+    l.knobs.forEach((k, i) => drawKnob(g, KNOBS[i][0], KNOBS[i][1], knobAngle(k, t)));
     g.save(); g.globalCompositeOperation = 'source-atop';               // campfire underlight
-    const wl = g.createLinearGradient(0, m.sy + m.sh, 0, m.H);
-    wl.addColorStop(0, 'rgba(255,140,60,0)'); wl.addColorStop(1, `rgba(255,140,60,${(.32 * FIRE.level).toFixed(3)})`);
-    g.fillStyle = wl; g.fillRect(0, m.sy + m.sh, m.W, m.H); g.restore();
-    const clip = clipFor(j.id);
-    if (clip.ready) drawCover(sg, clip.video, m.sw, m.sh); else (workScenes[j.id] ?? workScenes.ey)(sg, reduce ? 2 : t + n, m.sw, m.sh);
-    if (kind === 'curved') { drawCurvedScreen(g, screen, m); return; }
-    g.drawImage(screen, m.sx, m.sy);
-    // screen light on the bezel, then a soft diagonal reflection (modern glass, no scanlines)
-    const d = sg.getImageData(0, 0, m.sw, m.sh).data; let r = 0, gg = 0, b = 0, c = 0;
-    for (let i = 0; i < d.length; i += 32) { r += d[i]; gg += d[i + 1]; b += d[i + 2]; c++; }
-    g.fillStyle = `rgba(${r / c | 0},${gg / c | 0},${b / c | 0},.3)`;
-    g.fillRect(m.sx - 1, m.sy - 1, m.sw + 2, 1); g.fillRect(m.sx - 1, m.sy + m.sh, m.sw + 2, 1);
-    g.fillRect(m.sx - 1, m.sy, 1, m.sh); g.fillRect(m.sx + m.sw, m.sy, 1, m.sh);
-    g.fillStyle = 'rgba(255,255,255,.025)';
-    for (let i = 0; i < m.sh; i++) g.fillRect(m.sx + m.sw - 30 + Math.floor(i * .6), m.sy + i, 10, 1);
-    if (kind === 'ultra') {                                                    // RGB underglow strip, slowly cycling
-      const cxm = Math.floor(m.W / 2) - 1, y = m.sy + m.sh + 6;
-      for (let x = m.sx + 6; x < m.sx + m.sw - 6; x++) {
-        const hue = ((x * 3 + (reduce ? 0 : t * 60)) % 360);
-        g.fillStyle = `hsla(${hue}, 55%, 58%, .75)`; g.fillRect(x, y, 1, 1);
-        g.fillStyle = `hsla(${hue}, 55%, 58%, .06)`; g.fillRect(x, y + 1, 1, 2);
-      }
-      g.fillStyle = 'rgba(180,140,255,.04)'; g.fillRect(cxm - 20, y + 3, 42, 2);
+    const wl = g.createLinearGradient(0, TV_H * .55, 0, TV_H);
+    wl.addColorStop(0, 'rgba(255,140,60,0)'); wl.addColorStop(1, `rgba(255,140,60,${(.3 * FIRE.level).toFixed(3)})`);
+    g.fillStyle = wl; g.fillRect(0, 0, TV_W, TV_H); g.restore();
+    const noisy = !reduce && t - l.switchAt < .35;
+    if (noisy) staticNoise(g, t);
+    else {
+      const clip = clipFor(l.j.id);
+      if (clip.ready) drawCover(l.sg, clip.video, SW, SH); else scenes[idx](l.sg, reduce ? 2 : t + l.n);
+      g.drawImage(l.screen, SX, SY);
     }
+    crtPost(g, l.sg, noisy); drawDigit(g, idx + 1);
+    screenGlow(l.d, l.sg, t);
   });
 }
-
+// Hover glow takes the colour of what's on the glass, so it suits night, sunrise and the campfire.
+function screenGlow(el, sg, t) {
+  if (Math.floor(t * 4) === el._glowTick) return;
+  el._glowTick = Math.floor(t * 4);
+  const [r, g, b] = avgColor(sg);
+  el.style.setProperty('--glow', `${Math.min(255, r * 1.6 + 40) | 0} ${Math.min(255, g * 1.6 + 40) | 0} ${Math.min(255, b * 1.6 + 40) | 0}`);
+}
 
 /* readable job details, styled like the project strip */
 $id('jobs').innerHTML = JOBS.map(j => `
@@ -1797,7 +1810,7 @@ function drawSpace(t) {
   const g = xg;
   g.drawImage(spaceStatic, 0, 0);
   // The planet turns: we stay put, the sky slides past and bends with the horizon's curve.
-  const BW = spaceBand.width, off = reduce ? 0 : (t * 1.1) % BW;
+  const BW = spaceBand.width, off = reduce ? 0 : (t * 3.5) % BW;
   const drop = x => Math.round(16 * ((x - SPW / 2) / (SPW / 2)) ** 2);
   const toView = bx => { let x = bx - off; x = ((x % BW) + BW) % BW; return x; };
   for (let x = 0; x < SPW; x++) g.drawImage(spaceBand, Math.floor((x + off) % BW), 0, 1, SPH, x, drop(x), 1, SPH);
@@ -1818,8 +1831,8 @@ function drawSpace(t) {
   px(g, cx, cy, '#ffffff'); px(g, cx + 1, cy, '#ffffff'); px(g, cx, cy - 1, '#cfefff');
   drawMeteors(g, t);
   g.drawImage(spaceGround, 0, 0);
-  // campfire under the EY monitor
-  const ey = monitorPoint('ey'); FIRE.x = ey[0]; FIRE.y = groundTop(ey[0]) - 1;
+  // campfire, centre of the ground
+  FIRE.x = Math.round(SPW / 2); FIRE.y = groundTop(FIRE.x) - 1;
   drawFire(g, t);
   drawTrail(g, t);
   // supernova shockwave, then quiet reset

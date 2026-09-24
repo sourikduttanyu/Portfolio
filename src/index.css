@@ -126,9 +126,17 @@
   .work-scene { position: relative; overflow: hidden; padding: 150px 0 210px; }
   #space { position: absolute; inset: 0; width: 100%; height: 100%; }
   .work-scene .work-inner { position: relative; z-index: 1; }
-  .lcd { position: relative; cursor: pointer; }
   .scope { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); opacity: 0; transition: opacity .2s; pointer-events: none; }
-  .lcd:hover .scope, .lcd:focus-visible .scope { opacity: 1; }
+  .wtv:hover .scope, .wtv:focus-visible .scope { opacity: 1; }
+  /* work CRTs: same sets as the hero, floating over the campfire in career order, Insight raised */
+  .lcds { display: flex; justify-content: center; align-items: flex-start; flex-wrap: wrap; gap: 24px 5%; margin: 0; }
+  .tv.wtv { position: relative; }
+  .wtv:nth-child(1) { margin-top: 90px; } .wtv:nth-child(3) { margin-top: 110px; }
+  @media (max-width: 860px) { .wtv:nth-child(n) { margin-top: 0; } }
+  /* hover: the set glows with the colour of its own screen (fits night, sunrise and the campfire) */
+  .tv canvas { transition: filter .25s; }
+  .tv:hover canvas, .tv:focus-visible canvas { filter: drop-shadow(0 0 12px rgb(var(--glow, 255 214 170) / .55)) drop-shadow(0 0 3px rgb(var(--glow, 255 214 170) / .6)); }
+  .tv.empty:hover canvas { filter: none; }
   .loop-clock { position: absolute; right: 16px; bottom: 10px; z-index: 1; font: 11px "Silkscreen", monospace; color: rgba(232,163,61,.5); }
   .work-inner { width: min(1200px, 100% - 32px); margin: 0 auto; }
 
@@ -144,26 +152,16 @@
   .job li { max-width: 60ch; }
   .nowrap { white-space: nowrap; }
   .job li b { color: var(--ink); font-weight: 500; }
+  .job li.on b { color: var(--pink); }
+  .job li { transition: color .3s; }
   @media (max-width: 860px) { .jobs { grid-template-columns: 1fr; } }
-  .lcd:hover .tv-label, .lcd:focus-visible .tv-label { color: var(--pink); border-color: var(--pink); }
-  .lcds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); justify-items: center; gap: 48px 4%; margin: 0; }
-  @keyframes drift {
-    0%, 100% { transform: translateY(0) rotate(var(--r)); }
-    50% { transform: translateY(-6px) rotate(calc(var(--r) * -0.5)); }
-  }
-  .lcd { animation: drift var(--d) ease-in-out infinite; animation-delay: var(--delay); text-align: center; max-width: 100%; }
-  .lcd canvas { max-width: 100%; height: auto !important; margin: 0 auto; }
-  .lcd:nth-child(1) { --d: 10.5s; --delay: -2s; --r: .5deg; justify-self: end; }
-  .lcd:nth-child(2) { --d: 12s; --delay: -4s; --r: -.5deg; justify-self: start; margin-top: 24px; }
-  .lcd:nth-child(3) { --d: 10s; --delay: -1s; --r: .3deg; grid-column: 1 / -1; margin-top: -8px; }
-  @media (max-width: 700px) { .lcds { grid-template-columns: 1fr; } .lcd:nth-child(n) { justify-self: center; margin-top: 0; } }
 
 
   @media (max-width: 859px) {
     .tv-label { font-size: 12px; }
     }
   @media (prefers-reduced-motion: reduce) {
-    .tv, .lcd, .tv-shadow { animation: none; }
+    .tv, .tv-shadow { animation: none; }
     html { scroll-behavior: auto; }
   }
 
