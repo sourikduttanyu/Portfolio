@@ -916,14 +916,26 @@ function drawBolt(g, path) {
 }
 // Living promenade: lamp halos, carousel, walkers, rain splashes. (Ferry is drawn on the river.)
 function drawFerry(g, L, t) {
+  // NYC Ferry style, sailing right to left mid-river: pointed hull with a blue stripe, two decks of
+  // windows, railing, wheelhouse, mast + flag; bow foam, churned wake, broken reflection; lit at night.
   const day = L.P.day, tt = reduce ? 0 : t;
-  // ferry: NYC-ferry white/blue, crosses right to left every 40s, wake behind
-  const fk = (tt % 40) / 40, fx = Math.round(SKY_W + 30 - fk * (SKY_W + 70)), fy = HY + Math.round((PY - HY) * .6);   // mid-river
-  for (let i = 0; i < 26; i++) if (hash(i, Math.floor(tt * 6)) < .6 - i / 50) { g.fillStyle = '#e8ecff88'; g.fillRect(fx + 24 + i, fy + 3 + (i % 2), 1, 1); }
-  g.fillStyle = day ? '#f4f4f8' : '#c8c8e0'; g.fillRect(fx, fy, 24, 3);
-  g.fillStyle = '#2a5aa8'; g.fillRect(fx, fy + 2, 24, 1);
-  g.fillStyle = day ? '#e8e8f0' : '#9a9ab8'; g.fillRect(fx + 4, fy - 3, 15, 3);
-  for (let k = 0; k < 5; k++) { g.fillStyle = day ? '#5a6a9a' : '#ffe2a8'; g.fillRect(fx + 5 + k * 3, fy - 2, 2, 1); }
+  const fk = (tt % 40) / 40, x = Math.round(SKY_W + 34 - fk * (SKY_W + 80)), y = HY + Math.round((PY - HY) * .6);
+  const P = (px2, py2, c) => { g.fillStyle = c; g.fillRect(px2, py2, 1, 1); };
+  const W = 30, hull = day ? '#f4f4f8' : '#c8c8dc', hullLo = day ? '#b8bccc' : '#8a8aa8', blue = '#2a5aa8';
+  for (let i = 0; i < 30; i++) if (hash(i, Math.floor(tt * 6)) < .7 - i / 50) P(x + W + i, y + 3 + (i % 2), day ? '#ffffffaa' : '#e8ecff88');   // wake
+  for (let k = 0; k < 4; k++) P(x - 1 - (k % 2), y + 2 + (k >> 1), '#ffffffcc');                                                      // bow foam
+  for (let r = 0; r < 4; r++) for (let i = Math.max(0, 3 - r); i < W; i++)                                                            // hull, bow tapers
+    P(x + i, y + r, r === 3 ? '#1a2a4a' : r === 2 ? blue : r === 0 ? hull : hullLo);
+  for (let i = 3; i < W - 2; i++) P(x + i, y + 4 + (hash(i, Math.floor(tt * 4)) < .5 ? 1 : 2), day ? '#8a90b8' : '#3a3a5a');         // reflection
+  const glass = day ? '#5a6a9a' : '#ffe2a8', glint = day ? '#c8d8ff' : '#fff4d8';
+  for (let i = 4; i < W - 3; i++) { P(x + i, y - 3, hull); P(x + i, y - 2, i % 2 ? glass : hull); P(x + i, y - 1, hull); }        // lower cabin
+  for (let i = 8; i < W - 7; i++) { P(x + i, y - 6, hull); P(x + i, y - 5, i % 2 ? glass : hull); P(x + i, y - 4, hullLo); }      // upper deck
+  for (let i = 8; i < W - 7; i += 2) P(x + i, y - 7, day ? '#6a6a80' : '#9a9ab8');                                                    // railing
+  for (let r = 0; r < 3; r++) for (let i = 9; i < 13; i++) P(x + i, y - 10 + r, r === 1 ? (i % 2 ? glass : hull) : hull);           // wheelhouse
+  P(x + 10, y - 9, glint);
+  for (let r = 0; r < 5; r++) P(x + 21, y - 12 + r, '#4a4a60');                                                                     // mast + flag
+  P(x + 22, y - 12, '#d04a4a'); P(x + 23, y - 12, '#d04a4a'); P(x + 22, y - 11, '#2a5aa8');
+  if (!day) { P(x + 21, y - 13, '#ffffff'); P(x + 1, y + 1, '#ff4a5a'); P(x + W - 2, y + 1, '#4aff8a'); }                           // running lights
 }
 const walkers = [
   { speed: 6, dir: 1, y: 3, off: 0, coat: '#ff6fa0', umb: '#ff3d7f' },
