@@ -13,7 +13,7 @@ let raf = 0, ro = null, stopped = false;
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ---------------- data (from src/data) ---------------- */
-const SCENES = { jellysynth: 'plasma', sentinel: 'code', 'go-pubsub': 'packets', veil: 'noise', chronos: 'chart', astral: 'meter' };
+const SCENES = { jellysynth: 'plasma', sentinel: 'code', 'go-pubsub': 'packets', veil: 'noise', chronos: 'chart', astral: 'meter', feastfleet: 'delivery' };
 const PROJECTS = projects.map(p => {
   const href = p.repo ?? p.live;
   return { id: p.slug, name: p.name, tag: p.skill, line: p.tagline, plain: p.plain, results: p.results,
@@ -80,9 +80,6 @@ const TV_SIDE = [[84, 26], [92, 17], [92, 72], [84, 82]];
 function buildTVFrame() {
   return paint(TV_W, TV_H, (fx, fy, x, y) => {
     // antenna
-    const rod = (x0, y0, x1, y1) => { const t = (y - y0) / (y1 - y0); return t >= 0 && t <= 1 && Math.abs(x - Math.round(x0 + (x1 - x0) * t)) === 0; };
-    if (rod(50, 16, 36, 1) || rod(58, 16, 76, 1)) return y % 3 ? [150, 156, 168] : [210, 215, 225];
-    if ((x >= 35 && x <= 36 && y <= 1) || (x >= 76 && x <= 77 && y <= 1)) return [230, 230, 240];
     if (x >= 48 && x <= 60 && y >= 14 && y <= 18) return y === 14 ? PLASTIC[3] : PLASTIC[1];
     // feet (with a lit top edge)
     if (y >= 82 && y <= 86 && ((x >= 12 && x <= 24) || (x >= 62 && x <= 74))) return y === 82 ? PLASTIC[3] : PLASTIC[1];
@@ -137,7 +134,26 @@ function buildTVFrame() {
     return null;
   });
 }
-const TV_FRAME = buildTVFrame();
+// Antennas: 2px chrome rods (lit left edge, shaded right), ball tips, outlined from outside
+// so the thin shapes keep their colour. Composited under the body.
+function buildAntenna() {
+  const rods = [[[50, 16], [34, 2]], [[58, 16], [78, 2]]];
+  return paint(TV_W, TV_H, (fx, fy) => {
+    for (const [[x0, y0], [x1, y1]] of rods) {
+      if (Math.hypot(fx - x1, fy - y1) < 2) return fx - x1 + fy - y1 < -.5 ? [255, 255, 255] : [196, 200, 214];   // ball tip
+      const t = (fy - y0) / (y1 - y0);
+      if (t < 0 || t > 1) continue;
+      const cx = x0 + (x1 - x0) * t, d = fx - cx;
+      if (Math.abs(d) <= 1.05) return d < 0 ? [226, 230, 240] : [128, 134, 150];
+    }
+    return null;
+  }, [20, 16, 30], true);
+}
+const TV_FRAME = (() => {
+  const c = document.createElement('canvas'); c.width = TV_W; c.height = TV_H;
+  const g = c.getContext('2d'); g.drawImage(buildAntenna(), 0, 0); g.drawImage(buildTVFrame(), 0, 0);
+  return c;
+})();
 
 /* Live knobs: ridges + pointer rotate, shading stays lit from the top-left */
 const KNOBS = [[76, 38], [76, 50]];
@@ -207,6 +223,29 @@ const scenes = {
       }
     });
     rect(g, 2, 2, 1 + Math.floor((Math.sin(t * 2) + 1) * 3), 1, '#ff5c7a');
+  },
+  delivery(g, t) {                                                   // FeastFleet: order -> SQS -> rider across a street grid
+    rect(g, 0, 0, SW, SH, '#0d0f14');
+    for (let x = 2; x < SW; x += 10) rect(g, x, 0, 2, SH, '#1c2230');
+    for (let y = 4; y < SH; y += 10) rect(g, 0, y, SW, 2, '#1c2230');
+    rect(g, 4, 7, 6, 5, '#ff8a5c'); rect(g, 5, 6, 4, 1, '#ffb45c');           // restaurant
+    rect(g, 43, 27, 6, 5, '#6fd3ff'); rect(g, 44, 26, 4, 1, '#9fe8ff');        // customer
+    const q = Math.floor(t * 1.5) % 5;                                        // SQS queue filling and draining
+    rect(g, 36, 2, 16, 5, '#2a2f45');
+    for (let k = 0; k < 4; k++) rect(g, 37 + k * 4, 3, 3, 3, k < (q > 3 ? 7 - q : q) ? '#ffd66b' : '#1c2230');
+    const k = (t * .25) % 1, path = [[10, 9], [22, 9], [22, 29], [43, 29]];     // rider follows the streets
+    const segs = [12, 20, 21], total = 53; let d = k * total, i = 0;
+    while (i < 2 && d > segs[i]) { d -= segs[i]; i++; }
+    const [ax, ay] = path[i], [bx, by] = path[i + 1], f = Math.min(1, d / segs[i]);
+    rect(g, Math.round(ax + (bx - ax) * f) - 1, Math.round(ay + (by - ay) * f) - 1, 3, 3, '#57f287');
+    for (let s2 = 0; s2 < 3; s2++) rect(g, Math.round(ax + (bx - ax) * Math.max(0, f - .06 * (s2 + 1))), Math.round(ay + (by - ay) * Math.max(0, f - .06 * (s2 + 1))), 1, 1, '#2f6b4a');
+  },
+  nosignal(g, t) {                                                   // empty slot: SMPTE bars + blinking NO SIGNAL
+    const bars = ['#c0c0c0', '#c0c000', '#00c0c0', '#00c000', '#c000c0', '#c00000', '#0000c0'];
+    bars.forEach((c, k) => rect(g, Math.floor(k * SW / 7), 0, Math.ceil(SW / 7), 28, c));
+    ['#0000c0', '#131313', '#c000c0', '#131313', '#00c0c0', '#131313', '#c0c0c0'].forEach((c, k) => rect(g, Math.floor(k * SW / 7), 28, Math.ceil(SW / 7), 4, c));
+    rect(g, 0, 32, SW, 10, '#101010');
+    if (Math.floor(t * 1.5) % 2 === 0) { rect(g, 6, 12, 42, 9, '#000000cc'); g.font = '8px "Silkscreen"'; g.textBaseline = 'top'; g.fillStyle = '#ffffff'; g.fillText('NO SIGNAL', 9, 12); }
   },
   noise(g, t) {
     rect(g, 0, 0, SW, SH, '#10091a');
@@ -315,12 +354,14 @@ const tvs = [0, 1, 2].map(i => {
   const g = cv.getContext('2d');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
   const sg = screen.getContext('2d', { willReadFrequently: true });
-  btn.addEventListener('click', () => $id('p-' + current()[i].id)?.scrollIntoView({ block: 'start' }));
+  btn.addEventListener('click', () => { const p = current()[i]; if (p) $id('p-' + p.id)?.scrollIntoView({ block: 'start' }); });
   const up = -Math.PI / 2;
   const knobs = [{ from: up, to: up, t0: 0, dur: 0 }, { from: up + .6 * (i - 1), to: up + .6 * (i - 1), t0: 0, dur: 0 }];
   return { btn, cv, g, sg, screen, label, knobs };
 });
-function current() { return PROJECTS.slice(channel * 3, channel * 3 + 3); }
+// Channels of three; a short last channel shows NO SIGNAL on its open slots.
+const NCH = Math.ceil(PROJECTS.length / 3);
+function current() { return [0, 1, 2].map(i => PROJECTS[channel * 3 + i] ?? null); }
 // Triangle: TV 1 bottom-left, TV 2 bottom-right, TV 3 centred and raised.
 // Picks the largest scale at which all three screens + captions fit above the fold.
 const LABEL_H = 50, GAP = 20;
@@ -356,7 +397,7 @@ function sizeTVs() {
 
 function renderNow() {
   const now = $id('now');
-  now.innerHTML = current().map(p => `
+  now.innerHTML = current().filter(Boolean).map(p => `
     <article id="p-${p.id}">
       <div class="tag">${esc(p.tag)}</div>
       <h2>${esc(p.name)}</h2>
@@ -368,20 +409,21 @@ function renderNow() {
     </article>`).join('');
   tvs.forEach((tv, i) => {
     const p = current()[i];
-    tv.label.innerHTML = `<small>${esc(p.tag)}</small>${esc(p.name)}`;
-    tv.btn.setAttribute('aria-label', `${esc(p.name)}: ${esc(p.line)} Show details`);
+    tv.btn.classList.toggle('empty', !p);
+    tv.label.innerHTML = p ? `<small>${esc(p.tag)}</small>${esc(p.name)}` : `<small>CH 0${channel + 1}</small>Open slot`;
+    tv.btn.setAttribute('aria-label', p ? `${esc(p.name)}: ${esc(p.line)} Show details` : 'Open slot, no project on this channel yet');
   });
   $id('chLabel').textContent = 'CH 0' + (channel + 1);
 }
 function flip(dir) {
-  channel = (channel + dir + 2) % 2;
+  channel = (channel + dir + NCH) % NCH;
   switchAt = performance.now() / 1000; osdUntil = switchAt + 1.6;
   tvs.forEach((tv, i) => {                                   // every set turns its knobs its own way
     const [ch, fine] = tv.knobs, t0 = switchAt + i * .06, dur = reduce ? 0 : .32;
     ch.from = knobAngle(ch, switchAt); ch.to = ch.from + dir * (Math.PI / 3 + i * .45); ch.t0 = t0; ch.dur = dur;
     fine.from = knobAngle(fine, switchAt); fine.to = fine.from - dir * (.35 + hash(i, channel) * .9); fine.t0 = t0 + .08; fine.dur = dur;
   });
-  renderNow(); playOnly([...current().map(p => p.id), ...JOBS.map(j => j.id)]);
+  renderNow(); playOnly([...current().filter(Boolean).map(p => p.id), ...JOBS.map(j => j.id)]);
   if (reduce) (raf = requestAnimationFrame(frame));
 }
 $id('prev').onclick = () => flip(-1);
@@ -399,8 +441,9 @@ function drawTVs(t) {
     const noisy = (since >= 0 && since < staticFor) || (surge && t - tv.surgeAt < .3);
     if (noisy) { staticNoise(tv.g, t); }
     else {
-      const clip = clipFor(current()[i].id);
-      if (clip.ready) drawCover(tv.sg, clip.video, SW, SH); else scenes[current()[i].scene](tv.sg, reduce ? 1.5 : t + i);
+      const p = current()[i], clip = p && clipFor(p.id);
+      if (!p) scenes.nosignal(tv.sg, reduce ? 0 : t);
+      else if (clip.ready) drawCover(tv.sg, clip.video, SW, SH); else scenes[p.scene](tv.sg, reduce ? 1.5 : t + i);
       tv.g.drawImage(tv.screen, SX, SY);
       if (t < osdUntil) {                                   // on-screen display
         tv.g.fillStyle = '#9be58f'; tv.g.font = '8px "Press Start 2P"'; tv.g.textBaseline = 'top';

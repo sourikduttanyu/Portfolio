@@ -84,4 +84,17 @@ export const projects = [
     source: 'open',
     repo: 'https://github.com/sourikduttanyu/astral',
   },
+  {
+    slug: 'feastfleet',
+    tier: 'compact',
+    name: 'FeastFleet',
+    skill: 'Serverless · AWS',
+    tagline: 'A serverless food delivery and reservation platform on AWS (team project).',
+    plain: 'Search restaurants, order through a chatbot, book tables and track deliveries, all on managed AWS services with no servers to run.',
+    how: 'About 26 Lambda functions behind API Gateway. Placing an order enqueues it to SQS and a separate function processes it, so fulfilment failures never reach the customer. DynamoDB stores restaurants, menus and orders, with Lambda keeping OpenSearch in sync for search. Lex handles chatbot ordering, SageMaker powers image-based food search, and Cognito handles sign-in.',
+    results: 'Team project · 26 Lambda functions · order placement decoupled with SQS',
+    libraries: ['Lambda', 'SQS', 'DynamoDB', 'OpenSearch', 'Lex'],
+    source: 'open',
+    repo: 'https://github.com/cwwwz/FeastFleetDeliveryApp',
+  },
 ]

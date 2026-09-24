@@ -22,7 +22,8 @@ export default function PixelWorld() {
             </span>
           </button>
           <h1 className="name" id="name">SOURIK DUTTA</h1>
-          <p className="role">Backend &amp; distributed systems engineer <span>· MS CS, NYU</span></p>
+          <p className="role">Backend &amp; distributed systems engineer <span>· MS in Computer Science, NYU</span></p>
+          <p className="about">Brooklyn, NY. About two years building high-throughput, reliable backends at Insight Enterprises and Hanu Software, and owning them end to end.</p>
           <div className="links">
             <a className="btn primary" href="/Sourik_Dutta_Resume.pdf" {...ext}>Résumé</a>
             <a className="btn" href="https://github.com/sourikduttanyu" {...ext}>GitHub</a>
@@ -61,6 +62,21 @@ export default function PixelWorld() {
           <div className="work-inner"><div className="jobs" id="jobs" /></div>
         </div>
       </section>
+
+      <footer className="site-footer">
+        <div className="work-inner footer-inner">
+          <div>
+            <p className="footer-name">SOURIK DUTTA</p>
+            <p className="footer-meta">Brooklyn, NY · MS in Computer Science, NYU · Open to backend, distributed-systems and platform roles</p>
+          </div>
+          <nav className="links" aria-label="Contact">
+            <a className="btn primary" href="/Sourik_Dutta_Resume.pdf" {...ext}>Résumé</a>
+            <a className="btn" href="mailto:sourik1999dutta@gmail.com">Email</a>
+            <a className="btn" href="https://linkedin.com/in/sourik-dutta-71a34a17b/" {...ext}>LinkedIn</a>
+            <a className="btn" href="https://github.com/sourikduttanyu" {...ext}>GitHub</a>
+          </nav>
+        </div>
+      </footer>
     </div>
   )
 }
