@@ -387,6 +387,7 @@ function layoutStage(extra = 0) {
   tvs.forEach((tv, i) => {
     tv.cv.style.width = w + 'px'; tv.cv.style.height = TV_H * s + 'px';
     tv.btn.style.width = w + 'px'; tv.btn.style.left = pos[i][0] + 'px'; tv.btn.style.top = pos[i][1] + 'px';
+    tv.btn.style.setProperty('--px', s + 'px');                              // one art pixel, for the cast shadow
   });
   stage.style.height = drop + full + 'px';
   // the remote rises into the empty space under the raised middle TV, between the lower two
@@ -1911,22 +1912,31 @@ function toggleMusic() {
 }
 $id('music').addEventListener('click', toggleMusic);
 
+/* Sky speed: 1x / 2x / 4x multiplies how fast the stars and planets move (the supernova clock keeps real time) */
+let skyT = 0, skyLast = null, skySpeed = 1;
+root.querySelectorAll('.warp .btn').forEach(b => b.addEventListener('click', () => {
+  skySpeed = +b.dataset.speed;
+  root.querySelectorAll('.warp .btn').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+}));
+
 function drawSpace(t) {
   if (!spaceStatic) return;
   if (loopStart === null) loopStart = t;
   let e = t - loopStart;
   if (!reduce && e > LOOP + 8) { loopStart = t; e = 0; }
+  skyT += (skyLast === null ? 0 : Math.min(.1, t - skyLast)) * skySpeed; skyLast = t;
+  const st = skyT;
   const g = xg;
   g.drawImage(spaceStatic, 0, 0);
   // The planet turns: we stay put, the sky slides past and bends with the horizon's curve.
-  const BW = spaceBand.width, off = reduce ? 0 : (t * 3.5) % BW;
+  const BW = spaceBand.width, off = reduce ? 0 : (st * 3.5) % BW;
   const drop = x => Math.round(16 * ((x - SPW / 2) / (SPW / 2)) ** 2);
   const toView = bx => { let x = bx - off; x = ((x % BW) + BW) % BW; return x; };
   for (let x = 0; x < SPW; x++) g.drawImage(spaceBand, Math.floor((x + off) % BW), 0, 1, SPH, x, drop(x), 1, SPH);
   const beat = FIRE.pulse || 0;
   if (!reduce) twinkles.forEach(s2 => {
     const x = toView(s2.x);
-    if (x < SPW && Math.sin(t * s2.sp + s2.ph) > .6 - beat * .5) px(g, Math.round(x), s2.y + drop(x), '#ffffff');
+    if (x < SPW && Math.sin(st * s2.sp + s2.ph) > .6 - beat * .5) px(g, Math.round(x), s2.y + drop(x), '#ffffff');
   });
   // bodies ride the same sky
   const body = (sprite, bx, y) => { const x = toView(bx); if (x < SPW + sprite.width) g.drawImage(sprite, Math.round(x - sprite.width / 2), y + drop(x)); };
@@ -1942,7 +1952,7 @@ function drawSpace(t) {
   }
   // twin worlds circling each other
   {
-    const x = toView(BW * .74), ang = t * .6, cy = Math.round(SPH * .74) + drop(x);
+    const x = toView(BW * .74), ang = st * .6, cy = Math.round(SPH * .74) + drop(x);
     if (x < SPW + 30) {
       const ax = Math.round(x + Math.cos(ang) * 9), ay = Math.round(cy + Math.sin(ang) * 3), bx = Math.round(x - Math.cos(ang) * 9), by = Math.round(cy - Math.sin(ang) * 3);
       const order = Math.sin(ang) > 0 ? [[twinB, bx, by, 5], [twinA, ax, ay, 6]] : [[twinA, ax, ay, 6], [twinB, bx, by, 5]];
@@ -1950,11 +1960,11 @@ function drawSpace(t) {
     }
   }
   body(redSprite, BW * .93, Math.round(SPH * .05));
-  body(moonSprite, BW * .6, Math.round(SPH * .04 + Math.sin(t * .05) * 3));
+  body(moonSprite, BW * .6, Math.round(SPH * .04 + Math.sin(st * .05) * 3));
   const sunX = Math.round(toView(BW * .9)), sunY = Math.floor(SPH * .05 + 10) + drop(sunX);
   drawSun(g, sunX, sunY, reduce ? sunState(0) : sunState(e), t);
   // comet: its own slow pass every 80s
-  const ck = reduce ? .35 : (t % 80) / 80, cx = Math.round(-30 + (SPW + 60) * ck), cy = Math.round(SPH * .34 - ck * SPH * .18);
+  const ck = reduce ? .35 : (st % 80) / 80, cx = Math.round(-30 + (SPW + 60) * ck), cy = Math.round(SPH * .34 - ck * SPH * .18);
   for (let i = 1; i < 24; i++) if (bayer(cx - i, cy + i * .3) < (1 - i / 24) * .9) px(g, cx - i, Math.round(cy + i * .35), i < 6 ? '#e8fbff' : '#7fd8e8');
   px(g, cx, cy, '#ffffff'); px(g, cx + 1, cy, '#ffffff'); px(g, cx, cy - 1, '#cfefff');
   drawMeteors(g, t);

@@ -37,7 +37,8 @@ let glideRaf = 0
 function glide(top) {
   cancelAnimationFrame(glideRaf)
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { window.scrollTo(0, top); return }
-  const from = window.scrollY, dist = top - from, dur = Math.min(2600, 900 + Math.abs(dist) * .45), t0 = performance.now()
+  // Peak speed of the cubic ease is 1.5x the average; keep it near 700px/s (~12px per 60Hz frame) so text stays legible in passing.
+  const from = window.scrollY, dist = top - from, dur = Math.min(4500, Math.max(1000, 1.5 * Math.abs(dist) / .7)), t0 = performance.now()
   const ease = k => (k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2)
   const stop = () => { cancelAnimationFrame(glideRaf); off() }
   const off = () => ['wheel', 'touchstart', 'keydown'].forEach(e => window.removeEventListener(e, stop))
@@ -91,7 +92,7 @@ function SceneNav() {
       onClick={() => { setHint(false); const now = document.getElementById('now'); glide(now.getBoundingClientRect().top + window.scrollY - 16) }}>
       <PixelIcon rows={ICONS.down} /><span>Scroll for projects</span>
     </button>
-    <nav className={`scene-nav${hint ? ' hint' : ''}`} aria-label="Scenes">
+    <nav className={`scene-nav${hint ? ' beckon' : ''}`} aria-label="Scenes">
       {SCENES.map((s, i) => (
         <button key={s.id} type="button" className="btn" aria-label={s.label} aria-current={current === s.id} style={{ '--i': i }}
           onClick={() => go(s.id)}>
@@ -158,6 +159,11 @@ export default function PixelWorld() {
           </div>
           <div className="loop-clock" id="loopClock" aria-hidden="true" />
           <button className="btn music" id="music" type="button" aria-pressed="false">♪ Campfire</button>
+          <div className="warp" role="group" aria-label="Sky speed">
+            {[1, 2, 4].map(n => (
+              <button key={n} className="btn" type="button" data-speed={n} aria-pressed={n === 1}>{n}x</button>
+            ))}
+          </div>
         </div>
         <div className="log-panel">
           <div className="work-inner"><div className="jobs" id="jobs" /></div>
