@@ -16,7 +16,7 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const SCENES = { jellysynth: 'plasma', sentinel: 'code', 'go-pubsub': 'packets', veil: 'noise', chronos: 'chart', astral: 'meter', feastfleet: 'delivery' };
 const PROJECTS = projects.map(p => {
   const href = p.repo ?? p.live;
-  return { id: p.slug, name: p.name, tag: p.skill, line: p.tagline, plain: p.plain, results: p.results,
+  return { id: p.slug, name: p.name, tag: p.skill, line: p.tagline, plain: p.plain, results: p.results, how: p.how, stat: p.stat, pipeline: p.pipeline ?? [], open: p.source === 'open', libs: p.libraries,
     stack: p.libraries.join(' · '), src: p.source === 'open' ? 'Open source' : 'Closed source',
     href, linkText: href.replace(/^https:\/\/(github\.com\/)?/, ''), scene: SCENES[p.slug] ?? 'plasma' };
 });
@@ -354,6 +354,8 @@ const tvs = [0, 1, 2].map(i => {
   const g = cv.getContext('2d');
   const screen = document.createElement('canvas'); screen.width = SW; screen.height = SH;
   const sg = screen.getContext('2d', { willReadFrequently: true });
+  btn.addEventListener('mouseenter', () => { const p = current()[i]; if (p) $id('p-' + p.id)?.classList.add('linked'); });
+  btn.addEventListener('mouseleave', () => root.querySelectorAll('.dlc.linked').forEach(c => c.classList.remove('linked')));
   btn.addEventListener('click', () => { takeControl(); const p = current()[i]; if (p) $id('p-' + p.id)?.scrollIntoView({ block: 'start' }); });
   const up = -Math.PI / 2;
   const knobs = [{ from: up, to: up, t0: 0, dur: 0 }, { from: up + .6 * (i - 1), to: up + .6 * (i - 1), t0: 0, dur: 0 }];
@@ -416,16 +418,26 @@ function sizeTVs() {
 
 function renderNow() {
   const now = $id('now');
-  now.innerHTML = current().filter(Boolean).map(p => `
-    <article id="p-${p.id}">
+  now.innerHTML = current().map((p, slot) => !p ? '' : `
+    <article class="dlc" id="p-${p.id}" data-slot="${slot}">
+      <header class="dlc-head"><span class="dlc-slot">CH ${String(channel + 1).padStart(2, '0')} · ${slot + 1}/3</span>
+        <span class="dlc-badge ${p.open ? 'open' : 'live'}">${p.open ? 'Open source' : 'Live product'}</span></header>
       <div class="tag">${esc(p.tag)}</div>
       <h2>${esc(p.name)}</h2>
-      <p style="color:var(--ink)">${esc(p.line)}</p>
-      <p>${esc(p.plain)}</p>
-      <p class="meta"><b>Results</b> ${esc(p.results)}</p>
-      <p class="meta"><b>Stack</b> ${esc(p.stack)}</p>
-      <p class="meta">${esc(p.src)} · <a href="${p.href}" target="_blank" rel="noopener noreferrer">${esc(p.linkText)} ↗</a></p>
+      <p class="dlc-line">${esc(p.line)}</p>
+      ${p.stat ? `<div class="dlc-stat"><b>${esc(p.stat.value)}</b><span>${esc(p.stat.label)}</span></div>` : ''}
+      <p class="dlc-plain">${esc(p.plain)}</p>
+      <ol class="dlc-pipe" aria-label="How data moves">${p.pipeline.map((s2, k) => `<li style="--k:${k}">${esc(s2)}</li>`).join('')}</ol>
+      <details class="dlc-inside"><summary>Inside look</summary><p>${esc(p.how)}</p><p class="dlc-results"><b>Results</b> ${esc(p.results)}</p></details>
+      <ul class="dlc-stack" aria-label="Stack">${p.libs.map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+      <a class="btn dlc-go ${p.open ? '' : 'primary'}" href="${p.href}" target="_blank" rel="noopener noreferrer" title="${esc(p.linkText)}">${p.open ? 'View source' : 'Play live'} ▶</a>
     </article>`).join('');
+  // card <-> TV: hovering one lights the other
+  now.querySelectorAll('.dlc').forEach(card => {
+    const tv = tvs[+card.dataset.slot];
+    card.addEventListener('mouseenter', () => tv.btn.classList.add('linked'));
+    card.addEventListener('mouseleave', () => tv.btn.classList.remove('linked'));
+  });
   tvs.forEach((tv, i) => {
     const p = current()[i];
     tv.btn.classList.toggle('empty', !p);
@@ -494,6 +506,7 @@ function drawTVs(t) {
     }
     crtPost(tv.g, tv.sg, noisy); drawDigit(tv.g, surge ? 1 + Math.floor(Math.random() * 6) : channel + 1);
     screenGlow(tv.btn, tv.sg, t);
+    const card = current()[i] && $id('p-' + current()[i].id); if (card && tv.btn.style.getPropertyValue('--glow')) card.style.setProperty('--glow', tv.btn.style.getPropertyValue('--glow'));
   });
 }
 
