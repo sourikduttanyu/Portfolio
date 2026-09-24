@@ -85,12 +85,13 @@ export default function PixelWorld() {
             <a className="btn" href="mailto:sourik1999dutta@gmail.com">Email</a>
           </div>
 
-          <div className="stage" id="stage" />
+          <div className="stage" id="stage">
+            <button className="btn chan" id="prev" aria-label="Previous channel"><PixelIcon rows={ICONS.left} /></button>
+            <button className="btn chan" id="next" aria-label="Next channel"><PixelIcon rows={ICONS.right} /></button>
+          </div>
 
           <div className="remote">
-            <button className="btn chan" id="prev" aria-label="Previous channel"><PixelIcon rows={ICONS.left} /></button>
             <div className="ch" id="chLabel" aria-live="polite">CH 01</div>
-            <button className="btn chan" id="next" aria-label="Next channel"><PixelIcon rows={ICONS.right} /></button>
           </div>
           <p className="hint" id="hint">← → keys flip the channel · click a screen for details</p>
         </div>

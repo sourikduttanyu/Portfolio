@@ -366,7 +366,8 @@ function current() { return [0, 1, 2].map(i => PROJECTS[channel * 3 + i] ?? null
 // Picks the largest scale at which all three screens + captions fit above the fold.
 const LABEL_H = 50, GAP = 20;
 function layoutStage() {
-  const W = stage.clientWidth;
+  const G = window.innerWidth >= 860 ? 68 : 0;                 // room for the side arrows
+  const W = stage.clientWidth - 2 * G;
   const top = stage.getBoundingClientRect().top + scrollY;
   const below = root.querySelector('.remote').offsetHeight + $id('hint').offsetHeight + 36;
   const availH = Math.max(260, innerHeight - top - below);
@@ -381,12 +382,13 @@ function layoutStage() {
   fit ??= { s: 1, w: TV_W, h: TV_H, full: TV_H + LABEL_H, drop: TV_H + LABEL_H + 4, overlap: false };
   const { s, w, drop, full, overlap } = fit;
   const spread = overlap ? Math.min((W - 2 * w) / 2, w / 2 + GAP + w * .45) : Math.min((W - 2 * w) / 2, GAP * 1.5);
-  const pos = [[W / 2 - spread - w, drop], [W / 2 + spread, drop], [(W - w) / 2, 0]];
+  const pos = [[G + W / 2 - spread - w, drop], [G + W / 2 + spread, drop], [G + (W - w) / 2, 0]];
   tvs.forEach((tv, i) => {
     tv.cv.style.width = w + 'px'; tv.cv.style.height = TV_H * s + 'px';
     tv.btn.style.width = w + 'px'; tv.btn.style.left = pos[i][0] + 'px'; tv.btn.style.top = pos[i][1] + 'px';
   });
   stage.style.height = drop + full + 'px';
+  stage.style.setProperty('--arrow-y', Math.round(drop + TV_H * s * .45 - 24) + 'px');
 }
 // Work scene = one screen: size the three sets so they, their plates and the raised middle one
 // fit between the top edge and the ground. Narrow screens stack instead (scene grows taller).
@@ -403,7 +405,7 @@ function layoutWork() {
     const raise = Math.round(TV_H * s * .3) + 'px';
     lcds.forEach(l => { l.d.style.marginTop = l.n === 1 ? '0px' : raise; });
   } else lcds.forEach(l => { l.d.style.marginTop = '0px'; });
-  lcds.forEach(l => { l.cv.style.width = TV_W * s + 'px'; l.cv.style.height = TV_H * s + 'px'; });
+  lcds.forEach(l => { l.cv.style.width = TV_W * s + 'px'; l.cv.style.height = TV_H * s + 'px'; l.d.style.width = Math.max(TV_W * s, 200) + 'px'; });
 }
 function sizeTVs() {
   layoutStage(); bk = null;
@@ -800,7 +802,7 @@ function buildCity(P, W, H) {
 function buildDawnExtras(W) {
   const c = document.createElement('canvas'); c.width = W; c.height = HY + 10; const g = c.getContext('2d');
   // cumulus: overlapping puffs, lit from below by the low sun, dithered edges
-  [[.64, .08, 22], [.82, .22, 32], [.97, .1, 16], [.7, .38, 18], [.1, .5, 20]].forEach(([fx, fy, r]) => {
+  [[.84, .06, 20], [.8, .34, 30], [.98, .14, 14], [.62, .5, 16], [.1, .56, 18]].forEach(([fx, fy, r]) => {
     const cx = Math.round(fx * W), cy = Math.round(fy * HY) + 8;
     for (let y = -r; y <= r / 2; y++) for (let x = -r * 2; x <= r * 2; x++) {
       const v = Math.max(...[[0, 0, 1], [-r * .9, 3, .75], [r * .9, 2, .8], [-r * 1.6, 5, .5], [r * 1.5, 5, .55]].map(([ox, oy, s]) => 1 - Math.hypot((x - ox) / (r * s), (y - oy) / (r * s * .5))));
@@ -1910,6 +1912,6 @@ return () => {
   if (music.on) { clearInterval(music.timer); music.ctx?.close(); }
   Object.values(clips).forEach(c => { c.video.pause(); c.video.removeAttribute('src'); c.video.load(); });
   delete window.supernova; delete window.lightning; delete window.planes;
-  $id('stage').innerHTML = ''; $id('lcds').innerHTML = ''; $id('now').innerHTML = ''; $id('jobs').innerHTML = '';
+  $id('stage').querySelectorAll('.tv').forEach(n => n.remove()); $id('lcds').innerHTML = ''; $id('now').innerHTML = ''; $id('jobs').innerHTML = '';
 };
 }

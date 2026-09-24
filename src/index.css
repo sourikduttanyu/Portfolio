@@ -204,3 +204,24 @@
   .ch-pips { display: flex; gap: 5px; }
   .ch-pips i { width: 10px; height: 4px; background: #0d2a30; box-shadow: 0 0 0 1px #020708; }
   .ch-pips i.on { background: var(--cyan); box-shadow: 0 0 6px oklch(84% 0.12 205 / .7); }
+  /* channel arrows flank the TV stage like level-select arrows; pink on hover */
+  .stage .btn.chan { position: absolute; top: var(--arrow-y, 40%); z-index: 3; width: 52px; height: 52px; min-height: 52px; padding: 0; }
+  .stage .btn.chan svg { width: 26px; height: 26px; shape-rendering: crispEdges; }
+  #prev { left: 0; } #next { right: 0; }
+  .btn.chan:hover, .btn.chan.pressed { background: var(--pink); color: oklch(12% 0.04 290); }
+  @media (max-width: 859px) { .stage .btn.chan { top: auto; bottom: -62px; } }
+
+  /* day/night switch with identity: a starry window at night (sun hint at the empty end), a warm sky at sunrise */
+  .daynight-track { overflow: hidden; border-color: var(--ui-border);
+    background: radial-gradient(1px 1px at 46px 9px, #fff 99%, transparent), radial-gradient(1px 1px at 56px 24px, #cfe0ff 99%, transparent),
+      radial-gradient(1px 1px at 40px 27px, #fff 99%, transparent), radial-gradient(1.5px 1.5px at 62px 12px, #ffe7a8 99%, transparent),
+      radial-gradient(5px 5px at 57px 18px, oklch(80% 0.14 70 / .35) 99%, transparent), linear-gradient(#16103a, #2a1a52);
+    box-shadow: inset 0 3px 0 0 var(--ui-ledge), 0 4px 0 0 var(--ui-ledge), 0 5px 0 1px var(--ui-edge), 0 0 14px oklch(70% 0.14 295 / .45); }
+  .daynight:hover .daynight-track { filter: brightness(1.15); }
+  .daynight.is-day .daynight-track { border-color: oklch(70% 0.13 55);
+    background: radial-gradient(5px 5px at 16px 18px, oklch(95% 0.02 90 / .45) 99%, transparent), linear-gradient(#f0a878, #ffd08a);
+    box-shadow: inset 0 3px 0 0 oklch(62% 0.13 45), 0 4px 0 0 oklch(45% 0.1 40), 0 5px 0 1px var(--ui-edge), 0 0 14px oklch(80% 0.14 60 / .5); }
+  /* work sets never grow past their TV: the plate wraps inside it */
+  .wtv .tv-label { max-width: 100%; }
+  .work-scene.fit .lcds { flex-wrap: nowrap; }
+  @media (max-width: 859px) { .remote { margin-top: 30px; } .stage .btn.chan { bottom: -86px; } }
