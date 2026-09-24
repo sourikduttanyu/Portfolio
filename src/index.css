@@ -253,10 +253,8 @@
   @keyframes cue-bob { 50% { transform: translateY(3px); } }
   .scene-nav.hint .btn { animation: nav-shimmer .9s ease-out 1 both; animation-delay: calc(var(--i) * .16s); }
   @keyframes nav-shimmer { 30% { color: var(--pink); border-color: var(--pink); box-shadow: 0 0 14px oklch(70% 0.21 355 / .5); } }
-  .scene-nav.hint .btn:nth-child(2) .nav-tip { animation: tip-peek 2.8s ease-out .8s 1 both; }
-  @keyframes tip-peek { 0%, 100% { max-width: 0; opacity: 0; margin-left: 0; } 15%, 80% { max-width: 140px; opacity: 1; margin-left: 10px; } }
   @media (max-width: 700px) { .scroll-cue { bottom: 76px; } }
-  @media (prefers-reduced-motion: reduce) { .scroll-cue svg, .scene-nav.hint .btn, .scene-nav.hint .btn:nth-child(2) .nav-tip { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .scroll-cue svg, .scene-nav.hint .btn { animation: none; } }
   /* work plates: company, then role, then dates; the rotating project is the quiet last line */
   .wtv .tv-label { padding: 8px 12px 9px; }
   .plate-co { display: block; font-size: 16px; font-weight: 600; color: var(--ink); line-height: 1.25; }
