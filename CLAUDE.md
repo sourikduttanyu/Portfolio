@@ -68,7 +68,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Project: sourik.dev Portfolio
 
-**Stack:** React 19 · Vite · Tailwind CSS v4 · Framer Motion · GSAP · Lucide · No UI component libraries.
+**Stack:** React 19 · Vite · hand-written canvas pixel-art engine · No UI component libraries.
 
 **Commands:**
 ```bash
@@ -79,17 +79,18 @@ npm run lint      # ESLint
 ```
 
 **Architecture:**
-- `src/App.jsx` — root; composes all sections and global effects
-- `src/components/` — one file per section: `Hero`, `Blueprints`, `ServiceLogs`, `System`, `CommandCenter`, `StatusBar`, `ParticleField`, `SideEffects`
-- `src/index.css` — global styles, custom Tailwind tokens
-- `DESIGN.md` — full design system (colors, typography, spacing, component specs)
-- `PRODUCT.md` — product brief, brand personality, anti-references, accessibility requirements
+- `src/App.jsx` → `src/components/PixelWorld.jsx` — page markup (hero, channel remote, readable project strip, beam, work scene, ship-log cards); mounts the engine in `useEffect`
+- `src/pixel/world.js` — `mountWorld(root, { projects, jobs })`: all pixel art drawn into small canvases scaled nearest-neighbour. Returns a cleanup (StrictMode-safe). Sections: CRT TVs (3/4 view, knobs, channel flip, static), city sky + thunderstorm, aged-wood beam + vine + sign, work monitors (curved flagship / ultrawide / 16:9), tiny-planet scene (campfire, ship-log trail, 22-min supernova loop), Signalscope hover
+- `src/data/projects.js` / `src/data/experience.js` — all content; engine reads these
+- `public/clips/<slug>.mp4` — real footage; auto-replaces the procedural placeholder on that screen. Slugs: projects (`jellysynth sentinel go-pubsub veil chronos astral`), jobs (`insight hanu ey`). Encode with `scripts/encode-clip.sh`
+- `src/index.css` — page styles (ported from the approved sketch)
 
-**Design constraints (from PRODUCT.md / DESIGN.md):**
-- Terminal-native ops aesthetic — vocabulary from command-line tools and production dashboards
-- No gradient text, no glassmorphism, no generic developer portfolio patterns
-- WCAG AA minimum; `prefers-reduced-motion` must be respected everywhere
-- Density signals credibility — don't thin out layouts
+**Design constraints:**
+- Pixel-art world, Katana Zero night city (hero) → Outer Wilds-inspired tiny planet (work). Inspired by, never copying game characters/logos/UI
+- Readable text stays in DOM on solid backgrounds (project strip, ship-log cards); art never carries the only copy of information
+- `prefers-reduced-motion`: no float, rain, static, lightning, supernova; still frames only
+- Lightning flashes stay low-intensity and under 3/s (WCAG 2.3.1)
+- `DESIGN.md` describes the system; `PRODUCT.md` is outdated (old terminal aesthetic)
 
 **Gotchas:**
 - Tailwind v4 is config-file-free; tokens live in `src/index.css` via `@theme`, not `tailwind.config.js`
