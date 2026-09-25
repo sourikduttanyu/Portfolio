@@ -17,6 +17,7 @@ const ICONS = {
   up: ['.........', '....X....', '...XXX...', '..XXXXX..', '.XXXXXXX.', 'XXXXXXXXX', '.........', '.........', '.........'],
   close: ['.........', '.X.....X.', '..X...X..', '...X.X...', '....X....', '...X.X...', '..X...X..', '.X.....X.', '.........'],
   details: ['.XXXXXXX.', 'X.......X', '.XXXXXXX.', '.X.....X.', '.X.XXX.X.', '.X.....X.', '.X.XX..X.', '.XXXXXXX.', 'X.......X'],
+  rewind: ['.........', '...X....X', '..XX...XX', '.XXX..XXX', 'XXXX.XXXX', '.XXX..XXX', '..XX...XX', '...X....X', '.........'],
   work: ['...XXX...', '.XX...XX.', 'X..XXX..X', 'XXXXXXXXX', 'X.XXXXX.X', 'XXXXXXXXX', 'X..XXX..X', '.XX...XX.', '...XXX...'],
 }
 const SCENES = [
@@ -165,7 +166,7 @@ export default function PixelWorld() {
 
           <div className="remote">
             <button className="btn chan" id="prev" aria-label="Previous channel"><PixelIcon rows={ICONS.left} /></button>
-            <div className="ch" id="chLabel" aria-live="polite">CH 01</div>
+            <div className="ch" id="chLabel" aria-live="polite">PRJ 1-3</div>
             <button className="btn chan" id="next" aria-label="Next channel"><PixelIcon rows={ICONS.right} /></button>
           </div>
           <p className="hint" id="hint"><PixelIcon rows={ICONS.up} />Click a screen for details</p>
@@ -182,17 +183,17 @@ export default function PixelWorld() {
       <section className="work" aria-labelledby="work-h">
         <div className="work-scene" id="scene">
           <canvas id="space" aria-hidden="true" />
-          <p className="hint work-hint"><PixelIcon rows={ICONS.down} />Click a screen for details</p>
           <div className="work-inner">
             <h2 id="work-h" className="sr-only">Work experience</h2>
             <div className="lcds" id="lcds" />
           </div>
           <div className="loop-clock" id="loopClock" aria-hidden="true" />
           <button className="btn music" id="music" type="button" aria-pressed="false">♪ Campfire</button>
-          <div className="warp" role="group" aria-label="Sky speed">
-            {[1, 2, 4].map(n => (
+          <div className="warp" role="group" aria-label="Time speed">
+            {[1, 4, 8].map(n => (
               <button key={n} className="btn" type="button" data-speed={n} aria-pressed={n === 1}>{n}x</button>
             ))}
+            <button className="btn rewind" id="rewind" type="button" aria-pressed="false" aria-label="Reverse time"><PixelIcon rows={ICONS.rewind} /></button>
           </div>
         </div>
         <div className="log-panel">

@@ -602,14 +602,14 @@ function renderNow() {
   tvs.forEach((tv, i) => {
     const p = onTV(i);
     tv.btn.classList.toggle('empty', !p);
-    tv.label.innerHTML = p ? `<small>${esc(p.tag)}</small>${esc(p.name)}` : `<small>CH 0${channel + 1}</small>Open slot`;
+    tv.label.innerHTML = p ? `<small>${esc(p.tag)}</small>${esc(p.name)}` : `<small>No signal</small>Open slot`;
     tv.say.innerHTML = p ? sayHTML(p.keywords, p.libs) : '';
     tv.btn.setAttribute('aria-label', p ? `${esc(p.name)}: ${esc(p.line)} Show details` : 'Open slot, no project on this channel yet');
   });
-  const ch = $id('chLabel'), pad = n => String(n).padStart(2, '0');
-  ch.innerHTML = `<span class="ch-what">Projects</span><span class="ch-num">CH ${pad(channel + 1)}<small> /${pad(NCH)}</small></span>`
-    + `<span class="ch-pips" aria-hidden="true">${Array.from({ length: NCH }, (_, i) => `<i class="${i === channel ? 'on' : ''}"></i>`).join('')}</span>`;
-  ch.setAttribute('aria-label', `Projects, channel ${channel + 1} of ${NCH}`);
+  const ch = $id('chLabel');
+  const N = PROJECTS.length, first = channel * 3 + 1, last = Math.min(first + 2, N);   // each project is a channel; show the range on air
+  ch.innerHTML = `<span class="ch-what">Projects</span><span class="ch-num">PRJ ${first === last ? first : `${first}-${last}`}<small> /${N}</small></span>`;
+  ch.setAttribute('aria-label', first === last ? `Project ${last} of ${N}` : `Projects ${first} to ${last} of ${N}`);
 }
 function flip(dir) {
   channel = (channel + dir + NCH) % NCH;
@@ -743,14 +743,12 @@ function renderCloseup() {
     cuSheet.scrollTop = 0;
   }
   const ch = $id('cuCh');
-  ch.innerHTML = `<span class="ch-num">CH ${pad(cuState.i + 1)}<small> /${pad(N)}</small></span>`
+  ch.innerHTML = (job ? `<span class="ch-num">CH ${pad(cuState.i + 1)}<small> /${pad(N)}</small></span>` : `<span class="ch-num">PRJ ${cuState.i + 1}<small> /${N}</small></span>`)
     + `<span class="ch-pips" aria-hidden="true">${Array.from({ length: N }, (_, k) => `<i class="${k === cuState.i ? 'on' : ''}"></i>`).join('')}</span>`;
   ch.setAttribute('aria-label', `${label}, ${cuState.i + 1} of ${N}`);
   const c = clipFor(job ? job.id : PROJECTS[cuState.i].id); if (c.ready && !reduce) c.video.play().catch(() => {});
 }
-root.classList.add('nudge');
 function openCloseup(job, i) {
-  root.classList.remove('nudge');
   cuState.job = job; cuState.i = i; cuState.onAt = performance.now() / 1000; cuState.switchAt = -10;
   renderCloseup(); sizeCloseup();
   document.documentElement.classList.add('cu-lock');
@@ -809,6 +807,7 @@ function drawTVs(t) {
   }
   const staticFor = reduce ? 0 : .38;
   tvs.forEach((tv, i) => {
+    const num = onTV(i) ? PROJECTS.indexOf(onTV(i)) + 1 : null;   // each project is its own channel; open slots show none
     tv.g.clearRect(0, 0, TV_W, TV_H); tv.g.drawImage(TV_FRAME, 0, 0);
     tv.knobs.forEach((k, j) => drawKnob(tv.g, KNOBS[j][0], KNOBS[j][1], knobAngle(k, t)));
     const since = t - switchAt - i * .06;               // slight stagger between sets
@@ -820,12 +819,12 @@ function drawTVs(t) {
       if (!p) scenes.nosignal(tv.sg, reduce ? 0 : t);
       else if (clip.ready) drawCover(tv.sg, clip.video, SW, SH); else scenes[p.scene](tv.sg, reduce ? 1.5 : t + i);
       tv.g.drawImage(tv.screen, SX, SY);
-      if (t < osdUntil) {                                   // on-screen display
+      if (t < osdUntil && num) {                                   // on-screen display
         tv.g.fillStyle = '#9be58f'; tv.g.font = '8px "Press Start 2P"'; tv.g.textBaseline = 'top';
-        tv.g.fillText('CH' + (channel + 1), SX + 3, SY + 3);
+        tv.g.fillText('PRJ' + num, SX + 3, SY + 3);
       }
     }
-    crtPost(tv.g, tv.sg, noisy); drawDigit(tv.g, surge ? 1 + Math.floor(Math.random() * 6) : channel + 1);
+    crtPost(tv.g, tv.sg, noisy); drawDigit(tv.g, surge ? 1 + Math.floor(Math.random() * 6) : num);
     screenGlow(tv.btn, tv.sg, t);
   });
 }
@@ -843,13 +842,13 @@ const NIGHT = {
   sky: ['#05030f', '#08061a', '#0d0a26', '#151034', '#1f1540', '#2d1a4a', '#40204f'],
   haze: [70, 40, 110], hazeK: .45,
   face: '#1b1537', faceHi: '#2a2250', side: '#100c24', rim: '#3e3470',
-  win: ['#ffcf7a', '#ffe3a8', '#9fd7ff', '#ff6fa0'], winP: .22,
+  win: ['#a8875a', '#b89a6e', '#6f8aa8'], winP: .1,
   glassTop: '#1a1a3e', glassBot: '#3a2a5a', streak: '#6a5aa0',
   copper: '#1f3a3a', copperHi: '#2f5a55', masonry: '#1e1834', cream: '#2a2240', crownLit: '#ffe6a8',
   stone: '#2c2546', stoneHi: '#3d3560', stoneLo: '#171229', stoneJoint: '#221c3a', arch: '#07050f',
   deck: '#1a1530', deckLo: '#0c0a18', deckLight: '#ffb45c', cable: '#5e548f', hanger: '#4a427844', stay: '#6b5fa840',
   brick: '#1c1226', brickLo: '#140c1c', brickHi: '#2a1b33', brickSide: '#0f0916', parapet: '#35243f',
-  foreWin: '#ffb45c', foreWinP: .1, winDark: '#0b0714', fire: '#2a2140',
+  foreWin: '#b8844a', foreWinP: .1, winDark: '#0b0714', fire: '#2a2140',
   tank: ['#4a3526', '#3a2a1f', '#2e2118', '#1f160f'], carousel: { glass: '#ffcf7a66', top: '#ffcf7a', horse: '#fff1c4' },
   water: ['#07051a', '#0b0824'], waterTint: 'rgba(8,6,26,.55)',
 };
@@ -1128,7 +1127,7 @@ function buildCity(P, W, H) {
   }
   box(og, wx, wy - 3, 40, 3, P.parapet);
   for (let y = wy + 5; y < H - 4; y += 9) for (let x = wx + 6; x < W - 3; x += 9) {
-    const lit = hash(x, y) < (P.day ? .05 : .35);                             // at sunrise most panes are dark glass
+    const lit = hash(x, y) < (P.day ? .05 : .15);                             // at sunrise most panes are dark glass
     const pane = lit ? P.foreWin : P.day ? '#6e6290' : P.winDark;
     box(og, x, y + 1, 5, 6, pane); box(og, x + 1, y, 3, 1, pane);
     if (P.day && !lit) { box(og, x + 1, y + 1, 3, 1, '#b8a8d0'); dot(og, x + 1, y + 2, '#9a8cc0'); }   // dawn sky caught in the glass
@@ -1201,9 +1200,9 @@ function buildBrooklyn() {
   bk = { night: buildCity(NIGHT, SKY_W, SKY_H), dawn: buildCity(DAWN, SKY_W, SKY_H), clouds: buildDawnExtras(SKY_W), nightClouds: buildNightClouds(SKY_W), dayCv, dg, nightCv, ng };
   drops = Array.from({ length: Math.round(90 * SKY_H / 180) }, () => ({ x: Math.random() * SKY_W, y: Math.random() * SKY_H, v: 1.4 + Math.random() * 1.6 }));
 }
-/* Thunderstorm: random strikes every 6-20s. Double flash (bright, dip, bright, fade),
+/* Thunderstorm: first strike 3.5s in, then every 13.5-18s. Double flash (bright, dip, bright, fade),
    kept low-intensity and under 3 flashes/s (WCAG 2.3.1); off entirely for reduced motion. */
-const storm = { next: 3 + Math.random() * 6, at: -10, bolt: null };
+const storm = { next: 3.5, at: -10, bolt: null };
 function makeBolt() {
   const rods = bk?.night.rods, hitRod = rods && (storm.forceRod || Math.random() < .25);
   const target = hitRod ? (storm.forceRod === 'esb' ? rods.esb : storm.forceRod === 'wtc' ? rods.wtc : Math.random() < .5 ? rods.wtc : rods.esb) : null;
@@ -1457,7 +1456,7 @@ function drawSky(t) {
   kg.clearRect(0, 0, SKY_W, SKY_H);
   const day = dayAmount(t);
   if (!reduce && day === 0 && t >= storm.next) {
-    storm.at = t; storm.bolt = makeBolt(); storm.next = t + 6 + Math.random() * 14;
+    storm.at = t; storm.bolt = makeBolt(); storm.next = t + 13.5 + Math.random() * 4.5;
     if (storm.bolt.target) surgeNearest(storm.bolt.target[0], t);
   }
   const f = reduce || day > 0 ? 0 : flashLevel(t - storm.at);
@@ -2315,8 +2314,7 @@ function buildSpace() {
 
 /* sun, with the 22-minute supernova loop */
 const LOOP = 22 * 60;
-let loopStart = null;
-window.supernova = () => { loopStart = performance.now() / 1000 - (LOOP - 20); };   // preview: runs the last 20s
+window.supernova = () => { loopE = LOOP - 20; };   // preview: runs the last 20s
 function sunState(e) {
   const base = 9;
   if (e < LOOP - 75) return { r: base, core: '#fff3c4', mid: '#ffc857', edge: '#ff9a3c' };
@@ -2457,24 +2455,30 @@ function toggleMusic() {
 }
 $id('music').addEventListener('click', toggleMusic);
 
-/* Sky speed: 1x / 2x / 4x multiplies how fast the stars and planets move (the supernova clock keeps real time) */
-let skyT = 0, skyLast = null, skySpeed = 1;
-root.querySelectorAll('.warp .btn').forEach(b => b.addEventListener('click', () => {
+/* Time speed: 1x / 4x / 8x runs the sky and the supernova clock faster; Rewind runs both backwards */
+let skyT = 0, loopE = 0, skyLast = null, skySpeed = 1, skyDir = 1;
+root.querySelectorAll('.warp [data-speed]').forEach(b => b.addEventListener('click', () => {
   skySpeed = +b.dataset.speed;
-  root.querySelectorAll('.warp .btn').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
+  root.querySelectorAll('.warp [data-speed]').forEach(o => o.setAttribute('aria-pressed', String(o === b)));
 }));
+// Rewinding, the outer sets trade places so the row reads oldest -> newest; forward again puts them back.
+function orderWork() {
+  const [a, , c] = lcds, dx = c.d.offsetLeft - a.d.offsetLeft, dy = c.d.offsetTop - a.d.offsetTop, back = skyDir < 0;
+  a.d.style.translate = back ? `${dx}px ${dy}px` : ''; c.d.style.translate = back ? `${-dx}px ${-dy}px` : '';
+}
+$id('rewind').addEventListener('click', e => { skyDir = -skyDir; e.currentTarget.setAttribute('aria-pressed', String(skyDir < 0)); orderWork(); });
+on(window, 'resize', () => requestAnimationFrame(orderWork));
 
 function drawSpace(t) {
   if (!spaceStatic) return;
-  if (loopStart === null) loopStart = t;
-  let e = t - loopStart;
-  if (!reduce && e > LOOP + 8) { loopStart = t; e = 0; }
-  skyT += (skyLast === null ? 0 : Math.min(.1, t - skyLast)) * skySpeed; skyLast = t;
-  const st = skyT;
+  const dt = (skyLast === null ? 0 : Math.min(.1, t - skyLast)) * skySpeed * skyDir, SPAN = LOOP + 8; skyLast = t;
+  skyT += dt;
+  loopE = reduce ? 0 : Math.max(0, loopE + dt) % SPAN;                        // rewinding stops at 22:00 rather than falling into the last supernova
+  const st = skyT, e = loopE;
   const g = xg;
   g.drawImage(spaceStatic, 0, 0);
   // The planet turns: we stay put, the sky slides past and bends with the horizon's curve.
-  const BW = spaceBand.width, off = reduce ? 0 : (st * 3.5) % BW;
+  const BW = spaceBand.width, off = reduce ? 0 : ((st * 3.5) % BW + BW) % BW;
   const drop = x => Math.round(26 * ((x - SPW / 2) / (SPW / 2)) ** 2);
   const toView = bx => { let x = bx - off; x = ((x % BW) + BW) % BW; return x; };
   for (let x = 0; x < SPW; x++) g.drawImage(spaceBand, Math.floor((x + off) % BW), 0, 1, SPH, x, drop(x), 1, SPH);
@@ -2509,7 +2513,7 @@ function drawSpace(t) {
   const sunX = Math.round(toView(BW * .9)), sunY = Math.floor(skyY(.05) + 10) + drop(sunX);
   drawSun(g, sunX, sunY, reduce ? sunState(0) : sunState(e), t);
   // comet: its own slow pass every 80s
-  const ck = reduce ? .35 : (st % 80) / 80, cx = Math.round(-30 + (SPW + 60) * ck), cy = Math.round(skyY(.34 - ck * .18));
+  const ck = reduce ? .35 : ((st % 80 + 80) % 80) / 80, cx = Math.round(-30 + (SPW + 60) * ck), cy = Math.round(skyY(.34 - ck * .18));
   for (let i = 1; i < 24; i++) if (bayer(cx - i, cy + i * .3) < (1 - i / 24) * .9) px(g, cx - i, Math.round(cy + i * .35), i < 6 ? '#e8fbff' : '#7fd8e8');
   px(g, cx, cy, '#ffffff'); px(g, cx + 1, cy, '#ffffff'); px(g, cx, cy - 1, '#cfefff');
   drawMeteors(g, t);
@@ -2530,7 +2534,7 @@ function drawSpace(t) {
     }
   }
   const clock = $id('loopClock');
-  if (clock) { const r = Math.max(0, Math.floor(LOOP - e)); clock.textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; }
+  if (clock) { clock.style.setProperty('--loop', Math.min(1, e / LOOP).toFixed(4)); const r = Math.max(0, Math.floor(LOOP - e)); clock.textContent = `${String(Math.floor(r / 60)).padStart(2, '0')}:${String(r % 60).padStart(2, '0')}`; }
 }
 
 /* Signalscope: hovering a monitor tunes into its frequency */
